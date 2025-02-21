@@ -1,0 +1,50 @@
+[
+    { "name": "Cabernet Sauvignon", "category": "Red" },
+    { "name": "Merlot", "category": "Red" },
+    { "name": "Pinot Noir", "category": "Red" },
+    { "name": "Syrah/Shiraz", "category": "Red" },
+    { "name": "Zinfandel", "category": "Red" },
+    { "name": "Malbec", "category": "Red" },
+    { "name": "Sangiovese", "category": "Red" },
+    { "name": "Tempranillo", "category": "Red" },
+    { "name": "Grenache", "category": "Red" },
+    { "name": "Barbera", "category": "Red" },
+    { "name": "Nebbiolo", "category": "Red" },
+    { "name": "Gamay", "category": "Red" },
+    { "name": "Red Blend", "category": "Red" },
+
+    { "name": "Chardonnay", "category": "White" },
+    { "name": "Sauvignon Blanc", "category": "White" },
+    { "name": "Riesling", "category": "White" },
+    { "name": "Pinot Grigio/Pinot Gris", "category": "White" },
+    { "name": "Viognier", "category": "White" },
+    { "name": "Chenin Blanc", "category": "White" },
+    { "name": "Albariño", "category": "White" },
+    { "name": "Gewürztraminer", "category": "White" },
+    { "name": "Semillon", "category": "White" },
+    { "name": "White Blend", "category": "White" },
+
+    { "name": "Provence Rosé", "category": "Rosé" },
+    { "name": "White Zinfandel", "category": "Rosé" },
+    { "name": "Grenache Rosé", "category": "Rosé" },
+    { "name": "Pinot Noir Rosé", "category": "Rosé" },
+    { "name": "Sangiovese Rosé", "category": "Rosé" },
+
+    { "name": "Champagne", "category": "Sparkling" },
+    { "name": "Prosecco", "category": "Sparkling" },
+    { "name": "Cava", "category": "Sparkling" },
+    { "name": "Sparkling Rosé", "category": "Sparkling" },
+    { "name": "Moscato d’Asti", "category": "Sparkling" },
+    { "name": "Lambrusco", "category": "Sparkling" },
+
+    { "name": "Port", "category": "Fortified" },
+    { "name": "Sherry", "category": "Fortified" },
+    { "name": "Madeira", "category": "Fortified" },
+    { "name": "Marsala", "category": "Fortified" },
+
+    { "name": "Sauternes", "category": "Dessert" },
+    { "name": "Ice Wine", "category": "Dessert" },
+    { "name": "Tokaji", "category": "Dessert" },
+
+    { "name": "Other", "category": "Other" }
+]
