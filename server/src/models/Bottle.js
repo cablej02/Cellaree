@@ -3,11 +3,9 @@ import { Schema, model } from 'mongoose';
 const bottleSchema = new Schema(
     {
         winery: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'Winery',
             required: true,
-            unique: true,
-            trim: true,
-            lowercase: true,
             index: true,
         },
         productName: {
@@ -16,15 +14,18 @@ const bottleSchema = new Schema(
             trim: true,
             minlength: 1,
             maxlength: 100,
+            index: true,
         },
         location: {
             type: String,
             trim: true,
+            index: true,
         },
         style: {
             type: Schema.Types.ObjectId,
             ref: 'WineStyle',
             required: true,
+            index: true,
         },
     },
     { timestamps: true }
