@@ -21,8 +21,7 @@ const userBottleSchema = new Schema(
         quantity: {
             type: Number,
             required: true,
-            min: 1,
-            default: 1,
+            min: 0,
         },
         purchasePrice: {
             type: Number,
@@ -38,12 +37,12 @@ const userBottleSchema = new Schema(
             required: true,
             default: Date.now,
         },
-        status: {
-            type: String,
-            enum: ['cellar', 'drank'],
-            required: true,
-            default: 'cellar',
-        },
+        drankHistory: [
+            { 
+                date: { type: Date, required: true }, 
+                quantity: { type: Number, required: true, min: 1 } 
+            }
+        ]
     },
     { timestamps: true }
 );
