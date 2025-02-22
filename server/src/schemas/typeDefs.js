@@ -71,7 +71,7 @@ export const typeDefs = gql`
         getWinery(_id: ID!): Winery
         getWineStyles: [WineStyle]
         getWineStyle(_id: ID!): WineStyle
-        getBottles: [Bottle]
+        getBottles(page: Int, limit: Int): [Bottle]
         getBottle(_id: ID!): Bottle
         getUserBottles(userId: ID!): [UserBottle]
         getUserBottle(_id: ID!): UserBottle
