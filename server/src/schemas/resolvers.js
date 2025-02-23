@@ -16,17 +16,33 @@ const resolvers = {
             }
             throw new AuthenticationError('Not logged in');
         },
-        getWineries: async () => {
-            return Winery.find();
-        },
+        getWineries: async () => Winery.find(),
         getWinery: async (parent, { _id }) => {
-            return Winery.findById( _id );
+            try {
+                const winery = await Winery.findById( _id );
+
+                if(!winery){
+                    throw new Error('No winery found with this id!');
+                }
+
+                return winery;
+            } catch (err) {
+                throw new Error(`Error fetching Winery: ${err}`);
+            }
         },
-        getWineStyles: async () => {
-            return WineStyle.find();
-        },
+        getWineStyles: async () => WineStyle.find(),
         getWineStyle: async (parent, { _id }) => {
-            return WineStyle.findById( _id );
+            try {
+                const style = await WineStyle.findById( _id );
+
+                if (!style) {
+                    throw new Error('No style found with this id!');
+                }
+
+                return style;
+            } catch (err) {
+                throw new Error(`Error fetching WineStyle: ${err}`);
+            }
         },
         getBottles: async (parent, { page = 1, limit = 10 }) => {
             return Bottle.find()
@@ -36,7 +52,17 @@ const resolvers = {
                 .populate('style');
         },
         getBottle: async (parent, { _id }) => {
-            return Bottle.findById( _id ).populate('winery').populate('style');
+            try {
+                const bottle = await Bottle.findById( _id ).populate('winery').populate('style');
+
+                if (!bottle) {
+                    throw new Error('No bottle found with this id!');
+                }
+
+                return bottle;
+            } catch (err) {
+                throw new Error(`Error fetching bottle: ${err}`);
+            }
         },
         getUserBottles: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
@@ -44,51 +70,96 @@ const resolvers = {
             return UserBottle.find({ userId: context.user._id });
         },
         getUserBottle: async (parent, { _id }, context) => {
-            if (!context.user) throw new AuthenticationError("Not logged in");
+            try {
+                if (!context.user) throw new AuthenticationError("Not logged in");
 
-            const userBottle = await UserBottle.findById( _id );
+                const userBottle = await UserBottle.findById( _id );
 
-            if (!userBottle || userBottle.userId.toString() !== context.user._id) {
-                throw new AuthenticationError("You can't view another user's bottles!");
+                if (!userBottle || userBottle.userId.toString() !== context.user._id) {
+                    throw new AuthenticationError("You can't view another user's bottles!");
+                }
+
+                return userBottle;
+            } catch (err) {
+                throw new Error(`Error fetching user bottle: ${err}`);
             }
-
-            return userBottle;
         },
-        getReviewsForBottle: async (parent, { bottleId }) => {
-            return Review.find({ bottleId });
+        getReviewsForBottle: async (parent, { bottleId }, context) => {
+            try {
+                const reviews = await Review.find({ bottleId });
+
+                // filter for public reviews or the user's own reviews
+                return reviews.filter(review => 
+                    review.isPublic || 
+                    (context.user && review.userId.toString() === context.user._id)
+                );
+            } catch (err) {
+                throw new Error(`Error fetching reviews: ${err}`);
+            }
         },
         getReviewsByUser: async (parent, args, context) => {
             return Review.find({ userId: context.user._id });
         },
-        getReview: async (parent, { _id }) => {
-            return Review.findById( _id );
+        getReview: async (parent, { _id }, context) => {
+            try {
+                const review = await Review.findById( _id );
+
+                if (!review) {
+                    throw new Error('No review found with this id!');
+                }
+
+                if( !review.isPublic && review.userId.toString() !== context.user._id ) {
+                    throw new AuthenticationError("You can't view this review!");
+                }
+
+                return review;
+            } catch (err) {
+                throw new Error(`Error fetching review: ${err}`);
+            }
         },
     },
 
     Mutation: {
         // login via email or username
         login: async (parent, { email, password }) => {
-            const user = await User.findOne({ $or: [{ username: email }, { email: email }] });
+            try {
+                const user = await User.findOne({ $or: [{ username: email }, { email: email }] });
 
-            if (!user) {
-                throw new AuthenticationError("Can't find this user");
+                if (!user) {
+                    throw new AuthenticationError("Can't find this user");
+                }
+
+                const correctPw = await user.isCorrectPassword(password);
+
+                if (!correctPw) {
+                    throw new AuthenticationError('Wrong password!');
+                }
+
+                const token = signToken(user.username, user.email, user._id);
+                return { token, user };
+            } catch (err) {
+                throw new AuthenticationError('Error logging in');
             }
-
-            const correctPw = await user.isCorrectPassword(password);
-
-            if (!correctPw) {
-                throw new AuthenticationError('Wrong password!');
-            }
-
-            const token = signToken(user.username, user.email, user._id);
-            return { token, user };
         },
 
         addUser: async (parent, {username, email, password}) => {
-            const user = await User.create({username, email, password});
-            const token = signToken(user.username, user.email, user._id);
+            try {
+                const user = await User.create({username, email, password});
+                const token = signToken(user.username, user.email, user._id);
 
-            return { token, user };
+                return { token, user };
+            } catch (err) {
+                throw new Error(`Error creating user: ${err}`);
+            }
+        },
+        addWinery: async (parent, {name, country}) => {
+            try {
+                const winery = await Winery.create({name, country});
+
+                return winery;
+            } catch (err) {
+                throw new Error(`Error creating winery: ${err}`);
+            }
         },
     },
 };
