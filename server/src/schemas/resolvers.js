@@ -1,4 +1,3 @@
-import { get } from 'mongoose';
 import { User } from '../models/index.js';
 import { Winery } from '../models/index.js';
 import { WineStyle } from '../models/index.js';
@@ -9,10 +8,27 @@ import { Review } from '../models/index.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
 
 const resolvers = {
+    Bottle: {
+        winery: async (parent) => {
+            return await Winery.findById(parent.wineryId);
+        },
+        style: async (parent) => {
+            return await WineStyle.findById(parent.wineStyleId);
+        }
+    },
+
+    Wishlist: {
+        bottle: async (parent) => {
+            return await Bottle.findById(parent.bottleId);
+        }
+    },
+
     Query: {
         me: async (parent, args, context) => {
             if (context.user) {
-                const userData = await User.findOne({ _id: context.user._id }).select('-__v -password')
+                const userData = await User.findOne({ _id: context.user._id })
+                .select('-__v -password')
+                .populate('wishlist.bottleId');
                 return userData;
             }
             throw new AuthenticationError('Not logged in');
@@ -49,12 +65,12 @@ const resolvers = {
             return Bottle.find()
                 .skip((page - 1) * limit)
                 .limit(limit)
-                .populate('winery')
-                .populate('style');
+                .populate('wineryId')
+                .populate('wineStyleId');
         },
         getBottle: async (parent, { _id }) => {
             try {
-                const bottle = await Bottle.findById( _id ).populate('winery').populate('style');
+                const bottle = await Bottle.findById( _id ).populate('wineryId').populate('wineStyleId');
 
                 if (!bottle) {
                     throw new Error('No bottle found with this id!');
@@ -180,14 +196,18 @@ const resolvers = {
                 throw new Error(`Error creating user: ${err}`);
             }
         },
-        addWinery: async (parent, args) => {
+        addWinery: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Must be logged in to add a Winery!");
+
             try {
                 return Winery.create(args);
             } catch (err) {
                 throw new Error(`Error creating winery: ${err}`);
             }
         },
-        addBottle: async (parent, args) => {
+        addBottle: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Must be logged in to add a bottle!");
+
             try {
                 return Bottle.create(args);
             } catch (err) {

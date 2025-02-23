@@ -6,11 +6,10 @@ export const typeDefs = gql`
         username: String
         email: String
         wishlist: [Wishlist]
-        userBottles: [UserBottle]
     }
 
     type Wishlist {
-        bottleId: Bottle
+        bottle: Bottle
         vintage: Int
         notes: String
     }
@@ -94,7 +93,7 @@ export const typeDefs = gql`
         login(email: String!, password: String!): Auth
         addUser(username: String!, email: String!, password: String!): Auth
         addWinery(name: String!, country: [String]!): Winery
-        addBottle(winery: ID!, productName: String!, location: String, style: ID!): Bottle
+        addBottle(wineryId: ID!, productName: String!, location: String, wineStyleId: ID!): Bottle
         addUserBottle(bottleId: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): UserBottle
         addDrankBottle(bottleId: ID!, vintage: Int, drankDate: String!, quantity: Int!): DrankBottle
         addBottleToWishlist(bottleId: ID!, vintage: Int, notes: String): User
