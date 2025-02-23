@@ -1,6 +1,6 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-const userBottleSchema = new Schema(
+const drankBottleSchema = new Schema(
     {
         userId: {
             type: Schema.Types.ObjectId,
@@ -12,6 +12,7 @@ const userBottleSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Bottle',
             required: true,
+            index: true,
         },
         vintage: {
             type: Number,
@@ -21,18 +22,9 @@ const userBottleSchema = new Schema(
         quantity: {
             type: Number,
             required: true,
-            min: 0,
+            min: 1,
         },
-        purchasePrice: {
-            type: Number,
-            min: 0,
-        },
-        currentValue: {
-            type: Number,
-            min: 0,
-            default: function () { return this.purchasePrice; },
-        },
-        purchaseDate: {
+        drankDate: {
             type: Date,
             required: true,
             default: Date.now,
@@ -41,5 +33,8 @@ const userBottleSchema = new Schema(
     { timestamps: true }
 );
 
-const UserBottle = model('UserBottle', userBottleSchema);
-export default UserBottle;
+// compound index to increase query performance
+drankBottleSchema.index({ userId: 1, bottleId: 1});
+
+const DrankBottle = model('DrankBottle', drankBottleSchema);
+export default DrankBottle;

@@ -42,12 +42,15 @@ export const typeDefs = gql`
         purchasePrice: Float
         currentValue: Float
         purchaseDate: String
-        drankHistory: [DrankHistory]
     }
 
-    type DrankHistory {
-        date: Date
+    type DrankBottle {
+        _id: ID
+        userId: User
+        bottleId: Bottle
+        vintage: Int
         quantity: Int
+        drankDate: String
     }
 
     type Review {
@@ -61,7 +64,7 @@ export const typeDefs = gql`
     }
 
     type BottleReviews {
-        averageRating: Float
+        avgRating: Float
         reviews: [Review]
     }
 
@@ -80,6 +83,8 @@ export const typeDefs = gql`
         getBottle(_id: ID!): Bottle
         getUserBottles(userId: ID!): [UserBottle]
         getUserBottle(_id: ID!): UserBottle
+        getDrankBottles(userId: ID!): [DrankBottle]
+        getDrankBottle(_id: ID!): DrankBottle
         getReviewsForBottle(bottleId: ID!): BottleReviews
         getReviewsByUser(userId: ID!): [Review]
         getReview(_id: ID!): Review
@@ -90,8 +95,8 @@ export const typeDefs = gql`
         addUser(username: String!, email: String!, password: String!): Auth
         addWinery(name: String!, country: [String]!): Winery
         addBottle(winery: ID!, productName: String!, location: String, style: ID!): Bottle
-        addUserBottleToCellar(bottleId: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): UserBottle
-        addBottleToDrankHistory(userBottleId: ID!, date: Date!, quantity: Int!): UserBottle
+        addUserBottle(bottleId: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): UserBottle
+        addDrankBottle(bottleId: ID!, vintage: Int, drankDate: String!, quantity: Int!): DrankBottle
         addBottleToWishlist(bottleId: ID!, vintage: Int, notes: String): User
         addReview(bottleId: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
     }

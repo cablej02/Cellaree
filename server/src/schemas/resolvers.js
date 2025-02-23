@@ -4,6 +4,7 @@ import { Winery } from '../models/index.js';
 import { WineStyle } from '../models/index.js';
 import { Bottle } from '../models/index.js';
 import { UserBottle } from '../models/index.js';
+import { DrankBottle } from '../models/index.js';
 import { Review } from '../models/index.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
 
@@ -84,13 +85,33 @@ const resolvers = {
                 throw new Error(`Error fetching user bottle: ${err}`);
             }
         },
+        getDrankBottles: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            return DrankBottle.find({ userId: context.user._id });
+        },
+        getDrankBottle: async (parent, { _id }, context) => {
+            try {
+                if (!context.user) throw new AuthenticationError("Not logged in");
+
+                const drankBottle = await DrankBottle.findById( _id );
+
+                if (!drankBottle || drankBottle.userId.toString() !== context.user._id) {
+                    throw new AuthenticationError("You can't view another user's drank bottles!");
+                }
+
+                return drankBottle;
+            } catch (err) {
+                throw new Error(`Error fetching drank bottle: ${err}`);
+            }
+        },
         getReviewsForBottle: async (parent, { bottleId }, context) => {
             try {
                 const reviews = await Review.find({ bottleId });
 
                 // calculate average rating
                 const reviewCount = reviews.length;
-                const totalScore = reviews.reduce((sum, review) => acc + review.rating, 0);
+                const totalScore = reviews.reduce((sum, review) => sum + review.rating, 0);
                 const avgRating = reviewCount > 0 ? totalScore / reviewCount : 0;
 
                 // filter for public reviews or the user's own reviews
@@ -173,7 +194,7 @@ const resolvers = {
                 throw new Error(`Error creating bottle: ${err}`);
             }
         },
-        addUserBottleToCellar: async (parent, args, context) => {
+        addUserBottle: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
@@ -182,18 +203,11 @@ const resolvers = {
                 throw new Error(`Error adding bottle to cellar: ${err}`);
             }
         },
-        addBottleToDrankHistory: async (parent, { _id, date, quantity }, context) => {
+        addDrankBottle: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                const userBottle = await UserBottle.findById( _id );
-
-                if (!userBottle || userBottle.userId.toString() !== context.user._id) {
-                    throw new AuthenticationError("You can't add to another user's bottles!");
-                }
-
-                userBottle.drankHistory.push({ date, quantity });
-                return userBottle.save();
+                return DrankBottle.create({ ...args, userId: context.user._id });
             } catch (err) {
                 throw new Error(`Error adding to drank history: ${err}`);
             }
