@@ -1,13 +1,7 @@
-import {Schema, model} from 'mongoose';
+import {Schema} from 'mongoose';
 
-const userBottleSchema = new Schema(
+const cellarBottleSchema = new Schema(
     {
-        userId: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: true,
-            index: true,
-        },
         bottleId: {
             type: Schema.Types.ObjectId,
             ref: 'Bottle',
@@ -21,11 +15,13 @@ const userBottleSchema = new Schema(
         quantity: {
             type: Number,
             required: true,
-            min: 0,
+            min: 1,
+            default: 1,
         },
         purchasePrice: {
             type: Number,
             min: 0,
+            default: 0,
         },
         currentValue: {
             type: Number,
@@ -37,9 +33,7 @@ const userBottleSchema = new Schema(
             required: true,
             default: Date.now,
         }
-    },
-    { timestamps: true }
+    }
 );
 
-const UserBottle = model('UserBottle', userBottleSchema);
-export default UserBottle;
+export default cellarBottleSchema;

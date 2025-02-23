@@ -34,8 +34,8 @@ export const typeDefs = gql`
 
     type UserBottle {
         _id: ID
-        userId: User
-        bottleId: Bottle
+        userId: ID
+        bottle: Bottle
         vintage: Int
         quantity: Int
         purchasePrice: Float
@@ -80,7 +80,7 @@ export const typeDefs = gql`
         getWineStyle(_id: ID!): WineStyle
         getBottles(page: Int, limit: Int): [Bottle]
         getBottle(_id: ID!): Bottle
-        getUserBottles(userId: ID!): [UserBottle]
+        getUserBottles: [UserBottle]
         getUserBottle(_id: ID!): UserBottle
         getDrankBottles(userId: ID!): [DrankBottle]
         getDrankBottle(_id: ID!): DrankBottle

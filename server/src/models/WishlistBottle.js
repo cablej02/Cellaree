@@ -1,6 +1,6 @@
-import { Schema } from 'mongoose';
+import {Schema } from 'mongoose';
 
-const drankBottleSchema = new Schema(
+const wishlistBottleSchema = new Schema(
     {
         bottleId: {
             type: Schema.Types.ObjectId,
@@ -12,18 +12,17 @@ const drankBottleSchema = new Schema(
             min: 1800,
             max: new Date().getFullYear() + 1,
         },
-        quantity: {
-            type: Number,
-            required: true,
-            min: 1,
-            default: 1,
+        notes: {
+            type: String,
+            trim: true,
+            maxlength: 500,
+            default: '',
         },
-        drankDate: {
+        addedDate: {
             type: Date,
-            required: true,
             default: Date.now,
         }
     }
 );
 
-export default drankBottleSchema;
+export default wishlistBottleSchema;

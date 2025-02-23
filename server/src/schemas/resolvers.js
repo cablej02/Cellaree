@@ -23,6 +23,12 @@ const resolvers = {
         }
     },
 
+    UserBottle: {
+        bottle: async (parent) => {
+            return await Bottle.findById(parent.bottleId);
+        }
+    },
+
     Query: {
         me: async (parent, args, context) => {
             if (context.user) {
@@ -84,7 +90,7 @@ const resolvers = {
         getUserBottles: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
-            return UserBottle.find({ userId: context.user._id });
+            return UserBottle.find({ userId: context.user._id }).populate('bottleId');
         },
         getUserBottle: async (parent, { _id }, context) => {
             try {

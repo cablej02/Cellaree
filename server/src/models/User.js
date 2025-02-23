@@ -1,6 +1,10 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 
+import cellarBottleSchema from './CellarBottle.js';
+import drankBottleSchema from './DrankBottle.js';
+import wishlistBottleSchema from './WishlistBottle.js';
+
 const userSchema = new Schema(
     {
         username: {
@@ -16,32 +20,16 @@ const userSchema = new Schema(
             unique: true,
             lowercase: true,
             trim: true,
-            match: [/.+@.+\..+/, 'Please enter a valid email address'],
+            match: [/.+@.+\..+/, 'Invalid email format. Please enter a valid email.'],
             index: true,
         },
         password: {
             type: String,
             required: true,
         },
-        wishlist: [
-            {
-                bottleId: {
-                    type: Schema.Types.ObjectId,
-                    ref: 'Bottle',
-                    required: true,
-                },
-                vintage: {
-                    type: Number,
-                    min: 1800,
-                    max: new Date().getFullYear() + 1,
-                },
-                notes: {
-                    type: String,
-                    trim: true,
-                    maxlength: 500,
-                }
-            },
-        ],
+        cellar: { type: [cellarBottleSchema], default: [] },
+        drankHistory: {type: [drankBottleSchema], default: [] },
+        wishlist: { type: [wishlistBottleSchema], default: [] },
     },
     { timestamps: true }
 );
