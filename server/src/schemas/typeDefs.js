@@ -60,6 +60,11 @@ export const typeDefs = gql`
         isPublic: Boolean
     }
 
+    type BottleReviews {
+        averageRating: Float
+        reviews: [Review]
+    }
+
     type Auth {
         token: ID!
         user: User
@@ -75,7 +80,7 @@ export const typeDefs = gql`
         getBottle(_id: ID!): Bottle
         getUserBottles(userId: ID!): [UserBottle]
         getUserBottle(_id: ID!): UserBottle
-        getReviewsForBottle(bottleId: ID!): [Review]
+        getReviewsForBottle(bottleId: ID!): BottleReviews
         getReviewsByUser(userId: ID!): [Review]
         getReview(_id: ID!): Review
     }

@@ -88,11 +88,18 @@ const resolvers = {
             try {
                 const reviews = await Review.find({ bottleId });
 
+                // calculate average rating
+                const reviewCount = reviews.length;
+                const totalScore = reviews.reduce((sum, review) => acc + review.rating, 0);
+                const avgRating = reviewCount > 0 ? totalScore / reviewCount : 0;
+
                 // filter for public reviews or the user's own reviews
-                return reviews.filter(review => 
+                const visibleReviews = reviews.filter(review => 
                     review.isPublic || 
                     (context.user && review.userId.toString() === context.user._id)
                 );
+
+                return { avgRating, reviews: visibleReviews };
             } catch (err) {
                 throw new Error(`Error fetching reviews: ${err}`);
             }
@@ -152,13 +159,18 @@ const resolvers = {
                 throw new Error(`Error creating user: ${err}`);
             }
         },
-        addWinery: async (parent, {name, country}) => {
+        addWinery: async (parent, args) => {
             try {
-                const winery = await Winery.create({name, country});
-
-                return winery;
+                return Winery.create(args);
             } catch (err) {
                 throw new Error(`Error creating winery: ${err}`);
+            }
+        },
+        addBottle: async (parent, args) => {
+            try {
+                return Bottle.create(args);
+            } catch (err) {
+                throw new Error(`Error creating bottle: ${err}`);
             }
         },
     },
