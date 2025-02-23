@@ -173,6 +173,31 @@ const resolvers = {
                 throw new Error(`Error creating bottle: ${err}`);
             }
         },
+        addUserBottleToCellar: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                return UserBottle.create({ ...args, userId: context.user._id });
+            } catch (err) {
+                throw new Error(`Error adding bottle to cellar: ${err}`);
+            }
+        },
+        addBottleToDrankHistory: async (parent, { _id, date, quantity }, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const userBottle = await UserBottle.findById( _id );
+
+                if (!userBottle || userBottle.userId.toString() !== context.user._id) {
+                    throw new AuthenticationError("You can't add to another user's bottles!");
+                }
+
+                userBottle.drankHistory.push({ date, quantity });
+                return userBottle.save();
+            } catch (err) {
+                throw new Error(`Error adding to drank history: ${err}`);
+            }
+        }
     },
 };
 
