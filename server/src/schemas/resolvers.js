@@ -211,6 +211,40 @@ const resolvers = {
             } catch (err) {
                 throw new Error(`Error adding to drank history: ${err}`);
             }
+        },
+        addBottleToWishlist: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const user = await User.findById(context.user._id);
+
+                // check if bottle is already in wishlist
+                const alreadyExists = user.wishlist.some(
+                    obj => obj.bottleId.toString() === args.bottleId &&
+                    obj.vintage === args.vintage
+                );
+
+                if (alreadyExists) {
+                    throw new Error('This bottle is already in your wishlist!');
+                }
+
+                // add bottle to wishlist
+                user.wishlist.push(args);
+
+                // update db and return updated user
+                return user.save();
+            } catch (err) {
+                throw new Error(`Error adding to wishlist: ${err}`);
+            }
+        },
+        addReview: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                return Review.create({ ...args, userId: context.user._id });
+            } catch (err) {
+                throw new Error(`Error adding review: ${err}`);
+            }
         }
     },
 };
