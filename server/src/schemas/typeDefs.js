@@ -13,7 +13,6 @@ export const typeDefs = gql`
     type WishlistBottle {
         _id: ID
         bottleId: Bottle
-        vintage: Int
         notes: String
         addedDate: String
     }
@@ -100,7 +99,10 @@ export const typeDefs = gql`
         addBottle(wineryId: ID!, productName: String!, location: String, wineStyleId: ID!): Bottle
         addCellarBottle(bottleId: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): CellarBottle
         addDrankBottle(bottleId: ID!, vintage: Int, drankDate: String, quantity: Int!): DrankBottle
-        addWishlistBottle(bottleId: ID!, vintage: Int, notes: String): WishlistBottle
+
+        addWishlistBottle(bottleId: ID!): WishlistBottle
+        updateWishlistBottle(bottleId: ID!, notes: String!): WishlistBottle
+
         addReview(bottleId: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
     }
 `;

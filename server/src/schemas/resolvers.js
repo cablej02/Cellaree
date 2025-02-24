@@ -244,21 +244,36 @@ const resolvers = {
                 const user = await User.findById(context.user._id);
 
                 // check if bottle is already in wishlist
-                const exists = user.wishlist.some(
-                    obj => obj.bottleId.toString() === args.bottleId &&
-                    obj.vintage === args.vintage
-                );
+                const exists = user.wishlist.some(obj => obj.bottleId.toString() === args.bottleId);
 
                 if ( exists ) {
                     throw new Error('This bottle is already in your wishlist!');
                 }
 
-                
                 user.wishlist.push(args); // add bottle to wishlist
                 await user.save(); // update db
                 return user.wishlist[user.wishlist.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding to wishlist: ${err}`);
+            }
+        },
+        updateWishlistBottle: async (parent, { bottleId, notes }, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const user = await User.findById(context.user._id);
+
+                const wishlistEntry = user.wishlist.find(bottle => bottle.bottleId.toString() === bottleId);
+
+                if (!wishlistEntry) {
+                    throw new Error('No bottle found in wishlist with this id!');
+                }
+
+                wishlistEntry.notes = notes;
+                await user.save();
+                return wishlistEntry;
+            } catch (err) {
+                throw new Error(`Error updating wishlist notes: ${err}`);
             }
         },
         addReview: async (parent, args, context) => {

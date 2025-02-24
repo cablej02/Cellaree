@@ -7,11 +7,6 @@ const wishlistBottleSchema = new Schema(
             ref: 'Bottle',
             required: true,
         },
-        vintage: {
-            type: Number,
-            min: 1800,
-            max: new Date().getFullYear() + 1,
-        },
         notes: {
             type: String,
             trim: true,
