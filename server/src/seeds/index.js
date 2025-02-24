@@ -1,5 +1,5 @@
 import db from "../config/connection.js";
-import { User, Bottle, Winery, WineStyle, UserBottle, DrankBottle, Review } from "../models/index.js";
+import { User, Bottle, Winery, WineStyle, Review } from "../models/index.js";
 
 // import seed data
 import wineStyleData from './wineStyleData.json' assert { type: "json" };
@@ -16,8 +16,6 @@ const seed = async () => {
             WineStyle.deleteMany({}),
             Bottle.deleteMany({}),
             User.deleteMany({}),
-            UserBottle.deleteMany({}),
-            DrankBottle.deleteMany({}),
             Review.deleteMany({})
         ])
         console.log("Deleted all documents from collections");

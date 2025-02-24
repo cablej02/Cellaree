@@ -5,23 +5,31 @@ import { Bottle } from '../models/index.js';
 import { Review } from '../models/index.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
 
+// helper function to normalize date to just the date (no time)
+const normalizeDate = date => {
+    const d = new Date(date);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+
 const resolvers = {
-    Bottle: {
-        winery: async (parent) => Winery.findById(parent.wineryId),
-        style: async (parent) => WineStyle.findById(parent.wineStyleId)
-    },
-
-    // Wishlist: {
-    //     bottle: async (parent) => {
-    //         return await Bottle.findById(parent.bottleId);
-    //     }
-    // },
-
     Query: {
         me: async (parent, args, context) => {
             if (context.user) {
                 const userData = await User.findOne({ _id: context.user._id })
                     .select('-__v -password')
+                    .populate({
+                        path: 'cellar.bottleId',
+                        populate: 'wineryId wineStyleId' // populate paths for nested objects
+                    })
+                    .populate({
+                        path: 'drankHistory.bottleId',
+                        populate: 'wineryId wineStyleId' // populate paths for nested objects
+                    })
+                    .populate({
+                        path: 'wishlist.bottleId',
+                        populate: 'wineryId wineStyleId' // populate paths for nested objects
+                    })
+
                 return userData;
             }
             throw new AuthenticationError('Not logged in');
@@ -93,7 +101,7 @@ const resolvers = {
                 throw new Error(`Error fetching reviews for bottle: ${err}`);
             }
         },
-        getReviewsByUser: async (parent, args, context) => {
+        getReviews: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError('Not logged in');
             try {
                 return Review.find({ userId: context.user._id });
@@ -177,21 +185,24 @@ const resolvers = {
             try {
                 const user = await User.findById(context.user._id);
 
-                // Find an existing entry with same bottleId, vintage, and purchaseDate
+                // if purchaseDate is not provided, set it to today
+                const purchaseDate = args.purchaseDate ? new Date(args.purchaseDate) : new Date();
+
+                // Find an existing entry with same bottleId, vintage, purchasePrice and purchaseDate
                 const existingEntry = user.cellar.find(
                     obj => obj.bottleId.toString() === args.bottleId &&
                     obj.vintage === args.vintage &&
-                    new Date(obj.purchaseDate).toDateString() === new Date(args.purchaseDate).toDateString()
+                    obj.purchasePrice === args.purchasePrice &&
+                    normalizeDate(obj.purchaseDate) === normalizeDate(purchaseDate)
                 );
 
-                if (exists) {
+                if (existingEntry) {
                     existingEntry.quantity += args.quantity; // increment quantity
                     await user.save(); // update db
                     return existingEntry; // return the updated entry
                 }
 
-                
-                user.cellar.push(args); // add bottle to cellar
+                user.cellar.push({ ...args, purchaseDate }); // add bottle to cellar
                 await user.save(); // update db
                 return user.cellar[user.cellar.length - 1]; // return the last item
             } catch (err) {
@@ -204,11 +215,13 @@ const resolvers = {
             try {
                 const user = await User.findById(context.user._id);
 
+                const drankDate = args.drankDate ? new Date(args.drankDate) : new Date(); 
+
                 // Find an existing entry with same bottleId, vintage, and drankDate
-                const existingEntry = user.cellar.find(
+                const existingEntry = user.drankHistory.find(
                     obj => obj.bottleId.toString() === args.bottleId &&
                     obj.vintage === args.vintage &&
-                    new Date(obj.drankDate).toDateString() === new Date(args.drankDate).toDateString()
+                    normalizeDate(obj.drankDate) === normalizeDate(drankDate)
                 );
 
                 if( existingEntry ) {
@@ -217,9 +230,9 @@ const resolvers = {
                     return existingEntry; // return the updated entry
                 }
 
-                user.drank.push(args); // add new entry to drank history
+                user.drankHistory.push({ ...args, drankDate }); // add new entry to drank history
                 await user.save(); // update db
-                return user.drank[user.drank.length - 1]; // return the last item
+                return user.drankHistory[user.drankHistory.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding to drank history: ${err}`);
             }
