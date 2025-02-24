@@ -5,13 +5,17 @@ export const typeDefs = gql`
         _id: ID
         username: String
         email: String
-        wishlist: [Wishlist]
+        cellar: [CellarBottle]
+        drankHistory: [DrankBottle]
+        wishlist: [WishlistBottle]
     }
 
-    type Wishlist {
+    type WishlistBottle {
+        _id: ID
         bottle: Bottle
         vintage: Int
         notes: String
+        addedDate: String
     }
 
     type Bottle {
@@ -32,9 +36,8 @@ export const typeDefs = gql`
         name: String
     }
 
-    type UserBottle {
+    type CellarBottle {
         _id: ID
-        userId: ID
         bottle: Bottle
         vintage: Int
         quantity: Int
@@ -45,8 +48,7 @@ export const typeDefs = gql`
 
     type DrankBottle {
         _id: ID
-        userId: User
-        bottleId: Bottle
+        bottle: Bottle
         vintage: Int
         quantity: Int
         drankDate: String
@@ -54,16 +56,22 @@ export const typeDefs = gql`
 
     type Review {
         _id: ID
-        userId: User
-        bottleId: Bottle
+        user: ReviewUser
+        bottle: Bottle
         vintage: Int
         rating: Float
         content: String
         isPublic: Boolean
     }
 
+    type ReviewUser {
+        _id: ID
+        username: String
+    }
+
     type BottleReviews {
         avgRating: Float
+        ratingsCount: Int
         reviews: [Review]
     }
 
@@ -80,12 +88,8 @@ export const typeDefs = gql`
         getWineStyle(_id: ID!): WineStyle
         getBottles(page: Int, limit: Int): [Bottle]
         getBottle(_id: ID!): Bottle
-        getUserBottles: [UserBottle]
-        getUserBottle(_id: ID!): UserBottle
-        getDrankBottles(userId: ID!): [DrankBottle]
-        getDrankBottle(_id: ID!): DrankBottle
         getReviewsForBottle(bottleId: ID!): BottleReviews
-        getReviewsByUser(userId: ID!): [Review]
+        getReviews: [Review]
         getReview(_id: ID!): Review
     }
 
@@ -94,9 +98,9 @@ export const typeDefs = gql`
         addUser(username: String!, email: String!, password: String!): Auth
         addWinery(name: String!, country: [String]!): Winery
         addBottle(wineryId: ID!, productName: String!, location: String, wineStyleId: ID!): Bottle
-        addUserBottle(bottleId: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): UserBottle
+        addCellarBottle(bottleId: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): CellarBottle
         addDrankBottle(bottleId: ID!, vintage: Int, drankDate: String!, quantity: Int!): DrankBottle
-        addBottleToWishlist(bottleId: ID!, vintage: Int, notes: String): User
+        addWishlistBottle(bottleId: ID!, vintage: Int, notes: String): WishlistBottle
         addReview(bottleId: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
     }
 `;

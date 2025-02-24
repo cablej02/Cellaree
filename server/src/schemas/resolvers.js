@@ -2,66 +2,45 @@ import { User } from '../models/index.js';
 import { Winery } from '../models/index.js';
 import { WineStyle } from '../models/index.js';
 import { Bottle } from '../models/index.js';
-import { UserBottle } from '../models/index.js';
-import { DrankBottle } from '../models/index.js';
 import { Review } from '../models/index.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
 
 const resolvers = {
     Bottle: {
-        winery: async (parent) => {
-            return await Winery.findById(parent.wineryId);
-        },
-        style: async (parent) => {
-            return await WineStyle.findById(parent.wineStyleId);
-        }
+        winery: async (parent) => Winery.findById(parent.wineryId),
+        style: async (parent) => WineStyle.findById(parent.wineStyleId)
     },
 
-    Wishlist: {
-        bottle: async (parent) => {
-            return await Bottle.findById(parent.bottleId);
-        }
-    },
-
-    UserBottle: {
-        bottle: async (parent) => {
-            return await Bottle.findById(parent.bottleId);
-        }
-    },
+    // Wishlist: {
+    //     bottle: async (parent) => {
+    //         return await Bottle.findById(parent.bottleId);
+    //     }
+    // },
 
     Query: {
         me: async (parent, args, context) => {
             if (context.user) {
                 const userData = await User.findOne({ _id: context.user._id })
-                .select('-__v -password')
-                .populate('wishlist.bottleId');
+                    .select('-__v -password')
                 return userData;
             }
             throw new AuthenticationError('Not logged in');
         },
-        getWineries: async () => Winery.find(),
+        getWineries: async () => Winery.find().lean(),
         getWinery: async (parent, { _id }) => {
             try {
                 const winery = await Winery.findById( _id );
-
-                if(!winery){
-                    throw new Error('No winery found with this id!');
-                }
-
+                if(!winery) throw new Error('No winery found with this id!');
                 return winery;
             } catch (err) {
                 throw new Error(`Error fetching Winery: ${err}`);
             }
         },
-        getWineStyles: async () => WineStyle.find(),
+        getWineStyles: async () => WineStyle.find().lean(),
         getWineStyle: async (parent, { _id }) => {
             try {
                 const style = await WineStyle.findById( _id );
-
-                if (!style) {
-                    throw new Error('No style found with this id!');
-                }
-
+                if (!style) throw new Error('No style found with this id!');
                 return style;
             } catch (err) {
                 throw new Error(`Error fetching WineStyle: ${err}`);
@@ -72,69 +51,36 @@ const resolvers = {
                 .skip((page - 1) * limit)
                 .limit(limit)
                 .populate('wineryId')
-                .populate('wineStyleId');
+                .populate('wineStyleId')
+                .lean(); // return as plain JS object
         },
         getBottle: async (parent, { _id }) => {
             try {
-                const bottle = await Bottle.findById( _id ).populate('wineryId').populate('wineStyleId');
+                const bottle = await Bottle.findById( _id )
+                    .populate('wineryId')
+                    .populate('wineStyleId')
+                    .lean();
 
-                if (!bottle) {
-                    throw new Error('No bottle found with this id!');
-                }
-
+                if (!bottle) throw new Error('No bottle found with this id!');
                 return bottle;
             } catch (err) {
                 throw new Error(`Error fetching bottle: ${err}`);
-            }
-        },
-        getUserBottles: async (parent, args, context) => {
-            if (!context.user) throw new AuthenticationError("Not logged in");
-
-            return UserBottle.find({ userId: context.user._id }).populate('bottleId');
-        },
-        getUserBottle: async (parent, { _id }, context) => {
-            try {
-                if (!context.user) throw new AuthenticationError("Not logged in");
-
-                const userBottle = await UserBottle.findById( _id );
-
-                if (!userBottle || userBottle.userId.toString() !== context.user._id) {
-                    throw new AuthenticationError("You can't view another user's bottles!");
-                }
-
-                return userBottle;
-            } catch (err) {
-                throw new Error(`Error fetching user bottle: ${err}`);
-            }
-        },
-        getDrankBottles: async (parent, args, context) => {
-            if (!context.user) throw new AuthenticationError("Not logged in");
-
-            return DrankBottle.find({ userId: context.user._id });
-        },
-        getDrankBottle: async (parent, { _id }, context) => {
-            try {
-                if (!context.user) throw new AuthenticationError("Not logged in");
-
-                const drankBottle = await DrankBottle.findById( _id );
-
-                if (!drankBottle || drankBottle.userId.toString() !== context.user._id) {
-                    throw new AuthenticationError("You can't view another user's drank bottles!");
-                }
-
-                return drankBottle;
-            } catch (err) {
-                throw new Error(`Error fetching drank bottle: ${err}`);
             }
         },
         getReviewsForBottle: async (parent, { bottleId }, context) => {
             try {
                 const reviews = await Review.find({ bottleId });
 
+                // if no reviews, return null for avgRating
+                if (!reviews.length) {
+                    return { avgRating: null, ratingsCount: 0, reviews: [] };
+                }
+
                 // calculate average rating
-                const reviewCount = reviews.length;
+                const ratingsCount = reviews.length;
                 const totalScore = reviews.reduce((sum, review) => sum + review.rating, 0);
-                const avgRating = reviewCount > 0 ? totalScore / reviewCount : 0;
+                const avgRating =  totalScore / ratingsCount;
+                
 
                 // filter for public reviews or the user's own reviews
                 const visibleReviews = reviews.filter(review => 
@@ -142,13 +88,18 @@ const resolvers = {
                     (context.user && review.userId.toString() === context.user._id)
                 );
 
-                return { avgRating, reviews: visibleReviews };
+                return { avgRating, ratingsCount, reviews: visibleReviews };
             } catch (err) {
-                throw new Error(`Error fetching reviews: ${err}`);
+                throw new Error(`Error fetching reviews for bottle: ${err}`);
             }
         },
         getReviewsByUser: async (parent, args, context) => {
-            return Review.find({ userId: context.user._id });
+            if (!context.user) throw new AuthenticationError('Not logged in');
+            try {
+                return Review.find({ userId: context.user._id });
+            } catch (err) {
+                throw new Error(`Error fetching reviews for user: ${err}`);
+            }
         },
         getReview: async (parent, { _id }, context) => {
             try {
@@ -158,7 +109,7 @@ const resolvers = {
                     throw new Error('No review found with this id!');
                 }
 
-                if( !review.isPublic && review.userId.toString() !== context.user._id ) {
+                if( !review.isPublic && (!context.user || review.userId.toString() !== context.user._id )) {
                     throw new AuthenticationError("You can't view this review!");
                 }
 
@@ -220,11 +171,29 @@ const resolvers = {
                 throw new Error(`Error creating bottle: ${err}`);
             }
         },
-        addUserBottle: async (parent, args, context) => {
+        addCellarBottle: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                return UserBottle.create({ ...args, userId: context.user._id });
+                const user = await User.findById(context.user._id);
+
+                // Find an existing entry with same bottleId, vintage, and purchaseDate
+                const existingEntry = user.cellar.find(
+                    obj => obj.bottleId.toString() === args.bottleId &&
+                    obj.vintage === args.vintage &&
+                    new Date(obj.purchaseDate).toDateString() === new Date(args.purchaseDate).toDateString()
+                );
+
+                if (exists) {
+                    existingEntry.quantity += args.quantity; // increment quantity
+                    await user.save(); // update db
+                    return existingEntry; // return the updated entry
+                }
+
+                
+                user.cellar.push(args); // add bottle to cellar
+                await user.save(); // update db
+                return user.cellar[user.cellar.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding bottle to cellar: ${err}`);
             }
@@ -233,32 +202,48 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                return DrankBottle.create({ ...args, userId: context.user._id });
+                const user = await User.findById(context.user._id);
+
+                // Find an existing entry with same bottleId, vintage, and drankDate
+                const existingEntry = user.cellar.find(
+                    obj => obj.bottleId.toString() === args.bottleId &&
+                    obj.vintage === args.vintage &&
+                    new Date(obj.drankDate).toDateString() === new Date(args.drankDate).toDateString()
+                );
+
+                if( existingEntry ) {
+                    existingEntry.quantity += args.quantity; // increment quantity drank
+                    await user.save(); // update db
+                    return existingEntry; // return the updated entry
+                }
+
+                user.drank.push(args); // add new entry to drank history
+                await user.save(); // update db
+                return user.drank[user.drank.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding to drank history: ${err}`);
             }
         },
-        addBottleToWishlist: async (parent, args, context) => {
+        addWishlistBottle: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
                 const user = await User.findById(context.user._id);
 
                 // check if bottle is already in wishlist
-                const alreadyExists = user.wishlist.some(
+                const exists = user.wishlist.some(
                     obj => obj.bottleId.toString() === args.bottleId &&
                     obj.vintage === args.vintage
                 );
 
-                if (alreadyExists) {
+                if ( exists ) {
                     throw new Error('This bottle is already in your wishlist!');
                 }
 
-                // add bottle to wishlist
-                user.wishlist.push(args);
-
-                // update db and return updated user
-                return user.save();
+                
+                user.wishlist.push(args); // add bottle to wishlist
+                await user.save(); // update db
+                return user.wishlist[user.wishlist.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding to wishlist: ${err}`);
             }
@@ -267,7 +252,7 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                return Review.create({ ...args, userId: context.user._id });
+                return await Review.create({ ...args, userId: context.user._id });
             } catch (err) {
                 throw new Error(`Error adding review: ${err}`);
             }
