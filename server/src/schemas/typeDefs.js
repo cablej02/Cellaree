@@ -106,6 +106,9 @@ export const typeDefs = gql`
         updateBottle(_id: ID!, winery: ID, productName: String, location: String, wineStyle: ID): Bottle
 
         addCellarBottle(bottle: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): CellarBottle
+        updateCellarBottle(_id: ID!, vintage: Int, quantity: Int, purchasePrice: Float, currentValue: Float, purchaseDate: String): CellarBottle
+        removeCellarBottle(_id: ID!): CellarBottle
+
         addDrankBottle(bottle: ID!, vintage: Int, drankDate: String, quantity: Int!): DrankBottle
 
         addWishlistBottle(bottle: ID!): WishlistBottle

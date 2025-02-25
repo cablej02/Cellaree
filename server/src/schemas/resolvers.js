@@ -314,6 +314,63 @@ const resolvers = {
                 throw new Error(`Error adding bottle to cellar: ${err}`);
             }
         },
+        updateCellarBottle: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const updatedFields = {};
+                if (args.vintage) updatedFields.vintage = args.vintage;
+                if (args.quantity) updatedFields.quantity = args.quantity;
+                if (args.purchasePrice) updatedFields.purchasePrice = args.purchasePrice;
+                if (args.currentValue) updatedFields.currentValue = args.currentValue;
+                if (args.purchaseDate) updatedFields.purchaseDate = args.purchaseDate;
+
+                if (!Object.keys(updatedFields).length) throw new Error('No fields to update!');
+
+                // build $set object by looping over updatedFields and setting the values to the correct path for the subdocument
+                const setObj = {};
+                for (const [key, value] of Object.entries(updatedFields)) {
+                    setObj[`cellar.$.${key}`] = value
+                }
+
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id, 'cellar._id': args._id }, // find the user and the cellar subdocument by _id
+                    { $set: setObj },
+                    { new: true, runValidators: true }
+                );
+                
+                if (!updatedUser) throw new Error('No cellar bottle found with this id!');
+
+                // return the updated cellar entry
+                return updatedUser.cellar.find(obj => obj._id.toString() === args._id);
+            } catch (err) {
+                throw new Error(`Error updating cellar bottle: ${err}`);
+            }
+        },
+        removeCellarBottle: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                // get the user cellar array
+                const user = await User.findById(context.user._id).select('cellar');
+
+                // find the entry in the cellar array
+                let removedEntry = user.cellar.find(obj => obj._id.toString() === args._id);
+
+                if (!removedEntry) throw new Error('No cellar bottle found with this id!');
+
+                // remove the cellarBottle from the database 
+                await User.findByIdAndUpdate(
+                    context.user._id,
+                    { $pull: { cellar: { _id: args._id } } }
+                );
+
+                return removedEntry; // return the removed entry
+            } catch (err) {
+                throw new Error(`Error removing bottle from cellar: ${err}`);
+            }
+        },
+
         addDrankBottle: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
@@ -401,6 +458,7 @@ const resolvers = {
                 throw new Error(`Error removing bottle from wishlist: ${err}`);
             }
         },
+
         addReview: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
