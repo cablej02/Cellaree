@@ -259,6 +259,30 @@ const resolvers = {
                 throw new Error(`Error creating bottle: ${err}`);
             }
         },
+        updateBottle: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const updatedFields = {};
+                if (args.winery) updatedFields.winery = args.winery;
+                if (args.productName) updatedFields.productName = args.productName;
+                if (args.location) updatedFields.location = args.location;
+                if (args.wineStyle) updatedFields.wineStyle = args.wineStyle;
+
+                if (!Object.keys(updatedFields).length) throw new Error('No fields to update!');
+
+                const bottle = await Bottle.findByIdAndUpdate(
+                    args._id,
+                    { $set: updatedFields },
+                    { new: true, runValidators: true }
+                ).populate('winery').populate('wineStyle');
+                
+                if (!bottle) throw new Error('No bottle found with this id!');
+                return bottle;
+            } catch (err) {
+                throw new Error(`Error updating bottle: ${err}`);
+            }
+        },
 
         addCellarBottle: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
