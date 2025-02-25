@@ -95,6 +95,9 @@ export const typeDefs = gql`
     type Mutation {
         login(email: String!, password: String!): Auth
         addUser(username: String!, email: String!, password: String!): Auth
+        updateUser(username: String, email: String, password: String): User
+        removeUser: User
+        
         addWinery(name: String!, country: [String]!): Winery
         addBottle(winery: ID!, productName: String!, location: String, wineStyle: ID!): Bottle
 

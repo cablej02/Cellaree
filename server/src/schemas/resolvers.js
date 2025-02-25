@@ -178,6 +178,46 @@ const resolvers = {
                 throw new Error(`Error creating user: ${err}`);
             }
         },
+        updateUser: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                // add new fields to updatedFields object
+                const updatedFields = {};
+                if(args.username) updatedFields.username = args.username;
+                if(args.email) updatedFields.email = args.email;
+                if(args.password) updatedFields.password = args.password;
+
+                if( !Object.keys(updatedFields).length ) throw new Error('No fields to update!');
+
+                const user = await User.findByIdAndUpdate(
+                    context.user._id, 
+                    { $set: updatedFields },
+                    { new: true, runValidators: true }
+                ).select('username email');
+
+                if(!user) throw new Error('No user found with this id!');
+                
+                return user;
+            } catch (err) {
+                throw new Error(`Error updating user: ${err}`);
+            }
+        },
+        removeUser: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                // set the user field in reviews to null
+                await Review.updateMany({ user: context.user._id }, { user: null });
+                
+                const user = await User.findByIdAndDelete(context.user._id);
+                if (!user) throw new Error('No user found with this id!');
+                return user;
+            } catch (err) {
+                throw new Error(`Error deleting user: ${err}`);
+            }
+        },
+
         addWinery: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Must be logged in to add a Winery!");
 
