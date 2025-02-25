@@ -293,6 +293,26 @@ const resolvers = {
                 throw new Error(`Error updating wishlist notes: ${err}`);
             }
         },
+        removeWishlistBottle: async (parent, args , context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const user = await User.findById(context.user._id);
+
+                // find the entry in the wishlist array
+                const entry = user.wishlist.find(obj => obj.bottle.toString() === args.bottle);
+
+                if (!entry) throw new Error('No bottle found in wishlist with this id!');
+
+                // remove the bottle from the wishlist
+                user.wishlist = user.wishlist.filter(obj => obj.bottle.toString() !== args.bottle);
+
+                await user.save();
+                return entry; // return the removed entry
+            } catch (err) {
+                throw new Error(`Error removing bottle from wishlist: ${err}`);
+            }
+        },
         addReview: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 

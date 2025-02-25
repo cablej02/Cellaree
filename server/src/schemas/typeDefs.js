@@ -103,6 +103,7 @@ export const typeDefs = gql`
 
         addWishlistBottle(bottle: ID!): WishlistBottle
         updateWishlistBottle(bottle: ID!, notes: String!): WishlistBottle
+        removeWishlistBottle(bottle: ID!): WishlistBottle
 
         addReview(bottle: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
     }
