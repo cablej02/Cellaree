@@ -28,6 +28,7 @@ export const typeDefs = gql`
     type Winery {
         _id: ID
         name: String
+        countries: [String]
     }
 
     type WineStyle {
@@ -97,8 +98,10 @@ export const typeDefs = gql`
         addUser(username: String!, email: String!, password: String!): Auth
         updateUser(username: String, email: String, password: String): User
         removeUser: User
-        
-        addWinery(name: String!, country: [String]!): Winery
+
+        addWinery(name: String!, countries: [String]!): Winery
+        updateWinery(_id: ID!, name: String, countries: [String]): Winery
+
         addBottle(winery: ID!, productName: String!, location: String, wineStyle: ID!): Bottle
 
         addCellarBottle(bottle: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): CellarBottle
