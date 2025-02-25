@@ -2,7 +2,7 @@ import {Schema } from 'mongoose';
 
 const wishlistBottleSchema = new Schema(
     {
-        bottleId: {
+        bottle: {
             type: Schema.Types.ObjectId,
             ref: 'Bottle',
             required: true,

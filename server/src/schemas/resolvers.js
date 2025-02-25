@@ -18,16 +18,16 @@ const resolvers = {
                 const userData = await User.findOne({ _id: context.user._id })
                     .select('-__v -password')
                     .populate({
-                        path: 'cellar.bottleId',
-                        populate: 'wineryId wineStyleId' // populate paths for nested objects
+                        path: 'cellar.bottle',
+                        populate: 'winery wineStyle' // populate paths for nested objects
                     })
                     .populate({
-                        path: 'drankHistory.bottleId',
-                        populate: 'wineryId wineStyleId' // populate paths for nested objects
+                        path: 'drankHistory.bottle',
+                        populate: 'winery wineStyle' // populate paths for nested objects
                     })
                     .populate({
-                        path: 'wishlist.bottleId',
-                        populate: 'wineryId wineStyleId' // populate paths for nested objects
+                        path: 'wishlist.bottle',
+                        populate: 'winery wineStyle' // populate paths for nested objects
                     })
 
                 return userData;
@@ -58,15 +58,15 @@ const resolvers = {
             return Bottle.find()
                 .skip((page - 1) * limit)
                 .limit(limit)
-                .populate('wineryId')
-                .populate('wineStyleId')
+                .populate('winery')
+                .populate('wineStyle')
                 .lean(); // return as plain JS object
         },
         getBottle: async (parent, { _id }) => {
             try {
                 const bottle = await Bottle.findById( _id )
-                    .populate('wineryId')
-                    .populate('wineStyleId')
+                    .populate('winery')
+                    .populate('wineStyle')
                     .lean();
 
                 if (!bottle) throw new Error('No bottle found with this id!');
@@ -77,7 +77,13 @@ const resolvers = {
         },
         getReviewsForBottle: async (parent, { bottleId }, context) => {
             try {
-                const reviews = await Review.find({ bottleId });
+                const reviews = await Review.find({ bottleId })
+                    .populate('user', 'username') // only return username
+                    .populate({
+                        path: 'bottle',
+                        populate: 'winery wineStyle'
+                    })
+                    .lean();
 
                 // if no reviews, return null for avgRating
                 if (!reviews.length) {
@@ -89,11 +95,10 @@ const resolvers = {
                 const totalScore = reviews.reduce((sum, review) => sum + review.rating, 0);
                 const avgRating =  totalScore / ratingsCount;
                 
-
                 // filter for public reviews or the user's own reviews
                 const visibleReviews = reviews.filter(review => 
                     review.isPublic || 
-                    (context.user && review.userId.toString() === context.user._id)
+                    (context.user && review.user._id.toString() === context.user._id)
                 );
 
                 return { avgRating, ratingsCount, reviews: visibleReviews };
@@ -104,20 +109,32 @@ const resolvers = {
         getReviews: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError('Not logged in');
             try {
-                return Review.find({ userId: context.user._id });
+                return Review.find({ user: context.user._id })
+                    .populate({
+                        path: 'bottle',
+                        populate: 'winery wineStyle'
+                    })
+                    .populate('user', 'username') // only return username
+                    .lean();
             } catch (err) {
                 throw new Error(`Error fetching reviews for user: ${err}`);
             }
         },
         getReview: async (parent, { _id }, context) => {
             try {
-                const review = await Review.findById( _id );
+                const review = await Review.findById( _id )
+                    .populate({
+                        path: 'bottle',
+                        populate: 'winery wineStyle'
+                    })
+                    .populate('user', 'username') // only return username
+                    .lean();
 
                 if (!review) {
                     throw new Error('No review found with this id!');
                 }
 
-                if( !review.isPublic && (!context.user || review.userId.toString() !== context.user._id )) {
+                if( !review.isPublic && (!context.user || review.user._id.toString() !== context.user._id )) {
                     throw new AuthenticationError("You can't view this review!");
                 }
 
@@ -190,7 +207,7 @@ const resolvers = {
 
                 // Find an existing entry with same bottleId, vintage, purchasePrice and purchaseDate
                 const existingEntry = user.cellar.find(
-                    obj => obj.bottleId.toString() === args.bottleId &&
+                    obj => obj.bottle.toString() === args.bottle &&
                     obj.vintage === args.vintage &&
                     obj.purchasePrice === args.purchasePrice &&
                     normalizeDate(obj.purchaseDate) === normalizeDate(purchaseDate)
@@ -219,7 +236,7 @@ const resolvers = {
 
                 // Find an existing entry with same bottleId, vintage, and drankDate
                 const existingEntry = user.drankHistory.find(
-                    obj => obj.bottleId.toString() === args.bottleId &&
+                    obj => obj.bottle.toString() === args.bottle &&
                     obj.vintage === args.vintage &&
                     normalizeDate(obj.drankDate) === normalizeDate(drankDate)
                 );
@@ -244,7 +261,7 @@ const resolvers = {
                 const user = await User.findById(context.user._id);
 
                 // check if bottle is already in wishlist
-                const exists = user.wishlist.some(obj => obj.bottleId.toString() === args.bottleId);
+                const exists = user.wishlist.some(obj => obj.bottle.toString() === args.bottle);
 
                 if ( exists ) {
                     throw new Error('This bottle is already in your wishlist!');
@@ -257,19 +274,19 @@ const resolvers = {
                 throw new Error(`Error adding to wishlist: ${err}`);
             }
         },
-        updateWishlistBottle: async (parent, { bottleId, notes }, context) => {
+        updateWishlistBottle: async (parent, args , context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
                 const user = await User.findById(context.user._id);
 
-                const wishlistEntry = user.wishlist.find(bottle => bottle.bottleId.toString() === bottleId);
+                const wishlistEntry = user.wishlist.find(obj => obj.bottle.toString() === args.bottle);
 
                 if (!wishlistEntry) {
                     throw new Error('No bottle found in wishlist with this id!');
                 }
 
-                wishlistEntry.notes = notes;
+                wishlistEntry.notes = args.notes;
                 await user.save();
                 return wishlistEntry;
             } catch (err) {
@@ -280,7 +297,7 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                return await Review.create({ ...args, userId: context.user._id });
+                return await Review.create({ ...args, user: context.user._id });
             } catch (err) {
                 throw new Error(`Error adding review: ${err}`);
             }

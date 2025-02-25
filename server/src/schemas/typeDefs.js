@@ -12,17 +12,17 @@ export const typeDefs = gql`
 
     type WishlistBottle {
         _id: ID
-        bottleId: Bottle
+        bottle: Bottle
         notes: String
         addedDate: String
     }
 
     type Bottle {
         _id: ID
-        wineryId: Winery
+        winery: Winery
         productName: String
         location: String
-        wineStyleId: WineStyle
+        wineStyle: WineStyle
     }
 
     type Winery {
@@ -37,7 +37,7 @@ export const typeDefs = gql`
 
     type CellarBottle {
         _id: ID
-        bottleId: Bottle
+        bottle: Bottle
         vintage: Int
         quantity: Int
         purchasePrice: Float
@@ -47,7 +47,7 @@ export const typeDefs = gql`
 
     type DrankBottle {
         _id: ID
-        bottleId: Bottle
+        bottle: Bottle
         vintage: Int
         quantity: Int
         drankDate: String
@@ -87,7 +87,7 @@ export const typeDefs = gql`
         getWineStyle(_id: ID!): WineStyle
         getBottles(page: Int, limit: Int): [Bottle]
         getBottle(_id: ID!): Bottle
-        getReviewsForBottle(bottleId: ID!): BottleReviews
+        getReviewsForBottle(bottle: ID!): BottleReviews
         getReviews: [Review]
         getReview(_id: ID!): Review
     }
@@ -96,14 +96,15 @@ export const typeDefs = gql`
         login(email: String!, password: String!): Auth
         addUser(username: String!, email: String!, password: String!): Auth
         addWinery(name: String!, country: [String]!): Winery
-        addBottle(wineryId: ID!, productName: String!, location: String, wineStyleId: ID!): Bottle
-        addCellarBottle(bottleId: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): CellarBottle
-        addDrankBottle(bottleId: ID!, vintage: Int, drankDate: String, quantity: Int!): DrankBottle
+        addBottle(winery: ID!, productName: String!, location: String, wineStyle: ID!): Bottle
 
-        addWishlistBottle(bottleId: ID!): WishlistBottle
-        updateWishlistBottle(bottleId: ID!, notes: String!): WishlistBottle
+        addCellarBottle(bottle: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): CellarBottle
+        addDrankBottle(bottle: ID!, vintage: Int, drankDate: String, quantity: Int!): DrankBottle
 
-        addReview(bottleId: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
+        addWishlistBottle(bottle: ID!): WishlistBottle
+        updateWishlistBottle(bottle: ID!, notes: String!): WishlistBottle
+
+        addReview(bottle: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
     }
 `;
 

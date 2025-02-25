@@ -2,13 +2,13 @@ import { Schema, model } from 'mongoose';
 
 const reviewSchema = new Schema(
     {
-        userId: {
+        user: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
             index: true,
         },
-        bottleId: {
+        bottle: {
             type: Schema.Types.ObjectId,
             ref: "Bottle",
             required: true,

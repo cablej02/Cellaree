@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 const bottleSchema = new Schema(
     {
-        wineryId: {
+        winery: {
             type: Schema.Types.ObjectId,
             ref: 'Winery',
             required: true,
@@ -21,7 +21,7 @@ const bottleSchema = new Schema(
             trim: true,
             index: true,
         },
-        wineStyleId: {
+        wineStyle: {
             type: Schema.Types.ObjectId,
             ref: 'WineStyle',
             required: true,
