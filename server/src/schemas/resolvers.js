@@ -288,7 +288,7 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                const user = await User.findById(context.user._id);
+                const user = await User.findById(context.user._id).select('cellar');
 
                 // if purchaseDate is not provided, set it to today
                 const purchaseDate = args.purchaseDate ? new Date(args.purchaseDate) : new Date();
@@ -301,15 +301,25 @@ const resolvers = {
                     normalizeDate(obj.purchaseDate) === normalizeDate(purchaseDate)
                 );
 
+                // if entry exists, increment quantity
                 if (existingEntry) {
-                    existingEntry.quantity += args.quantity; // increment quantity
-                    await user.save(); // update db
-                    return existingEntry; // return the updated entry
+                    const updatedEntry = { ...existingEntry, quantity: existingEntry.quantity + args.quantity };
+                    await User.findOneAndUpdate(
+                        { _id: context.user._id, 'cellar._id': existingEntry._id },
+                        { $set: {"cellar.$": updatedEntry } }, // update the existing subdoc
+                        { new: true, runValidators: true}
+                    );
+                    return updatedEntry; // return the updated entry with the new quantity
                 }
 
-                user.cellar.push({ ...args, purchaseDate }); // add bottle to cellar
-                await user.save(); // update db
-                return user.cellar[user.cellar.length - 1]; // return the last item
+                // create a new entry and add it to the cellar array
+                const newEntry = { ...args, purchaseDate };
+                await User.findByIdAndUpdate(
+                    context.user._id,
+                    { $push: { cellar: newEntry } }
+                );
+
+                return newEntry;
             } catch (err) {
                 throw new Error(`Error adding bottle to cellar: ${err}`);
             }
@@ -399,6 +409,61 @@ const resolvers = {
                 throw new Error(`Error adding to drank history: ${err}`);
             }
         },
+        updateDrankBottle: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const updatedFields = {};
+                if (args.vintage) updatedFields.vintage = args.vintage;
+                if (args.quantity) updatedFields.quantity = args.quantity;
+                if (args.drankDate) updatedFields.drankDate = args.drankDate;
+
+                if (!Object.keys(updatedFields).length) throw new Error('No fields to update!');
+
+                // build $set object by looping over updatedFields and setting the values to the correct path for the subdocument
+                const setObj = {};
+                for (const [key, value] of Object.entries(updatedFields)) {
+                    setObj[`drankHistory.$.${key}`] = value
+                }
+
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id, 'drankHistory._id': args._id }, // find the user and the drankHistory subdocument by _id
+                    { $set: setObj },
+                    { new: true, runValidators: true }
+                );
+
+                if (!updatedUser) throw new Error('No drank bottle found with this id!');
+
+                // return the updated drank entry
+                return updatedUser.drankHistory.find(obj => obj._id.toString() === args._id);
+            } catch (err) {
+                throw new Error(`Error updating drank bottle: ${err}`);
+            }
+        },
+        removeDrankBottle: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                // get the user drankHistory array
+                const user = await User.findById(context.user._id).select('drankHistory');
+
+                // find the entry in the drankHistory array
+                let removedEntry = user.drankHistory.find(obj => obj._id.toString() === args._id);
+
+                if (!removedEntry) throw new Error('No drank bottle found with this id!');
+
+                // remove the drankBottle from the database 
+                await User.findByIdAndUpdate(
+                    context.user._id,
+                    { $pull: { drankHistory: { _id: args._id } } } 
+                );
+
+                return removedEntry; // return the removed entry
+            } catch (err) {
+                throw new Error(`Error removing bottle from drank history: ${err}`);
+            }
+        },
+
         addWishlistBottle: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
@@ -423,17 +488,16 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                const user = await User.findById(context.user._id);
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id, 'wishlist._id': args._id }, // find the user and the wishlist subdocument by _id
+                    { $set: { 'wishlist.$.notes': args.notes } }, // update the notes field
+                    { new: true, runValidators: true }
+                );
 
-                const wishlistEntry = user.wishlist.find(obj => obj.bottle.toString() === args.bottle);
+                if (!updatedUser) throw new Error('No wishlist bottle found with this id!');
 
-                if (!wishlistEntry) {
-                    throw new Error('No bottle found in wishlist with this id!');
-                }
-
-                wishlistEntry.notes = args.notes;
-                await user.save();
-                return wishlistEntry;
+                // return the updated wishlist entry
+                return updatedUser.wishlist.find(obj => obj._id.toString() === args._id);
             } catch (err) {
                 throw new Error(`Error updating wishlist notes: ${err}`);
             }
@@ -442,18 +506,18 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                const user = await User.findById(context.user._id);
+                const user = await User.findById(context.user._id).select('wishlist');
 
-                // find the entry in the wishlist array
-                const entry = user.wishlist.find(obj => obj.bottle.toString() === args.bottle);
+                const removedEntry = user.wishlist.find(obj => obj._id.toString() === args._id);
 
-                if (!entry) throw new Error('No bottle found in wishlist with this id!');
+                if (!removedEntry) throw new Error('No wishlist entry found in wishlist with this id!');
 
-                // remove the bottle from the wishlist
-                user.wishlist = user.wishlist.filter(obj => obj.bottle.toString() !== args.bottle);
-
-                await user.save();
-                return entry; // return the removed entry
+                await User.findByIdAndUpdate(
+                    context.user._id,
+                    { $pull: { wishlist: { _id: args._id } }
+                });
+                
+                return removedEntry; // return the removed entry
             } catch (err) {
                 throw new Error(`Error removing bottle from wishlist: ${err}`);
             }
