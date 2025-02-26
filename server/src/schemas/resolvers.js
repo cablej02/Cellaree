@@ -290,6 +290,8 @@ const resolvers = {
             try {
                 const user = await User.findById(context.user._id).select('cellar');
 
+                if(!user) throw new Error('No user found with this id!');
+
                 // if purchaseDate is not provided, set it to today
                 const purchaseDate = args.purchaseDate ? new Date(args.purchaseDate) : new Date();
 
@@ -303,23 +305,25 @@ const resolvers = {
 
                 // if entry exists, increment quantity
                 if (existingEntry) {
-                    const updatedEntry = { ...existingEntry, quantity: existingEntry.quantity + args.quantity };
+                    // update the quantity of the existing entry
+                    existingEntry.quantity += args.quantity;
+
                     await User.findOneAndUpdate(
                         { _id: context.user._id, 'cellar._id': existingEntry._id },
-                        { $set: {"cellar.$": updatedEntry } }, // update the existing subdoc
-                        { new: true, runValidators: true}
+                        { $set: {"cellar.$": existingEntry } }, // update the existing subdoc
+                        { new: true, runValidators: true, select: 'cellar' }
                     );
-                    return updatedEntry; // return the updated entry with the new quantity
+                    return existingEntry; // return the entry with the new quantity
                 }
 
                 // create a new entry and add it to the cellar array
-                const newEntry = { ...args, purchaseDate };
-                await User.findByIdAndUpdate(
+                const updatedUser = await User.findByIdAndUpdate(
                     context.user._id,
-                    { $push: { cellar: newEntry } }
+                    { $push: { cellar: { ...args, purchaseDate } } },
+                    { new: true, runValidators: true, select: 'cellar' }
                 );
 
-                return newEntry;
+                return updatedUser.cellar[updatedUser.cellar.length - 1]; // return the last item in the cellar array
             } catch (err) {
                 throw new Error(`Error adding bottle to cellar: ${err}`);
             }
@@ -385,7 +389,9 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                const user = await User.findById(context.user._id);
+                const user = await User.findById(context.user._id).select('drankHistory');
+
+                if(!user) throw new Error('No user found with this id!');
 
                 const drankDate = args.drankDate ? new Date(args.drankDate) : new Date(); 
 
@@ -398,13 +404,21 @@ const resolvers = {
 
                 if( existingEntry ) {
                     existingEntry.quantity += args.quantity; // increment quantity drank
-                    await user.save(); // update db
-                    return existingEntry; // return the updated entry
+
+                    await User.findOneAndUpdate(
+                        { _id: context.user._id, 'drankHistory._id': existingEntry._id },
+                        { $set: { 'drankHistory.$': existingEntry } }, // update the existing subdoc
+                        { new: true, runValidators: true, select: 'drankHistory' }
+                    );
+                    return existingEntry; // return the entry with the new quantity
                 }
 
-                user.drankHistory.push({ ...args, drankDate }); // add new entry to drank history
-                await user.save(); // update db
-                return user.drankHistory[user.drankHistory.length - 1]; // return the last item
+                const updatedUser = await User.findByIdAndUpdate(
+                    context.user._id,
+                    { $push: { drankHistory: { ...args, drankDate } } },
+                    { new: true, runValidators: true, select: 'drankHistory' }
+                );
+                return updatedUser.drankHistory[updatedUser.drankHistory.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding to drank history: ${err}`);
             }
@@ -468,7 +482,9 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                const user = await User.findById(context.user._id);
+                const user = await User.findById(context.user._id).select('wishlist');
+
+                if(!user) throw new Error('No user found with this id!');
 
                 // check if bottle is already in wishlist
                 const exists = user.wishlist.some(obj => obj.bottle.toString() === args.bottle);
@@ -477,9 +493,12 @@ const resolvers = {
                     throw new Error('This bottle is already in your wishlist!');
                 }
 
-                user.wishlist.push(args); // add bottle to wishlist
-                await user.save(); // update db
-                return user.wishlist[user.wishlist.length - 1]; // return the last item
+                const updatedUser = await User.findByIdAndUpdate(
+                    context.user._id,
+                    { $push: { wishlist: args } },
+                    { new: true, runValidators: true, select: 'wishlist' }
+                );
+                return updatedUser.wishlist[updatedUser.wishlist.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding to wishlist: ${err}`);
             }
@@ -531,7 +550,43 @@ const resolvers = {
             } catch (err) {
                 throw new Error(`Error adding review: ${err}`);
             }
-        }
+        },
+        updateReview: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const updatedFields = {};
+                if (args.vintage) updatedFields.vintage = args.vintage;
+                if (args.rating) updatedFields.rating = args.rating;
+                if (args.content) updatedFields.content = args.content;
+                if (args.isPublic !== undefined) updatedFields.isPublic = args.isPublic;
+
+                if (!Object.keys(updatedFields).length) throw new Error('No fields to update!');
+
+                const updatedReview = await Review.findOneAndUpdate(
+                    { _id: args._id, user: context.user._id },
+                    { $set: updatedFields },
+                    { new: true, runValidators: true }
+                );
+
+                if (!updatedReview) throw new Error('No review found with this id!');
+                return updatedReview;
+            } catch (err) {
+                throw new Error(`Error updating review: ${err}`);
+            }
+        },
+        removeReview: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const removedReview = await Review.findOneAndDelete({ _id: args._id, user: context.user._id });
+
+                if (!removedReview) throw new Error('No review found with this id!');
+                return removedReview;
+            } catch (err) {
+                throw new Error(`Error removing review: ${err}`);
+            }
+        },
     },
 };
 

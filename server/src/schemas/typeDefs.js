@@ -118,6 +118,8 @@ export const typeDefs = gql`
         removeWishlistBottle(_id: ID!): WishlistBottle
 
         addReview(bottle: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
+        updateReview(_id: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
+        removeReview(_id: ID!): Review
     }
 `;
 
