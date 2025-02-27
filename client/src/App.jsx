@@ -4,6 +4,7 @@ import { setContext } from '@apollo/client/link/context'
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import AuthService from './utils/auth'
+import { UserProvider } from './context/UserContext'
 
 import Navbar from './components/Navbar'
 
@@ -40,8 +41,10 @@ const App = () => {
 
     return (
         <ApolloProvider client={client}>
-            <Navbar />
-            <Outlet />
+            <UserProvider>
+                <Navbar />
+                <Outlet />
+            </UserProvider>
         </ApolloProvider>
     )
 }
