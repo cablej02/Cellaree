@@ -33,15 +33,19 @@ class AuthService {
     return localStorage.getItem('id_token');
   }
 
-  login(idToken, navigate) {
+  login(idToken, navigate, client) {
     // Saves user token to localStorage
     localStorage.setItem('id_token', idToken);
+    // clear the Apollo cache so the user data is cleared
+    if(client) client.resetStore();
     navigate('/');
   }
 
-  logout(navigate) {
+  logout(navigate, client) {
     // Clear user token and profile data from localStorage
     localStorage.removeItem('id_token');
+    // clear the Apollo cache so the user data is cleared
+    if(client) client.resetStore();
     // this will reload the page and reset the state of the application
     navigate('/login');
   }

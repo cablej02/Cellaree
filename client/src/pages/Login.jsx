@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation, useApolloClient } from '@apollo/client';
 import AuthService from '../utils/auth';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Input, Text, Tabs, Field } from '@chakra-ui/react';
@@ -7,6 +7,7 @@ import { LOGIN, ADD_USER } from '../utils/mutations';
 
 const Login = () => {
     const navigate = useNavigate();
+    const client = useApolloClient();
 
     const [login, { error: loginError }] = useMutation(LOGIN);
     const [addUser, { error: signupError }] = useMutation(ADD_USER);
@@ -27,7 +28,7 @@ const Login = () => {
         e.preventDefault();
         try {
             const { data } = await login({ variables: { ...loginData } });
-            AuthService.login(data.login.token, navigate);
+            AuthService.login(data.login.token, navigate, client);
         } catch (err) {
             console.error('Login failed', err);
         }
@@ -37,7 +38,7 @@ const Login = () => {
         e.preventDefault();
         try {
             const { data } = await addUser({ variables: { ...signupData } });
-            AuthService.login(data.addUser.token, navigate);
+            AuthService.login(data.addUser.token, navigate, client);
         } catch (err) {
             console.error('Signup failed', err);
         }
