@@ -1,6 +1,9 @@
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import { Outlet } from 'react-router-dom'
+
+import { useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+import AuthService from './utils/auth'
 
 import Navbar from './components/Navbar'
 
@@ -25,13 +28,22 @@ const client = new ApolloClient({
     cache: new InMemoryCache(),
 });
 
-function App() {
-  return (
-    <ApolloProvider client={client}>
+const App = () => {
+    const navigate = useNavigate();
+
+    // check if user is logged in on mount
+    useEffect(() => {
+        if (!AuthService.loggedIn()) {
+            navigate('/login');
+        }
+    }, [navigate]);
+
+    return (
+        <ApolloProvider client={client}>
             <Navbar />
             <Outlet />
-    </ApolloProvider>
-  )
+        </ApolloProvider>
+    )
 }
 
 export default App
