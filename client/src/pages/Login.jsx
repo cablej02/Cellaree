@@ -14,8 +14,6 @@ const Login = () => {
     const [loginData, setLoginData] = useState({ email: '', password: '' });
     const [signupData, setSignupData] = useState({ username: '', email: '', password: '' });
 
-    const [tabValue, setTabValue] = useState("login");
-
     const handleInputChange = (e, type) => {
         const { name, value } = e.target;
         if (type === 'login') {
@@ -46,22 +44,23 @@ const Login = () => {
     };
 
     return (
-        <Box maxW="400px" mx="auto" mt="100px" p="6" borderWidth="1px" borderRadius="md">
-            <Tabs.Root defaultValue={'login'} variant={'enclosed'} fitted>
+        <Box maxW="400px" mx="auto" p="6" borderWidth="1px" borderRadius="md" bg="dark">
+            <Tabs.Root defaultValue={'login'} variant="custom" fitted>
                 <Tabs.List>
                     <Tabs.Trigger value="login">Login</Tabs.Trigger>
                     <Tabs.Trigger value="signup">Sign Up</Tabs.Trigger>
                 </Tabs.List>
 
                 {/* Login Form */}
-                <Tabs.Content value="login">
+                <Tabs.Content value="login" mt="5">
                     <form onSubmit={handleLoginSubmit}>
                         <Field.Root>
                             <Field.Label>Email or Username</Field.Label>
                             <Input 
                                 type="text" 
                                 name="email" 
-                                value={loginData.email} 
+                                value={loginData.email}
+                                bg="light"
                                 onChange={(e) => handleInputChange(e, 'login')} 
                                 required 
                             />
@@ -71,26 +70,28 @@ const Login = () => {
                             <Input 
                                 type="password" 
                                 name="password" 
-                                value={loginData.password} 
+                                value={loginData.password}
+                                bg="light"
                                 onChange={(e) => handleInputChange(e, 'login')} 
                                 required 
                             />
                         </Field.Root>
-                        <Button type="submit" colorScheme="blue" width="full" mt="3">Login</Button>
+                        <Button type="submit" colorPalette="primary" color="text" width="full" mt="3">Login</Button>
                     </form>
-                    {loginError && <Text color="red.500" mt="2">Invalid login credentials</Text>}
+                    {loginError && <Text color="danger" mt="2">Invalid login credentials</Text>}
                 </Tabs.Content>
 
                 {/* Signup Form */}
-                <Tabs.Content value="signup">
+                <Tabs.Content value="signup" mt="5">
                     <form onSubmit={handleSignupSubmit}>
                         <Field.Root>
                             <Field.Label>Username</Field.Label>
                             <Input 
                                 type="text" 
                                 name="username" 
-                                value={signupData.username} 
-                                onChange={(e) => handleInputChange(e, 'signup')} 
+                                value={signupData.username}
+                                bg="light"
+                                onChange={(e) => handleInputChange(e, 'signup')}
                                 required 
                             />
                         </Field.Root>
@@ -99,8 +100,9 @@ const Login = () => {
                             <Input 
                                 type="email" 
                                 name="email" 
-                                value={signupData.email} 
-                                onChange={(e) => handleInputChange(e, 'signup')} 
+                                value={signupData.email}
+                                bg="light"
+                                onChange={(e) => handleInputChange(e, 'signup')}
                                 required 
                             />
                         </Field.Root>
@@ -109,14 +111,15 @@ const Login = () => {
                             <Input 
                                 type="password" 
                                 name="password" 
-                                value={signupData.password} 
+                                value={signupData.password}
+                                bg="light"
                                 onChange={(e) => handleInputChange(e, 'signup')} 
                                 required 
                             />
                         </Field.Root>
-                        <Button type="submit" colorScheme="green" width="full" mt="3">Sign Up</Button>
+                        <Button type="submit" colorPalette="primary" color="text" width="full" mt="3">Sign Up</Button>
                     </form>
-                    {signupError && <Text color="red.500" mt="2">Error creating account</Text>}
+                    {signupError && <Text color="danger" mt="2">Error creating account</Text>}
                 </Tabs.Content>
             </Tabs.Root>
         </Box>
