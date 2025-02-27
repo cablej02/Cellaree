@@ -1,10 +1,13 @@
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react'
 
 import './index.css'
 import App from './App.jsx'
-import Cellar from './Cellar.jsx'
-import Login from './Login.jsx'
+import Cellar from './pages/Cellar.jsx'
+import Login from './pages/Login.jsx'
+
+const system = createSystem(defaultConfig);
 
 const router = createBrowserRouter([
     {
@@ -25,5 +28,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')).render(
-    <RouterProvider router={router} />
+    <ChakraProvider value={system}>
+        <RouterProvider router={router} />
+    </ChakraProvider>
 )
