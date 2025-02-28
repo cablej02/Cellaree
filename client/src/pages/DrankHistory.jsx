@@ -1,19 +1,53 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Text } from "@chakra-ui/react";
-
+import { Flex, Box, Table, Thead, Tbody, Tr, Th, Td, Text } from "@chakra-ui/react";
+import { FaSortUp, FaSortDown, FaSort } from "react-icons/fa";
 import { capitalizeWords } from "../utils/formatting";
 
 const DrankHistory = () => {
     const { user } = useUser();
     const [history, setHistory] = useState([]);
+    const [sortConfig, setSortConfig] = useState({ key: "drankDate", direction: 'desc' });
+
+    const handleSort = (key) => {
+        setSortConfig((prev) => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc', // if same key, toggle direction
+        }))
+    };
+
+    const getSortIcon = (key) => {
+        if (sortConfig.key === key) {
+            return sortConfig.direction === "asc" ? <FaSortUp /> : <FaSortDown />;
+        }
+        return <FaSort />;
+    };
 
     // Sync state with user data on load
     useEffect(() => {
         if (user?.drankHistory) {
-            setHistory(user.drankHistory);
+            let sortedHistory = [...user.drankHistory];
+
+            sortedHistory.sort((a, b) => {
+                let valA = a[sortConfig.key];
+                let valB = b[sortConfig.key];
+
+                // Convert date strings to numbers
+                if (sortConfig.key === "drankDate") {
+                    valA = parseInt(valA);
+                    valB = parseInt(valB);
+                }
+
+                // convert strings to lowercase before sorting
+                if (typeof valA === "string") valA = valA.toLowerCase();
+                if (typeof valB === "string") valB = valB.toLowerCase();
+
+                return sortConfig.direction === "asc" ? valA - valB : valB - valA;
+            });
+
+            setHistory(sortedHistory);
         }
-    }, [user]);
+    }, [user, sortConfig]);
 
     return (
         <Box bg="background" p={6} borderRadius="md">
@@ -24,15 +58,51 @@ const DrankHistory = () => {
             <Table variant="simple" colorScheme="primary">
                 <Thead>
                     <Tr>
-                        <Th color="text">Drank Date</Th>
-                        <Th color="text">Product Name</Th>
-                        <Th color="text">Winery</Th>
-                        <Th color="text">Country</Th>
-                        <Th color="text">Location</Th>
-                        <Th color="text">Type</Th>
-                        <Th color="text">Style</Th>
-                        <Th color="text">Vintage</Th>
-                        <Th color="text">Quantity</Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("drankDate")}>
+                            <Flex align="center" gap={2}>
+                                Drank Date {getSortIcon("drankDate")}
+                            </Flex>
+                        </Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("productName")}>
+                            <Flex align="center" gap={2}>
+                                Product Name{ getSortIcon("productName")}
+                            </Flex>
+                        </Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("wineryName")}>
+                            <Flex align="center" gap={2}>
+                                Winery {getSortIcon("wineryName")}
+                            </Flex>
+                        </Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("country")}>
+                            <Flex align="center" gap={2}>
+                                Country {getSortIcon("country")}
+                            </Flex>
+                        </Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("location")}>
+                            <Flex align="center" gap={2}>
+                                Location {getSortIcon("location")}
+                            </Flex>
+                        </Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("type")}>
+                            <Flex align="center" gap={2}>
+                                Type {getSortIcon("type")}
+                            </Flex>
+                        </Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("style")}>
+                            <Flex align="center" gap={2}>
+                                Style {getSortIcon("style")}
+                            </Flex>
+                        </Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("vintage")}>
+                            <Flex align="center" gap={2}>
+                                Vintage {getSortIcon("vintage")}
+                            </Flex>
+                        </Th>
+                        <Th color="text" cursor="pointer" onClick={()=> handleSort("quantity")}>
+                            <Flex align="center" gap={2}>
+                                Quantity {getSortIcon("quantity")}
+                            </Flex>
+                        </Th>
                     </Tr>
                 </Thead>
                 <Tbody>
