@@ -16,6 +16,11 @@ const bottleSchema = new Schema(
             maxlength: 100,
             index: true,
         },
+        country: {
+            type: String,
+            required: true,
+            enum: ['Argentina', 'Australia', 'Brazil', 'Canada', 'Chile', 'France', 'Germany', 'Greece', 'Hungary', 'Italy', 'Lebanon', 'Mexico', 'New Zealand', 'Portugal', 'Romania', 'South Africa', 'Spain', 'Switzerland', 'United States', 'Uruguay', 'Other'],
+        },
         location: {
             type: String,
             trim: true,

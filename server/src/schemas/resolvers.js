@@ -233,7 +233,6 @@ const resolvers = {
             try {
                 const updatedFields = {};
                 if (args.name) updatedFields.name = args.name;
-                if (args.countries) updatedFields.countries = args.countries;
 
                 if (!Object.keys(updatedFields).length) throw new Error('No fields to update!');
 
@@ -266,6 +265,7 @@ const resolvers = {
                 const updatedFields = {};
                 if (args.winery) updatedFields.winery = args.winery;
                 if (args.productName) updatedFields.productName = args.productName;
+                if (args.country) updatedFields.country = args.country;
                 if (args.location) updatedFields.location = args.location;
                 if (args.wineStyle) updatedFields.wineStyle = args.wineStyle;
 

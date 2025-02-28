@@ -3,6 +3,7 @@ import { User, Bottle, Winery, WineStyle, Review } from "../models/index.js";
 
 // import seed data
 import wineStyleData from './wineStyleData.json' assert { type: "json" };
+import wineryData from './wineryData.json' assert { type: "json" };
 
 const seed = async () => {
     try {
@@ -23,6 +24,8 @@ const seed = async () => {
         console.log("Seeding wine styles...");
         await WineStyle.insertMany(wineStyleData);
         console.log("Wine styles seeded");
+        await Winery.insertMany(wineryData);
+        console.log("Wineries seeded");
 
         process.exit(0);
     } catch (error) {

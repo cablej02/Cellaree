@@ -13,9 +13,9 @@ export const ME = gql`
                     winery {
                     _id
                     name
-                    countries
                     }
                     productName
+                    country
                     location
                     wineStyle {
                         _id
@@ -36,9 +36,9 @@ export const ME = gql`
                     winery {
                         _id
                         name
-                        countries
                     }
                     productName
+                    country
                     location
                     wineStyle {
                         _id
@@ -57,9 +57,9 @@ export const ME = gql`
                     winery {
                         _id
                         name
-                        countries
                     }
                     productName
+                    country
                     location
                     wineStyle {
                         _id

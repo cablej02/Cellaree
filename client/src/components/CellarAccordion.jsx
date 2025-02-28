@@ -3,7 +3,7 @@ import { capitalizeWords } from '../utils/formatting';
 
 const CellarAccordion = ({ groupedBottles}) => {
     return (
-        <Accordion allowMultiple>
+        <Accordion allowToggle>
             {groupedBottles.length > 0 ? (
                 groupedBottles.map(({ bottle, totalQuantity, entries }) => (
                     <AccordionItem key={bottle._id}>
@@ -12,7 +12,7 @@ const CellarAccordion = ({ groupedBottles}) => {
                                 <Box flex='1' textAlign='left'>
                                     <Text fontWeight='bold'>{capitalizeWords(bottle.productName)}</Text>
                                     <Text fontSize='sm' color='secondary'>
-                                        {capitalizeWords(bottle.winery.name)} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
+                                        {capitalizeWords(bottle.winery.name)} - {bottle.winery.countries?.join(", ") || ""} - {bottle.location} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
                                     </Text>
                                 </Box>
                                 <AccordionIcon />

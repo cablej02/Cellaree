@@ -9,12 +9,7 @@ const winerySchema = new Schema(
             trim: true,
             lowercase: true,
             index: true,
-        },
-        countries: {
-            type: [String],
-            required: true,
-            enum: ['Argentina', 'Australia', 'Brazil', 'Canada', 'Chile', 'France', 'Germany', 'Greece', 'Hungary', 'Italy', 'Lebanon', 'Mexico', 'New Zealand', 'Portugal', 'Romania', 'South Africa', 'Spain', 'Switzerland', 'United States', 'Uruguay', 'Other'],
-        },
+        }
     },
     { timestamps: true }
 );
