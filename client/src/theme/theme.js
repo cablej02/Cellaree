@@ -22,6 +22,7 @@ const theme = extendTheme({
             900: "#25000b",
         },
         secondary: "#adb5bd",
+        tertiary: "#62666c",
     },
     components: {
         Tabs: {

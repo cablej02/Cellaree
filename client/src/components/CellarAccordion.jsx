@@ -1,4 +1,5 @@
-import { Box, Flex, Text, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel } from "@chakra-ui/react";
+import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, Text, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
+import { capitalizeWords } from '../utils/formatting';
 
 const CellarAccordion = ({ groupedBottles}) => {
     return (
@@ -9,24 +10,37 @@ const CellarAccordion = ({ groupedBottles}) => {
                         <h2>
                             <AccordionButton>
                                 <Box flex='1' textAlign='left'>
-                                    <Text fontWeight='bold'>{bottle.productName}</Text>
-                                    <Text fontSize='sm' color='gray.500'>
-                                        {bottle.winery.name} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
+                                    <Text fontWeight='bold'>{capitalizeWords(bottle.productName)}</Text>
+                                    <Text fontSize='sm' color='secondary'>
+                                        {capitalizeWords(bottle.winery.name)} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
                                     </Text>
                                 </Box>
                                 <AccordionIcon />
                             </AccordionButton>
                         </h2>
                         <AccordionPanel pb={4}>
-                            {entries.map((entry) => (
-                                <Flex key={entry._id} p={2} borderBottom='1px solid gray' justifyContent='space-between' wrap='wrap'>
-                                    <Text flex='1'>Vintage: {entry.vintage || 'N/A'}</Text>
-                                    <Text flex='1'>Quantity: {entry.quantity}</Text>
-                                    <Text flex='1'>Purchase Price: ${entry.purchasePrice?.toFixed(2) || 'N/A'}</Text>
-                                    <Text flex='1'>Current Value: ${entry.currentValue?.toFixed(2) || 'N/A'}</Text>
-                                    <Text flex='1'>Purchase Date: {new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Text>
-                                </Flex>
-                            ))}
+                            <Table variant='simple' size='sm'>
+                                <Thead>
+                                    <Tr>
+                                        <Th color="tertiary">Vintage</Th>
+                                        <Th color="tertiary">Quantity</Th>
+                                        <Th color="tertiary">Purchase Price</Th>
+                                        <Th color="tertiary">Current Value</Th>
+                                        <Th color="tertiary">Purchase Date</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {entries.map((entry) => (
+                                        <Tr key={entry._id}>
+                                            <Td>{entry.vintage || 'N/A'}</Td>
+                                            <Td>{entry.quantity}</Td>
+                                            <Td>${entry.purchasePrice?.toFixed(2) || 'N/A'}</Td>
+                                            <Td>${entry.currentValue?.toFixed(2) || 'N/A'}</Td>
+                                            <Td>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Td>
+                                        </Tr>
+                                    ))}
+                                </Tbody>
+                            </Table>
                         </AccordionPanel>
                     </AccordionItem>
                 ))
