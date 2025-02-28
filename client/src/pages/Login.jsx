@@ -49,7 +49,7 @@ const Login = () => {
     };
 
     return (
-        <Box maxW="400px" mx="auto" p="6" borderWidth="1px" borderRadius="md" bg="dark" color="text">
+        <Box maxW="400px" mt="20px" mx="auto" p="6" borderWidth="1px" borderRadius="md" bg="dark" color="text">
             <Tabs variant="login" isFitted>
                 <TabList>
                     <Tab>Login</Tab>
@@ -71,7 +71,7 @@ const Login = () => {
                                     <Input type="password" name="password" value={loginData.password} bg="light" onChange={(e) => handleInputChange(e, "login")} required />
                                 </FormControl>
 
-                                <Button type="submit" variant="solid" width="full">Login</Button>
+                                <Button type="submit" variant="primary" width="full">Login</Button>
                                 {loginError && <Text color="error">Invalid login credentials</Text>}
                             </VStack>
                         </form>
@@ -96,7 +96,7 @@ const Login = () => {
                                     <Input type="password" name="password" value={signupData.password} bg="light" onChange={(e) => handleInputChange(e, "signup")} required />
                                 </FormControl>
 
-                                <Button type="submit" colorScheme="primary" width="full">Sign Up</Button>
+                                <Button type="submit" variant="primary" width="full">Sign Up</Button>
                                 {signupError && <Text color="error">Error creating account</Text>}
                             </VStack>
                         </form>
