@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
-import { Box, Text, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import CellarAccordion from "../components/CellarAccordion";
 
 const Cellar = () => {
     const { user } = useUser();
 
-    // organize bottles by bottleId
+    // bottles groupbed by bottleId for accordion display
     const [groupedBottles, setGroupedBottles] = useState([]);
 
     useEffect(() => {
@@ -30,43 +31,19 @@ const Cellar = () => {
                 group.entries.push(entry);
                 return acc;
             }, []);
+
+            // sort entries by vintage
+            grouped.forEach(group => {
+                group.entries.sort((a, b) => (a.vintage || 9999) - (b.vintage || 9999));
+            });
             setGroupedBottles(grouped);
         }
     } , [user]);
 
     return (
-        <Accordion allowMultiple>
-            {groupedBottles.length > 0 ? (
-                groupedBottles.map(({ bottle, totalQuantity, entries }) => (
-                    <AccordionItem key={bottle._id}>
-                        <h2>
-                            <AccordionButton>
-                                <Box flex='1' textAlign='left'>
-                                    <Text fontWeight='bold'>{bottle.productName}</Text>
-                                    <Text fontSize='sm' color='gray.500'>
-                                        {bottle.winery.name} - {bottle.wineStyle.name} ({totalQuantity} bottles)
-                                    </Text>
-                                </Box>
-                                <AccordionIcon />
-                            </AccordionButton>
-                        </h2>
-                        <AccordionPanel pb={4}>
-                            {entries.map((entry) => (
-                                <Box key={entry._id} p={2} borderBottom='1px solid gray'>
-                                    <Text>Vintage: {entry.vintage || 'N/A'}</Text>
-                                    <Text>Quantity: {entry.quantity}</Text>
-                                    <Text>Purchase Price: ${entry.purchasePrice?.toFixed(2) || 'N/A'}</Text>
-                                    <Text>Current Value: ${entry.currentValue?.toFixed(2) || 'N/A'}</Text>
-                                    <Text>Purchase Date: {new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Text>
-                                </Box>
-                            ))}
-                        </AccordionPanel>
-                    </AccordionItem>
-                ))
-            ) : (
-                <Text>No bottles in your cellar.</Text>
-            )}
-        </Accordion>
+        <Box maxW='1000px' mx='auto' p={4}>
+            <CellarAccordion groupedBottles={groupedBottles} />
+        </Box>
     );
 };
 
