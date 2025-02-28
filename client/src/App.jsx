@@ -4,9 +4,13 @@ import { setContext } from '@apollo/client/link/context'
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import AuthService from './utils/auth'
+import { ChakraProvider } from "@chakra-ui/react";
 import { UserProvider } from './context/UserContext'
 
 import Navbar from './components/Navbar'
+
+// chakra theme
+import theme from './theme/theme.js'
 
 import './App.css'
 
@@ -40,13 +44,15 @@ const App = () => {
     }, [navigate]);
 
     return (
-        <ApolloProvider client={client}>
-            <UserProvider>
-                <Navbar />
-                <Outlet />
-            </UserProvider>
-        </ApolloProvider>
+        <ChakraProvider theme={theme}>
+            <ApolloProvider client={client}>
+                <UserProvider>
+                    <Navbar />
+                    <Outlet />
+                </UserProvider>
+            </ApolloProvider>
+        </ChakraProvider>
     )
 }
 
-export default App
+export default App;

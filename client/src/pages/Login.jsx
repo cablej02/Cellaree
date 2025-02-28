@@ -1,9 +1,13 @@
-import { useState } from 'react';
-import { useMutation, useApolloClient } from '@apollo/client';
-import AuthService from '../utils/auth';
-import { useNavigate } from 'react-router-dom';
-import { Box, Button, Input, Text, Tabs, Field } from '@chakra-ui/react';
-import { LOGIN, ADD_USER } from '../utils/mutations';
+import { useState } from "react";
+import { useMutation, useApolloClient } from "@apollo/client";
+import AuthService from "../utils/auth";
+import { useNavigate } from "react-router-dom";
+import { 
+    Box, Button, Input, Text, 
+    Tabs, TabList, TabPanels, Tab, TabPanel, 
+    FormControl, FormLabel, VStack 
+} from "@chakra-ui/react";
+import { LOGIN, ADD_USER } from "../utils/mutations";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -45,84 +49,60 @@ const Login = () => {
     };
 
     return (
-        <Box maxW="400px" mx="auto" p="6" borderWidth="1px" borderRadius="md" bg="dark">
-            <Tabs.Root defaultValue={'login'} variant="custom" fitted>
-                <Tabs.List>
-                    <Tabs.Trigger value="login">Login</Tabs.Trigger>
-                    <Tabs.Trigger value="signup">Sign Up</Tabs.Trigger>
-                </Tabs.List>
+        <Box maxW="400px" mx="auto" p="6" borderWidth="1px" borderRadius="md" bg="dark" color="text">
+            <Tabs variant="login" isFitted>
+                <TabList>
+                    <Tab>Login</Tab>
+                    <Tab>Sign Up</Tab>
+                </TabList>
 
-                {/* Login Form */}
-                <Tabs.Content value="login" mt="5">
-                    <form onSubmit={handleLoginSubmit}>
-                        <Field.Root>
-                            <Field.Label>Email or Username</Field.Label>
-                            <Input 
-                                type="text" 
-                                name="email" 
-                                value={loginData.email}
-                                bg="light"
-                                onChange={(e) => handleInputChange(e, 'login')} 
-                                required 
-                            />
-                        </Field.Root>
-                        <Field.Root>
-                            <Field.Label>Password</Field.Label>
-                            <Input 
-                                type="password" 
-                                name="password" 
-                                value={loginData.password}
-                                bg="light"
-                                onChange={(e) => handleInputChange(e, 'login')} 
-                                required 
-                            />
-                        </Field.Root>
-                        <Button type="submit" colorPalette="primary" color="text" width="full" mt="3">Login</Button>
-                    </form>
-                    {loginError && <Text color="danger" mt="2">Invalid login credentials</Text>}
-                </Tabs.Content>
+                <TabPanels>
+                    {/* Login Form */}
+                    <TabPanel>
+                        <form onSubmit={handleLoginSubmit}>
+                            <VStack spacing={4}>
+                                <FormControl>
+                                    <FormLabel>Email or Username</FormLabel>
+                                    <Input type="text" name="email" value={loginData.email} bg="light" onChange={(e) => handleInputChange(e, "login")} required />
+                                </FormControl>
 
-                {/* Signup Form */}
-                <Tabs.Content value="signup" mt="5">
-                    <form onSubmit={handleSignupSubmit}>
-                        <Field.Root>
-                            <Field.Label>Username</Field.Label>
-                            <Input 
-                                type="text" 
-                                name="username" 
-                                value={signupData.username}
-                                bg="light"
-                                onChange={(e) => handleInputChange(e, 'signup')}
-                                required 
-                            />
-                        </Field.Root>
-                        <Field.Root>
-                            <Field.Label>Email</Field.Label>
-                            <Input 
-                                type="email" 
-                                name="email" 
-                                value={signupData.email}
-                                bg="light"
-                                onChange={(e) => handleInputChange(e, 'signup')}
-                                required 
-                            />
-                        </Field.Root>
-                        <Field.Root>
-                            <Field.Label>Password</Field.Label>
-                            <Input 
-                                type="password" 
-                                name="password" 
-                                value={signupData.password}
-                                bg="light"
-                                onChange={(e) => handleInputChange(e, 'signup')} 
-                                required 
-                            />
-                        </Field.Root>
-                        <Button type="submit" colorPalette="primary" color="text" width="full" mt="3">Sign Up</Button>
-                    </form>
-                    {signupError && <Text color="danger" mt="2">Error creating account</Text>}
-                </Tabs.Content>
-            </Tabs.Root>
+                                <FormControl>
+                                    <FormLabel>Password</FormLabel>
+                                    <Input type="password" name="password" value={loginData.password} bg="light" onChange={(e) => handleInputChange(e, "login")} required />
+                                </FormControl>
+
+                                <Button type="submit" variant="solid" width="full">Login</Button>
+                                {loginError && <Text color="error">Invalid login credentials</Text>}
+                            </VStack>
+                        </form>
+                    </TabPanel>
+
+                    {/* Signup Form */}
+                    <TabPanel>
+                        <form onSubmit={handleSignupSubmit}>
+                            <VStack spacing={4}>
+                                <FormControl>
+                                    <FormLabel>Username</FormLabel>
+                                    <Input type="text" name="username" value={signupData.username} bg="light" onChange={(e) => handleInputChange(e, "signup")} required />
+                                </FormControl>
+
+                                <FormControl>
+                                    <FormLabel>Email</FormLabel>
+                                    <Input type="email" name="email" value={signupData.email} bg="light" onChange={(e) => handleInputChange(e, "signup")} required />
+                                </FormControl>
+
+                                <FormControl>
+                                    <FormLabel>Password</FormLabel>
+                                    <Input type="password" name="password" value={signupData.password} bg="light" onChange={(e) => handleInputChange(e, "signup")} required />
+                                </FormControl>
+
+                                <Button type="submit" colorScheme="primary" width="full">Sign Up</Button>
+                                {signupError && <Text color="error">Error creating account</Text>}
+                            </VStack>
+                        </form>
+                    </TabPanel>
+                </TabPanels>
+            </Tabs>
         </Box>
     );
 };
