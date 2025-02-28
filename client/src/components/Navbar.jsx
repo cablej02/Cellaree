@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Flex, HStack, Button, Text, Spacer, Menu, MenuButton, MenuList, MenuItem, MenuDivider, useToken } from "@chakra-ui/react";
 
 const Navbar = () => {
-    const { user } = useUser();
+    const { user, setUser } = useUser();
     const navigate = useNavigate();
 
     // get pimary color hex value from theme
@@ -12,6 +12,7 @@ const Navbar = () => {
 
     const handleLogout = () => {
         AuthService.logout(navigate);
+        setUser(null);
     };
 
     return (
@@ -36,7 +37,7 @@ const Navbar = () => {
                                 {user.username}
                             </MenuButton>
                             <MenuList>
-                                <MenuItem onClick={() => navigate("/cellar")}>My Cellar</MenuItem>
+                                <MenuItem onClick={() => navigate("/")}>My Cellar</MenuItem>
                                 <MenuItem onClick={() => navigate("/drank-history")}>Drank History</MenuItem>
                                 <MenuItem onClick={() => navigate("/wishlist")}>Wishlist</MenuItem>
                                 <MenuItem onClick={() => navigate("/update-user")}>Update User</MenuItem>

@@ -30,7 +30,7 @@ const theme = extendTheme({
                     tablist: {
                         borderColor: "primary",
                         borderRadius: "md",
-                        backgroundColor: "background",
+                        backgroundColor: "darker",
                         padding: "4px",
                         gap: "4px",
                     },

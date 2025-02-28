@@ -6,66 +6,69 @@ export const ME = gql`
             _id
             username
             email
-                cellar {
-            _id
-            bottle {
+            cellar {
                 _id
-                winery {
-                _id
-                name
-                countries
+                bottle {
+                    _id
+                    winery {
+                    _id
+                    name
+                    countries
+                    }
+                    productName
+                    location
+                    wineStyle {
+                        _id
+                        name
+                        category
+                    }
                 }
-                productName
-                location
-                wineStyle {
-                _id
-                name
-                }
-            }
-            vintage
-            quantity
-            purchasePrice
-            currentValue
-            purchaseDate
+                vintage
+                quantity
+                purchasePrice
+                currentValue
+                purchaseDate
             }
             drankHistory {
-            _id
-            bottle {
                 _id
-                winery {
-                _id
-                name
-                countries
+                bottle {
+                    _id
+                    winery {
+                        _id
+                        name
+                        countries
+                    }
+                    productName
+                    location
+                    wineStyle {
+                        _id
+                        name
+                        category
+                    }
                 }
-                productName
-                location
-                wineStyle {
-                _id
-                name
-                }
-            }
-            vintage
-            quantity
-            drankDate
+                vintage
+                quantity
+                drankDate
             }
             wishlist {
-            _id
-            bottle {
                 _id
-                winery {
-                _id
-                name
-                countries
+                bottle {
+                    _id
+                    winery {
+                        _id
+                        name
+                        countries
+                    }
+                    productName
+                    location
+                    wineStyle {
+                        _id
+                        name
+                        category
+                    }
                 }
-                productName
-                location
-                wineStyle {
-                _id
-                name
-                }
-            }
-            notes
-            addedDate
+                notes
+                addedDate
             }
         }
     }

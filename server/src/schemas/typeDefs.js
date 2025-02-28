@@ -34,6 +34,7 @@ export const typeDefs = gql`
     type WineStyle {
         _id: ID
         name: String
+        category: String
     }
 
     type CellarBottle {
