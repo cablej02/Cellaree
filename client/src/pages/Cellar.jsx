@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
-import { Box } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
+
 import CellarAccordion from "../components/CellarAccordion";
+import AddBottleForm from "../components/AddBottleForm";    
 
 const Cellar = () => {
     const { user } = useUser();
@@ -42,6 +44,8 @@ const Cellar = () => {
 
     return (
         <Box maxW='1000px' mx='auto' p={4}>
+            <Heading as='h1' mb={4}>My Cellar</Heading>
+            <AddBottleForm onSuccess={() => setGroupedBottles([])} />
             <CellarAccordion groupedBottles={groupedBottles} />
         </Box>
     );
