@@ -44,7 +44,16 @@ const AddBottleForm = ({ onSuccess }) => {
 
             const { data } = await addCellarBottle({ variables });
             if(data?.addCellarBottle) {
-                setUser({ ...user, cellar: [...user.cellar, data.addCellarBottle] });
+                setUser({
+                    ...user,
+                    cellar: [
+                        ...user.cellar,
+                        {
+                            ...data.addCellarBottle,
+                            bottle: bottles.find(b => b._id === formData.bottle) || data.addCellarBottle.bottle
+                        }
+                    ]
+                });
             }
             setFormData({
                 bottle: '',

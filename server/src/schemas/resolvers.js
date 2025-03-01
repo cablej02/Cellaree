@@ -308,12 +308,17 @@ const resolvers = {
                     // update the quantity of the existing entry
                     existingEntry.quantity += args.quantity;
 
-                    await User.findOneAndUpdate(
+                    const updatedUser = await User.findOneAndUpdate(
                         { _id: context.user._id, 'cellar._id': existingEntry._id },
                         { $set: {"cellar.$": existingEntry } }, // update the existing subdoc
                         { new: true, runValidators: true, select: 'cellar' }
-                    );
-                    return existingEntry; // return the entry with the new quantity
+                    ).populate({
+                        path: 'cellar.bottle',
+                        populate: 'winery wineStyle'
+                    })
+
+                    // return the updated entry with the new quantity
+                    return updatedUser.cellar.find(entry => entry._id.toString() === existingEntry._id.toString()); 
                 }
 
                 // create a new entry and add it to the cellar array
@@ -321,7 +326,10 @@ const resolvers = {
                     context.user._id,
                     { $push: { cellar: { ...args, purchaseDate } } },
                     { new: true, runValidators: true, select: 'cellar' }
-                );
+                ).populate({
+                    path: 'cellar.bottle',
+                    populate: 'winery wineStyle'
+                });
 
                 return updatedUser.cellar[updatedUser.cellar.length - 1]; // return the last item in the cellar array
             } catch (err) {
@@ -351,7 +359,10 @@ const resolvers = {
                     { _id: context.user._id, 'cellar._id': args._id }, // find the user and the cellar subdocument by _id
                     { $set: setObj },
                     { new: true, runValidators: true }
-                );
+                ).populate({
+                    path: 'cellar.bottle',
+                    populate: 'winery wineStyle'
+                });
                 
                 if (!updatedUser) throw new Error('No cellar bottle found with this id!');
 
@@ -405,19 +416,28 @@ const resolvers = {
                 if( existingEntry ) {
                     existingEntry.quantity += args.quantity; // increment quantity drank
 
-                    await User.findOneAndUpdate(
+                    const updatedUser = await User.findOneAndUpdate(
                         { _id: context.user._id, 'drankHistory._id': existingEntry._id },
                         { $set: { 'drankHistory.$': existingEntry } }, // update the existing subdoc
                         { new: true, runValidators: true, select: 'drankHistory' }
-                    );
-                    return existingEntry; // return the entry with the new quantity
+                    ).populate({
+                        path: 'drankHistory.bottle',
+                        populate: 'winery wineStyle'
+                    })
+
+                    // return the updated entry with the new quantity
+                    return updatedUser.drankHistory.find(entry => entry._id.toString() === existingEntry._id.toString()); 
                 }
 
                 const updatedUser = await User.findByIdAndUpdate(
                     context.user._id,
                     { $push: { drankHistory: { ...args, drankDate } } },
                     { new: true, runValidators: true, select: 'drankHistory' }
-                );
+                ).populate({
+                    path: 'drankHistory.bottle',
+                    populate: 'winery wineStyle'
+                });
+
                 return updatedUser.drankHistory[updatedUser.drankHistory.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding to drank history: ${err}`);
@@ -444,7 +464,10 @@ const resolvers = {
                     { _id: context.user._id, 'drankHistory._id': args._id }, // find the user and the drankHistory subdocument by _id
                     { $set: setObj },
                     { new: true, runValidators: true }
-                );
+                ).populate({
+                    path: 'drankHistory.bottle',
+                    populate: 'winery wineStyle'
+                });
 
                 if (!updatedUser) throw new Error('No drank bottle found with this id!');
 
@@ -497,7 +520,11 @@ const resolvers = {
                     context.user._id,
                     { $push: { wishlist: args } },
                     { new: true, runValidators: true, select: 'wishlist' }
-                );
+                ).populate({
+                    path: 'wishlist.bottle',
+                    populate: 'winery wineStyle'
+                });
+
                 return updatedUser.wishlist[updatedUser.wishlist.length - 1]; // return the last item
             } catch (err) {
                 throw new Error(`Error adding to wishlist: ${err}`);
@@ -511,7 +538,10 @@ const resolvers = {
                     { _id: context.user._id, 'wishlist._id': args._id }, // find the user and the wishlist subdocument by _id
                     { $set: { 'wishlist.$.notes': args.notes } }, // update the notes field
                     { new: true, runValidators: true }
-                );
+                ).populate({
+                    path: 'wishlist.bottle',
+                    populate: 'winery wineStyle'
+                });
 
                 if (!updatedUser) throw new Error('No wishlist bottle found with this id!');
 
