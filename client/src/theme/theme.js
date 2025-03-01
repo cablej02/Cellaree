@@ -23,6 +23,7 @@ const theme = extendTheme({
         },
         secondary: "#adb5bd",
         tertiary: "#62666c",
+        bgModal: "#1a1d1e",
     },
     components: {
         Tabs: {

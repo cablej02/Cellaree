@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Heading, Button } from "@chakra-ui/react";
 
 import CellarAccordion from "../components/CellarAccordion";
-import AddBottleForm from "../components/AddBottleForm";    
+import AddBottleModal from "../components/AddBottleModal";    
 
 const Cellar = () => {
-    const { user } = useUser();
+    const { user, setUser } = useUser();
 
     // bottles groupbed by bottleId for accordion display
     const [groupedBottles, setGroupedBottles] = useState([]);
+
+    // open modal state
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         if(user?.cellar) {
@@ -42,10 +45,19 @@ const Cellar = () => {
         }
     } , [user]);
 
+    const handleAddBottleSuccess = (newBottle) => {
+        setUser({ ...user, cellar: [...user.cellar, newBottle] });
+    }
+
     return (
         <Box maxW='1000px' mx='auto' p={4}>
             <Heading as='h1' mb={4}>My Cellar</Heading>
-            <AddBottleForm onSuccess={() => setGroupedBottles([])} />
+            <Button variant='primary' mb={4} onClick={() => setIsModalOpen(true)}>Add Bottle</Button>
+            <AddBottleModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={handleAddBottleSuccess} 
+            />
             <CellarAccordion groupedBottles={groupedBottles} />
         </Box>
     );
