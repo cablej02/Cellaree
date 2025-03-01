@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter, 
-    Button, FormControl, FormLabel, Input, Select, NumberInput, NumberInputField 
+    Button, FormControl, FormLabel, Input, NumberInput, NumberInputField, List, ListItem
 } from '@chakra-ui/react';
 import { useMutation } from '@apollo/client';
 import { ADD_CELLAR_BOTTLE } from '../utils/mutations';
@@ -21,11 +21,36 @@ const AddBottleModal = ({ isOpen, onClose, onSuccess }) => {
         purchaseDate: new Date().toISOString().split('T')[0], // today's date
     });
     
+    const [searchInput, setSearchInput] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+
+    // mutation to add bottle to cellar
     const [addCellarBottle, { loading, error }] = useMutation(ADD_CELLAR_BOTTLE);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSearchChange = (e) => {
+        setFormData((prev) => ({ ...prev, bottleId: '' })); // remove bottleId if search input changes
+        const input = e.target.value;
+        setSearchInput(input);
+        setSearchResults(
+            bottles.filter(
+                bottle => (
+                    bottle.winery.name.toLowerCase().includes(input.toLowerCase()) ||
+                    bottle.productName.toLowerCase().includes(input.toLowerCase()) ||
+                    `${bottle.winery.name} - ${bottle.productName}`.toLowerCase().includes(input.toLowerCase())
+                )
+            )
+        );
+    };
+
+    const handleSelectBottle = (bottleId, bottleName) => {
+        setSearchInput(bottleName); // set search input to selected bottle name
+        setSearchResults([]); // clear search results
+        setFormData((prev) => ({ ...prev, bottleId })); // set bottleId in form data
     };
 
     const handleSubmit = async (e) => {
@@ -61,14 +86,29 @@ const AddBottleModal = ({ isOpen, onClose, onSuccess }) => {
                 <ModalHeader>Add Bottle to Cellar</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <FormControl isRequired>
-                        <FormLabel>Select Bottle</FormLabel>
-                        <Select name='bottleId' value={formData.bottleId} onChange={handleChange} bg='dark' color='text'>
-                            <option value='' disabled>Select a bottle</option>
-                            {bottles.map((bottle) => (
-                                <option key={bottle._id} value={bottle._id}>{capitalizeWords(bottle.winery.name)} - {capitalizeWords(bottle.productName)}</option>
-                            ))}
-                        </Select>
+                <FormControl isRequired>
+                        <FormLabel>Search Bottle</FormLabel>
+                        <Input 
+                            type='text' 
+                            placeholder='Search for a bottle...' 
+                            value={searchInput} 
+                            onChange={handleSearchChange} 
+                            bg='light' color='white'
+                        />
+                        {searchResults.length > 0 && (
+                            <List bg='dark' borderRadius='md' mt={2}>
+                                {searchResults.map((bottle) => (
+                                    <ListItem 
+                                        key={bottle._id} 
+                                        p={2} 
+                                        _hover={{ bg: 'primary', cursor: 'pointer' }}
+                                        onClick={() => handleSelectBottle(bottle._id, `${capitalizeWords(bottle.winery.name)} - ${capitalizeWords(bottle.productName)}`)}
+                                    >
+                                        {capitalizeWords(bottle.winery.name)} - {capitalizeWords(bottle.productName)}
+                                    </ListItem>
+                                ))}
+                            </List>
+                        )}
                     </FormControl>
                     <FormControl>
                         <FormLabel>Vintage</FormLabel>
