@@ -257,7 +257,8 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Must be logged in to add a bottle!");
 
             try {
-                return Bottle.create(args);
+                const newBottle = Bottle.create(args);
+                return await newBottle.populate('winery').populate('wineStyle');
             } catch (err) {
                 throw new Error(`Error creating bottle: ${err}`);
             }

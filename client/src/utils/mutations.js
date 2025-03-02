@@ -88,3 +88,23 @@ export const DRINK_CELLAR_BOTTLE = gql`
         }
     }
 `;
+
+export const ADD_BOTTLE = gql`
+    mutation addBottle($productName: String!, $winery: ID!, $wineStyle: ID!, $country: String!, $location: String) {
+        addBottle(productName: $productName, winery: $winery, wineStyle: $wineStyle, country: $country, location: $location) {
+            _id
+            productName
+            winery {
+                _id
+                name
+            }
+            wineStyle {
+                _id
+                name
+                category
+            }
+            country
+            location
+        }
+    }
+`;
