@@ -6,6 +6,7 @@ import App from './App.jsx'
 import Cellar from './pages/Cellar.jsx'
 import Login from './pages/Login.jsx'
 import DrankHistory from './pages/DrankHistory.jsx'
+import BrowseBottles from './pages/BrowseBottles.jsx'
 
 const router = createBrowserRouter([
     {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
             {
                 path: '/drank-history',
                 element: <DrankHistory />,
+            },
+            {
+                path: '/browse',
+                element: <BrowseBottles />,
             }
         ]
     }

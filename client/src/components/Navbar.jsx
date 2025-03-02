@@ -1,7 +1,7 @@
 import { useUser } from "../context/UserContext";
 import AuthService from "../utils/auth";
 import { useNavigate } from "react-router-dom";
-import { Box, Flex, HStack, Button, Text, Spacer, Menu, MenuButton, MenuList, MenuItem, MenuDivider, useToken } from "@chakra-ui/react";
+import { Box, Flex, HStack, Button, Text, Spacer, Menu, MenuButton, MenuList, MenuItem, useToken } from "@chakra-ui/react";
 
 const Navbar = () => {
     const { user, setUser } = useUser();
@@ -20,7 +20,16 @@ const Navbar = () => {
             <Flex h={16} alignItems="center" justifyContent="space-between">
                 {/* Left Side - App Title */}
                 <HStack spacing={8} alignItems="center">
-                    <Text fontSize="5xl" fontWeight="bold" color="text" textShadow={`2px 2px 4px ${primary500}`}>Cellaree</Text>
+                    <Text
+                        fontSize="5xl"
+                        fontWeight="bold"
+                        color="text"
+                        textShadow={`2px 2px 4px ${primary500}`}
+                        onClick={() => navigate("/")}
+                        cursor="pointer"
+                    >
+                        Cellaree
+                    </Text>
                 </HStack>
 
                 <Spacer />
