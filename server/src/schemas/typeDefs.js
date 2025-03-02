@@ -97,6 +97,7 @@ export const typeDefs = gql`
         getReviewsForBottle(bottle: ID!): BottleReviews
         getReviews: [Review]
         getReview(_id: ID!): Review
+        getAllowedCountries: [String]
     }
 
     type Mutation {

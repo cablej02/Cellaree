@@ -147,6 +147,10 @@ const resolvers = {
                 throw new Error(`Error fetching review: ${err}`);
             }
         },
+
+        getAllowedCountries: async () => {
+            return Bottle.schema.path('country').enumValues;
+        }
     },
 
     Mutation: {

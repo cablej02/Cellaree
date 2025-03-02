@@ -112,3 +112,9 @@ export const GET_WINE_STYLES = gql`
         }
     }
 `;
+
+export const GET_ALLOWED_COUNTRIES = gql`
+    {
+        getAllowedCountries
+    }
+`;
