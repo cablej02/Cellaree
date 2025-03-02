@@ -395,6 +395,66 @@ const resolvers = {
                 throw new Error(`Error removing bottle from cellar: ${err}`);
             }
         },
+        drinkCellarBottle: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const user = await User.findById(context.user._id)
+                    .select('cellar drankHistory')
+                    .populate({
+                        path: 'cellar.bottle',
+                        populate: 'winery wineStyle'
+                    }).populate({
+                        path: 'drankHistory.bottle',
+                        populate: 'winery wineStyle'
+                    });
+                
+                if(!user) throw new Error('No user found with this id!');
+                
+                // find the cellar entry
+                const cellarEntry = user.cellar.find(obj => obj._id.toString() === args._id);
+                if (!cellarEntry) throw new Error('No cellar bottle found with this id!');
+
+                // Validate quantity
+                if(args.quantity > cellarEntry.quantity) {
+                    throw new Error("You can't drink more than you have!");
+                }
+
+                // add the bottle to the drankHistory array
+                const drankDate = args.drankDate ? new Date(args.drankDate) : new Date();
+
+                // Find an existing entry with same bottleId, vintage, and drankDate
+                const existingDrankEntry = user.drankHistory.find(
+                    obj => obj.bottle.toString() === cellarEntry.bottle.toString() &&
+                    obj.vintage === args.vintage &&
+                    normalizeDate(obj.drankDate) === normalizeDate(drankDate)
+                );
+
+                if( existingDrankEntry ) {
+                    existingDrankEntry.quantity += args.quantity; // increment quantity drank
+                } else {
+                    // create a new entry and add it to the drankHistory array
+                    user.drankHistory.push({
+                        bottle: cellarEntry.bottle,
+                        vintage: cellarEntry.vintage,
+                        quantity: args.quantity,
+                        drankDate
+                    })
+                }
+
+                // update quantity or remove from cellar
+                if(cellarEntry.quantity > args.quantity) {
+                    cellarEntry.quantity -= args.quantity;
+                } else{
+                    user.cellar = user.cellar.filter(obj => obj._id.toString() !== args._id);
+                }
+
+                await user.save();
+                return { cellar: user.cellar, drankHistory: user.drankHistory};
+            } catch (err) {
+                throw new Error(`Error drinking bottle: ${err}`);
+            }
+        },
 
         addDrankBottle: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError("Not logged in");

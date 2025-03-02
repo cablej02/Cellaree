@@ -76,6 +76,11 @@ export const typeDefs = gql`
         reviews: [Review]
     }
 
+    type DrinkBottleResponse {
+        cellar: [CellarBottle]
+        drankHistory: [DrankBottle]
+    }
+
     type Auth {
         token: ID!
         user: User
@@ -109,6 +114,7 @@ export const typeDefs = gql`
         addCellarBottle(bottle: ID!, vintage: Int, quantity: Int!, purchasePrice: Float, purchaseDate: String): CellarBottle
         updateCellarBottle(_id: ID!, vintage: Int, quantity: Int, purchasePrice: Float, currentValue: Float, purchaseDate: String): CellarBottle
         removeCellarBottle(_id: ID!): CellarBottle
+        drinkCellarBottle(_id: ID!, quantity: Int!, drankDate: String): DrinkBottleResponse
 
         addDrankBottle(bottle: ID!, vintage: Int, drankDate: String, quantity: Int!): DrankBottle
         updateDrankBottle(_id: ID!, vintage: Int, quantity: Int, drankDate: String): DrankBottle
