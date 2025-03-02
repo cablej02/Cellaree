@@ -54,13 +54,17 @@ const resolvers = {
                 throw new Error(`Error fetching WineStyle: ${err}`);
             }
         },
-        getBottles: async (parent, { page = 1, limit = 10 }) => {
-            return Bottle.find()
-                .skip((page - 1) * limit)
-                .limit(limit)
+        getBottles: async (parent, { page = 1, limit = 0 }) => {
+            const result = Bottle.find()
                 .populate('winery')
                 .populate('wineStyle')
                 .lean(); // return as plain JS object
+
+            if (limit > 0) {
+                result.skip((page - 1) * limit).limit(limit);
+            }
+            
+            return result;
         },
         getBottle: async (parent, { _id }) => {
             try {
