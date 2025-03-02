@@ -33,6 +33,18 @@ export const ADD_CELLAR_BOTTLE = gql`
             purchaseDate
             bottle {
                 _id
+                winery {
+                    _id
+                    name
+                }
+                productName
+                country
+                location
+                wineStyle {
+                    _id
+                    name
+                    category
+                }
             }
         }
     }
