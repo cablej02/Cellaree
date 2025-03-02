@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_BOTTLES, GET_WINERIES, GET_WINE_STYLES } from '../utils/queries';
+import { useUser } from '../context/UserContext';
 import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import AddBottleModal from '../components/AddBottleModal';
 
 const BrowseBottles = () => {
+    const { user } = useUser();
     const { data: bottlesData, loading, error } = useQuery(GET_BOTTLES);
     const { data: wineriesData } = useQuery(GET_WINERIES);
     const { data: wineStylesData } = useQuery(GET_WINE_STYLES);
@@ -18,6 +20,14 @@ const BrowseBottles = () => {
             setBottles(bottlesData.getBottles); // Sync state when data loads
         }
     }, [bottlesData]);
+
+    const getBottleUserStats = (bottleId) => {
+        const cellarCount = user?.cellar?.filter((entry) => entry.bottle._id === bottleId).reduce((acc, entry) => acc + entry.quantity, 0);
+        const drankCount = user?.drankHistory?.filter((entry) => entry.bottle._id === bottleId).reduce((acc, entry) => acc + entry.quantity, 0);
+        const onWishlist = user?.wishlist?.some((entry) => entry.bottle._id === bottleId);
+
+        return { cellarCount, drankCount, onWishlist };
+    };
 
     const handleAddBottleSuccess = (newBottle) => {
         console.log('New bottle added:', newBottle);
@@ -41,20 +51,29 @@ const BrowseBottles = () => {
                             <Th color='tertiary'>Wine Style</Th>
                             <Th color='tertiary'>Country</Th>
                             <Th color='tertiary'>Location</Th>
+                            <Th color='tertiary'>In Cellar</Th>
+                            <Th color='tertiary'>Drank</Th>
+                            <Th color='tertiary'>Wishlist</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
                         {bottles.length > 0 ? (
-                            bottles.map((bottle) => (
-                                <Tr key={bottle._id}>
-                                    <Td>{capitalizeWords(bottle.productName)}</Td>
-                                    <Td>{capitalizeWords(bottle.winery.name)}</Td>
-                                    <Td>{bottle.wineStyle.category}</Td>
-                                    <Td>{bottle.wineStyle.name}</Td>
-                                    <Td>{bottle.country}</Td>
-                                    <Td>{bottle.location}</Td>
-                                </Tr>
-                            ))
+                            bottles.map((bottle) => {
+                                const { cellarCount, drankCount, onWishlist } = getBottleUserStats(bottle._id);
+                                return (
+                                    <Tr key={bottle._id}>
+                                        <Td>{capitalizeWords(bottle.productName)}</Td>
+                                        <Td>{capitalizeWords(bottle.winery.name)}</Td>
+                                        <Td>{bottle.wineStyle.category}</Td>
+                                        <Td>{bottle.wineStyle.name}</Td>
+                                        <Td>{bottle.country}</Td>
+                                        <Td>{bottle.location}</Td>
+                                        <Td>{cellarCount}</Td>
+                                        <Td>{drankCount}</Td>
+                                        <Td>{onWishlist ? 'Yes' : 'No'}</Td>
+                                    </Tr>
+                                );
+                            })
                         ) : (
                             <Tr>
                                 <Td colSpan={4} textAlign='center'>No bottles found.</Td>

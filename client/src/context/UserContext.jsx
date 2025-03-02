@@ -3,7 +3,6 @@ import { useQuery, useApolloClient } from "@apollo/client";
 import { ME } from "../utils/queries";
 import AuthService from "../utils/auth";
 import { useNavigate } from "react-router-dom";
-import { use } from "react";
 
 const UserContext = createContext(null);
 
