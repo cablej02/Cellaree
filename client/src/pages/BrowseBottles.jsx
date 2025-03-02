@@ -1,18 +1,37 @@
+import { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_BOTTLES } from '../utils/queries';
+import { GET_WINERIES, GET_WINE_STYLES } from '../utils/queries';
 import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
+import AddBottleModal from '../components/AddBottleModal';
 
 const BrowseBottles = () => {
     const { data, loading, error } = useQuery(GET_BOTTLES);
     const bottles = data?.getBottles || [];
 
+    const { data: wineriesData } = useQuery(GET_WINERIES);
+    const wineries = wineriesData?.getWineries || [];
+
+    const { data: wineStylesData } = useQuery(GET_WINE_STYLES);
+    const wineStyles = wineStylesData?.getWineStyles || [];
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     if (loading) return <Text>Loading bottles...</Text>;
     if (error) return <Text color='red.500'>Error loading bottles.</Text>;
 
+    const handleAddBottleSuccess = (newBottle) => {
+        console.log('New bottle added:', newBottle);
+
+        // do something with the new bottle
+
+        
+    };
+
     return (
         <Box maxW='1000px' mx='auto' p={4}>
-            <Button variant='primary' mb={4}>Add New Bottle</Button>
+            <Button variant='primary' mb={4} onClick={() => setIsModalOpen(true)}>Add New Bottle</Button>
             <Table variant='simple' size='sm'>
                 <Thead>
                     <Tr>
@@ -43,6 +62,13 @@ const BrowseBottles = () => {
                     )}
                 </Tbody>
             </Table>
+            <AddBottleModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAddSuccess={handleAddBottleSuccess}
+                wineries={wineries}
+                wineStyles={wineStyles}
+            />
         </Box>
     );
 };

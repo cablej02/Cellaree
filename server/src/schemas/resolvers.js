@@ -34,7 +34,7 @@ const resolvers = {
             }
             throw new AuthenticationError('Not logged in');
         },
-        getWineries: async () => Winery.find().lean(),
+        getWineries: async () => Winery.find().sort({name:1}).lean(),
         getWinery: async (parent, { _id }) => {
             try {
                 const winery = await Winery.findById( _id );
@@ -44,7 +44,7 @@ const resolvers = {
                 throw new Error(`Error fetching Winery: ${err}`);
             }
         },
-        getWineStyles: async () => WineStyle.find().lean(),
+        getWineStyles: async () => WineStyle.find().sort({name:1}).lean(),
         getWineStyle: async (parent, { _id }) => {
             try {
                 const style = await WineStyle.findById( _id );

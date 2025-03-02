@@ -93,3 +93,22 @@ export const GET_BOTTLES = gql`
         }
     }
 `;
+
+export const GET_WINERIES = gql`
+    {
+        getWineries {
+            _id
+            name
+        }
+    }
+`;
+
+export const GET_WINE_STYLES = gql`
+    {
+        getWineStyles {
+            _id
+            name
+            category
+        }
+    }
+`;
