@@ -26,7 +26,16 @@ const DrankHistory = () => {
     // Sync state with user data on load
     useEffect(() => {
         if (user?.drankHistory) {
-            let sortedHistory = [...user.drankHistory];
+            // create a new array with nested fields flattened for sorting
+            let sortedHistory = user.drankHistory.map(entry => ({
+                ...entry,
+                productName: entry.bottle?.productName || "",
+                wineryName: entry.bottle?.winery?.name || "",
+                country: entry.bottle?.country || "",
+                location: entry.bottle?.location || "",
+                type: entry.bottle?.wineStyle?.category || "",
+                style: entry.bottle?.wineStyle?.name || "",
+            }));
 
             sortedHistory.sort((a, b) => {
                 let valA = a[sortConfig.key];
@@ -41,6 +50,11 @@ const DrankHistory = () => {
                 // convert strings to lowercase before sorting
                 if (typeof valA === "string") valA = valA.toLowerCase();
                 if (typeof valB === "string") valB = valB.toLowerCase();
+
+                // Use localeCompare for string sorting
+                if (typeof valA === "string" && typeof valB === "string") {
+                    return sortConfig.direction === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
 
                 return sortConfig.direction === "asc" ? valA - valB : valB - valA;
             });
@@ -117,7 +131,7 @@ const DrankHistory = () => {
                                 </Td>
                                 <Td color="text">{capitalizeWords(entry.bottle.productName)}</Td>
                                 <Td color="text">{capitalizeWords(entry.bottle.winery.name)}</Td>
-                                <Td color="text">{entry.bottle.winery.countries?.join(", ") || "Unknown"}</Td>
+                                <Td color="text">{entry.bottle.country || "Unknown"}</Td>
                                 <Td color="text">{entry.bottle.location || "Unknown" }</Td>
                                 <Td color="text">{entry.bottle.wineStyle.category}</Td>
                                 <Td color="text">{entry.bottle.wineStyle.name}</Td>
