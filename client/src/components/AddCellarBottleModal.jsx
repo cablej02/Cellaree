@@ -9,7 +9,7 @@ import { useQuery } from '@apollo/client';
 import { GET_BOTTLES } from '../utils/queries';
 import { capitalizeWords } from '../utils/formatting';
 
-const AddBottleModal = ({ isOpen, onClose, onSuccess }) => {
+const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
     const { data } = useQuery(GET_BOTTLES);
     const bottles = data?.getBottles || [];
 
@@ -165,4 +165,4 @@ const AddBottleModal = ({ isOpen, onClose, onSuccess }) => {
     );
 };
 
-export default AddBottleModal;
+export default AddCellarBottleModal;

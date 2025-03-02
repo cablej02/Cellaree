@@ -3,7 +3,7 @@ import { useUser } from "../context/UserContext";
 import { Box, Heading, Button } from "@chakra-ui/react";
 
 import CellarAccordion from "../components/CellarAccordion";
-import AddBottleModal from "../components/AddBottleModal";    
+import AddCellarBottleModal from "../components/AddCellarBottleModal";    
 
 const Cellar = () => {
     const { user, setUser } = useUser();
@@ -57,7 +57,7 @@ const Cellar = () => {
         <Box maxW='1000px' mx='auto' p={4}>
             <Heading as='h1' mb={4}>My Cellar</Heading>
             <Button variant='primary' mb={4} onClick={() => setIsModalOpen(true)}>Add Bottle</Button>
-            <AddBottleModal
+            <AddCellarBottleModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={handleAddBottleSuccess} 
