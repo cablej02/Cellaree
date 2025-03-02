@@ -46,34 +46,34 @@ const AddBottleModal = ({ isOpen, onClose, onAddSuccess, wineries, wineStyles })
                 <ModalCloseButton />
                 <ModalBody>
                     <FormControl isRequired>
-                        <FormLabel>Product Name</FormLabel>
-                        <Input name='productName' value={formData.productName} onChange={handleChange} />
+                        <FormLabel >Product Name</FormLabel>
+                        <Input name='productName' value={formData.productName} onChange={handleChange} bg="dark"/>
                     </FormControl>
                     <FormControl isRequired>
                         <FormLabel>Winery</FormLabel>
-                        <Select name='winery' value={formData.winery} onChange={handleChange}>
-                            <option value='' disabled>Select a winery</option>
+                        <Select name='winery' value={formData.winery} onChange={handleChange} bg="dark">
+                            <option value='' disabled style={{ background: '#212529', color: 'white' }}>Select a Winery</option>
                             {wineries.map((winery) => (
-                                <option key={winery._id} value={winery._id}>{winery.name}</option>
+                                <option key={winery._id} value={winery._id} style={{ background: '#212529', color: 'white' }}>{capitalizeWords(winery.name)}</option>
                             ))}
                         </Select>
                     </FormControl>
                     <FormControl isRequired>
                         <FormLabel>Wine Style</FormLabel>
-                        <Select name='wineStyle' value={formData.wineStyle} onChange={handleChange}>
-                            <option value='' disabled>Select a wine style</option>
+                        <Select name='wineStyle' value={formData.wineStyle} onChange={handleChange} bg="dark">
+                            <option value='' disabled style={{ background: '#212529', color: 'white' }}>Select a Wine Style</option>
                             {wineStyles.map((style) => (
-                                <option key={style._id} value={style._id}>{style.name}</option>
+                                <option key={style._id} value={style._id} style={{ background: '#212529', color: 'white' }}>{capitalizeWords(style.name)}</option>
                             ))}
                         </Select>
                     </FormControl>
                     <FormControl isRequired>
                         <FormLabel>Country</FormLabel>
-                        <Input name='country' value={formData.country} onChange={handleChange} />
+                        <Input name='country' value={formData.country} onChange={handleChange} bg="dark"/>
                     </FormControl>
                     <FormControl>
                         <FormLabel>Location</FormLabel>
-                        <Input name='location' value={formData.location} onChange={handleChange} />
+                        <Input name='location' value={formData.location} onChange={handleChange} bg="dark"/>
                     </FormControl>
                 </ModalBody>
                 <ModalFooter>
