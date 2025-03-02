@@ -46,8 +46,12 @@ const Cellar = () => {
     } , [user]);
 
     const handleAddBottleSuccess = (newBottle) => {
-        setUser({ ...user, cellar: [...user.cellar, newBottle] });
-    }
+        // if bottle already exists, do nothing.  Apollo cache will update automatically
+        if(user.cellar.some(entry => entry._id === newBottle._id)) return;
+        
+        // add new bottle to user context
+        setUser(prev => ({ ...prev, cellar: [...prev.cellar, newBottle] })); 
+    };
 
     return (
         <Box maxW='1000px' mx='auto' p={4}>
