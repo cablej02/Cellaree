@@ -37,3 +37,54 @@ export const ADD_CELLAR_BOTTLE = gql`
         }
     }
 `;
+
+export const DRINK_CELLAR_BOTTLE = gql`
+    mutation drinkCellarBottle($_id: ID!, $quantity: Int!, $drankDate: String) {
+        drinkCellarBottle(_id: $_id, quantity: $quantity, drankDate: $drankDate) {
+            cellar {
+                _id
+                bottle {
+                    _id
+                    winery {
+                        _id
+                        name
+                    }
+                    productName
+                    country
+                    location
+                    wineStyle {
+                        _id
+                        name
+                        category
+                    }
+                }
+                vintage
+                quantity
+                purchasePrice
+                currentValue
+                purchaseDate
+            }
+            drankHistory {
+                _id
+                vintage
+                quantity
+                drankDate
+                bottle {
+                    _id
+                    winery {
+                        _id
+                        name
+                    }
+                    productName
+                    country
+                    location
+                    wineStyle {
+                        _id
+                        name
+                        category
+                    }
+                }
+            }
+        }
+    }
+`;

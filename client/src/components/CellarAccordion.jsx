@@ -1,7 +1,23 @@
-import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, Text, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
+import { useMutation } from '@apollo/client';
+import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, Text, Button, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
+import { DRINK_CELLAR_BOTTLE } from '../utils/mutations';
 
 const CellarAccordion = ({ groupedBottles}) => {
+    const [drinkCellarBottle] = useMutation(DRINK_CELLAR_BOTTLE);
+
+    const handleDrinkBottle = async (entry) => {
+        console.log("Drinking bottle:", entry);
+        const variables = {
+            _id: entry._id,
+            quantity: 1,
+        }
+        const { data } = await drinkCellarBottle({
+            variables
+        });
+        console.log(data);
+    }
+
     return (
         <Accordion allowToggle>
             {groupedBottles.length > 0 ? (
@@ -27,6 +43,7 @@ const CellarAccordion = ({ groupedBottles}) => {
                                         <Th color="tertiary">Purchase Price</Th>
                                         <Th color="tertiary">Current Value</Th>
                                         <Th color="tertiary">Purchase Date</Th>
+                                        <Th color="tertiary">Drink Bottle</Th>
                                     </Tr>
                                 </Thead>
                                 <Tbody>
@@ -37,6 +54,9 @@ const CellarAccordion = ({ groupedBottles}) => {
                                             <Td>${entry.purchasePrice?.toFixed(2) || 'N/A'}</Td>
                                             <Td>${entry.currentValue?.toFixed(2) || 'N/A'}</Td>
                                             <Td>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Td>
+                                            <Td>
+                                                <Button variant='secondary' size='xs' onClick={() => handleDrinkBottle(entry)}>Drink</Button>
+                                            </Td>
                                         </Tr>
                                     ))}
                                 </Tbody>
