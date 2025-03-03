@@ -100,7 +100,7 @@ const BrowseBottles = () => {
                                                 onClick={() => toggleWishlist(bottle._id)}
                                                 aria-label='Toggle Wishlist'
                                                 bg="transparent"
-                                                _hover={{ filter: "drop-shadow(0px 0px 6px rgba(255, 255, 255, 0.8))" }}
+                                                _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
                                                 _active={{ bg: "transparent" }}
                                             />
                                         </Td>
