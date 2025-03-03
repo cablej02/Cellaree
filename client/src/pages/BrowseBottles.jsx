@@ -55,8 +55,8 @@ const BrowseBottles = () => {
     };
     
     //color imports
-    const primaryColor = useToken("colors", "primary.500");
-    const backgroundColor = useToken("colors", "background");
+    const primaryColor = useToken("colors", "primary.300");
+    const textColor = useToken("colors", "text");
     return (
         <Box maxW='1000px' mx='auto' p={4}>
             {loading && <Text>Loading bottles...</Text>}
@@ -95,12 +95,13 @@ const BrowseBottles = () => {
                                         <Td>{drankCount}</Td>
                                         <Td textAlign="center">
                                             <IconButton
-                                                icon={onWishlist ? <BsBagHeartFill color='red' /> : <BsBagHeart color='white' />}
+                                                icon={onWishlist ? <BsBagHeartFill color={primaryColor} /> : <BsBagHeart color={textColor} />}
                                                 size='lg'
                                                 onClick={() => toggleWishlist(bottle._id)}
                                                 aria-label='Toggle Wishlist'
-                                                variant='ghost'
-                                                _hover={{ bg: 'gray', color: 'white' }}
+                                                bg="transparent"
+                                                _hover={{ filter: "drop-shadow(0px 0px 6px rgba(255, 255, 255, 0.8))" }}
+                                                _active={{ bg: "transparent" }}
                                             />
                                         </Td>
                                     </Tr>
