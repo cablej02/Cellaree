@@ -157,7 +157,7 @@ const resolvers = {
         // login via email or username
         login: async (parent, { email, password }) => {
             try {
-                const user = await User.findOne({ $or: [{ username: email }, { email: email }] });
+                const user = await User.findOne({ $or: [{ username_lower: email.toLowerCase() }, { email: email.toLowerCase() }] });
 
                 if (!user) {
                     throw new AuthenticationError("Can't find this user");

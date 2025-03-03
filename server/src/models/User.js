@@ -10,7 +10,13 @@ const userSchema = new Schema(
         username: {
             type: String,
             required: true,
+            trim: true,
+            unique: false, // Remove uniqueness from the main field
+        },
+        username_lower: {
+            type: String,
             unique: true,
+            lowercase: true,
             trim: true,
             index: true,
         },
@@ -34,8 +40,13 @@ const userSchema = new Schema(
     { timestamps: true }
 );
 
-// set up pre-save middleware to create password to hash
 userSchema.pre('save', async function (next) {
+    // create a username_lower field for case-insensitive unique usernames
+    if(this.isModified('username')) {
+        this.username_lower = this.username.toLowerCase();
+    }
+
+    //create password to hash
     if (this.isNew || this.isModified('password')) {
         const saltRounds = 10;
         this.password = await bcrypt.hash(this.password, saltRounds);
