@@ -101,6 +101,56 @@ export const DRINK_CELLAR_BOTTLE = gql`
     }
 `;
 
+export const ADD_WISHLIST_BOTTLE = gql`
+    mutation addWishlistBottle($bottle: ID!) {
+        addWishlistBottle(bottle: $bottle) {
+            _id
+            notes
+            addedDate
+            bottle {
+                _id
+                winery {
+                    _id
+                    name
+                }
+                productName
+                country
+                location
+                wineStyle {
+                    _id
+                    name
+                    category
+                }
+            }
+        }
+    }
+`;
+
+export const REMOVE_WISHLIST_BOTTLE = gql`
+    mutation removeWishlistBottle($_id: ID!) {
+        removeWishlistBottle(_id: $_id) {
+            _id
+            notes
+            addedDate
+            bottle {
+                _id
+                winery {
+                    _id
+                    name
+                }
+                productName
+                country
+                location
+                wineStyle {
+                    _id
+                    name
+                    category
+                }
+            }
+        }
+    }
+`;
+
 export const ADD_BOTTLE = gql`
     mutation addBottle($productName: String!, $winery: ID!, $wineStyle: ID!, $country: String!, $location: String) {
         addBottle(productName: $productName, winery: $winery, wineStyle: $wineStyle, country: $country, location: $location) {

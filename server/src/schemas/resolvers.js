@@ -624,7 +624,10 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                const user = await User.findById(context.user._id).select('wishlist');
+                const user = await User.findById(context.user._id).select('wishlist').populate({
+                    path: 'wishlist.bottle',
+                    populate: 'winery wineStyle'
+                })
 
                 const removedEntry = user.wishlist.find(obj => obj._id.toString() === args._id);
 

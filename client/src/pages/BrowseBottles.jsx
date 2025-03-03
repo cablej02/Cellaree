@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
+import { ADD_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from '../utils/mutations';
 import { GET_BOTTLES, GET_WINERIES, GET_WINE_STYLES } from '../utils/queries';
 import { useUser } from '../context/UserContext';
-import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text } from '@chakra-ui/react';
+import { Box, Button, IconButton, Table, Thead, Tbody, Tr, Th, Td, Text, useToken } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import AddBottleModal from '../components/AddBottleModal';
+import { BsBagHeart, BsBagHeartFill } from "react-icons/bs";
 
 const BrowseBottles = () => {
-    const { user } = useUser();
+    const { user, setUser } = useUser();
     const { data: bottlesData, loading, error } = useQuery(GET_BOTTLES);
     const { data: wineriesData } = useQuery(GET_WINERIES);
     const { data: wineStylesData } = useQuery(GET_WINE_STYLES);
     
     const [bottles, setBottles] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [addWishlistBottle] = useMutation(ADD_WISHLIST_BOTTLE);
+    const [removeWishlistBottle] = useMutation(REMOVE_WISHLIST_BOTTLE);
 
     useEffect(() => {
         if (bottlesData?.getBottles && !loading) {
@@ -29,11 +34,29 @@ const BrowseBottles = () => {
         return { cellarCount, drankCount, onWishlist };
     };
 
+    const toggleWishlist = async (bottleId) => {
+        const isOnWishlist = user?.wishlist?.some((entry) => entry.bottle._id === bottleId);
+        try {
+            if (isOnWishlist) {
+                await removeWishlistBottle({ variables: { _id: user.wishlist.find((entry) => entry.bottle._id === bottleId)._id } });
+                setUser({ ...user, wishlist: user.wishlist.filter((entry) => entry.bottle._id !== bottleId) });
+            } else {
+                const { data } = await addWishlistBottle({ variables: { bottle: bottleId } });
+                setUser({ ...user, wishlist: [...user.wishlist, data.addWishlistBottle] });
+            }
+        } catch (error) {
+            console.error('Error updating wishlist:', error);
+        }
+    };
+
     const handleAddBottleSuccess = (newBottle) => {
         console.log('New bottle added:', newBottle);
         setBottles((prevBottles) => [...prevBottles, newBottle]);
     };
-
+    
+    //color imports
+    const primaryColor = useToken("colors", "primary.500");
+    const backgroundColor = useToken("colors", "background");
     return (
         <Box maxW='1000px' mx='auto' p={4}>
             {loading && <Text>Loading bottles...</Text>}
@@ -70,7 +93,16 @@ const BrowseBottles = () => {
                                         <Td>{bottle.location}</Td>
                                         <Td>{cellarCount}</Td>
                                         <Td>{drankCount}</Td>
-                                        <Td>{onWishlist ? 'Yes' : 'No'}</Td>
+                                        <Td textAlign="center">
+                                            <IconButton
+                                                icon={onWishlist ? <BsBagHeartFill color='red' /> : <BsBagHeart color='white' />}
+                                                size='lg'
+                                                onClick={() => toggleWishlist(bottle._id)}
+                                                aria-label='Toggle Wishlist'
+                                                variant='ghost'
+                                                _hover={{ bg: 'gray', color: 'white' }}
+                                            />
+                                        </Td>
                                     </Tr>
                                 );
                             })
