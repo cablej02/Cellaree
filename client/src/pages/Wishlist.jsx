@@ -9,6 +9,7 @@ import { FaTrash, FaSave } from "react-icons/fa";
 const Wishlist = () => {
     const { user, setUser } = useUser();
     const [notes, setNotes] = useState({});
+    const [noteChanged, setNoteChanged] = useState({});
 
     const sortWishlist = (wishlist) => {
         return [...wishlist].sort((a, b) => {
@@ -22,11 +23,13 @@ const Wishlist = () => {
 
     const handleNoteChange = (id, value) => {
         setNotes({ ...notes, [id]: value });
+        setNoteChanged({ ...noteChanged, [id]: true });
     }
 
     const handleSaveNote = async (id) => {
         try {
             await updateWishlistBottle({ variables: { _id: id, notes: notes[id] } });
+            setNoteChanged({ ...noteChanged, [id]: false });
         } catch (error) {
             console.error("Error updating note:", error);
         }
@@ -84,19 +87,21 @@ const Wishlist = () => {
                                             borderRadius="md"
                                             w="100%"
                                         />
-                                        <IconButton 
-                                            icon={<FaSave color="green" />} 
-                                            bg="transparent"
-                                            variant="ghost"
-                                            onClick={() => handleSaveNote(entry._id)}
-                                            aria-label="Save note"
-                                            _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
-                                            _active={{ bg: "transparent" }}
-                                            position="absolute"
-                                            bottom={-1}
-                                            right={-1}
-                                            zIndex={"1001"}
-                                        />
+                                        {noteChanged[entry._id] && (
+                                            <IconButton 
+                                                icon={<FaSave color="green" />} 
+                                                bg="transparent"
+                                                variant="ghost"
+                                                onClick={() => handleSaveNote(entry._id)}
+                                                aria-label="Save note"
+                                                _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
+                                                _active={{ bg: "transparent" }}
+                                                position="absolute"
+                                                bottom={-1}
+                                                right={-1}
+                                                zIndex={"1001"}
+                                            />
+                                        )}
                                     </Box>
                                 </HStack>
                             </CardBody>
