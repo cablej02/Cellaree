@@ -97,7 +97,7 @@ const Login = () => {
                                 </FormControl>
 
                                 <Button type="submit" variant="primary" width="full">Sign Up</Button>
-                                {signupError && <Text color="error">Error creating account</Text>}
+                                {signupError && <Text color="red.400">Error creating account</Text>}
                             </VStack>
                         </form>
                     </TabPanel>
