@@ -190,25 +190,55 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
+                const user = await User.findById(context.user._id).select('username email password');
+
+                if(!user) throw new Error('No user found with this id!');
+
+                // check if the current password is correct
+                const validPassword = await user.isCorrectPassword(args.password);
+                console.log(validPassword, typeof validPassword); //TODO remove this
+                if (!validPassword) throw new AuthenticationError('Incorrect password!');
+
                 // add new fields to updatedFields object
                 const updatedFields = {};
                 if(args.username) updatedFields.username = args.username;
                 if(args.email) updatedFields.email = args.email;
-                if(args.password) updatedFields.password = args.password;
 
                 if( !Object.keys(updatedFields).length ) throw new Error('No fields to update!');
 
-                const user = await User.findByIdAndUpdate(
-                    context.user._id, 
+                const updatedUser = await User.findByIdAndUpdate(
+                    user._id,
                     { $set: updatedFields },
                     { new: true, runValidators: true }
                 ).select('username email');
 
-                if(!user) throw new Error('No user found with this id!');
-                
-                return user;
+                return updatedUser;
             } catch (err) {
                 throw new Error(`Error updating user: ${err}`);
+            }
+        },
+        updatePassword: async (parent, args, context) => {
+            if (!context.user) throw new AuthenticationError("Not logged in");
+
+            try {
+                const user = await User.findById(context.user._id).select('password');
+
+                if (!user) throw new Error('No user found with this id!');
+
+                // check if the current password is correct
+                const validPassword = await user.isCorrectPassword(args.currentPassword);
+                console.log(validPassword, typeof validPassword); //TODO remove this
+                if (!validPassword) throw new AuthenticationError('Incorrect password!');
+
+                await User.findByIdAndUpdate(
+                    user._id,
+                    { $set: { password: args.newPassword } },
+                    { new: true }
+                );
+
+                return 'Password updated Successfully!';
+            } catch (err) {
+                throw new Error(`Error updating password: ${err}`);
             }
         },
         removeUser: async (parent, args, context) => {

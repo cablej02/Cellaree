@@ -22,6 +22,21 @@ export const ADD_USER = gql`
     }
 `;
 
+export const UPDATE_USER = gql`
+    mutation updateUser($username: String, $email: String, $password: String!) {
+        updateUser(username: $username, email: $email, password: $password) {
+            username
+            email
+        }
+    }
+`;
+
+export const UPDATE_PASSWORD = gql`
+    mutation updatePassword($currentPassword: String!, $newPassword: String!) {
+        updatePassword(currentPassword: $currentPassword, newPassword: $newPassword)
+    }
+`;
+
 export const ADD_CELLAR_BOTTLE = gql`
     mutation addCellarBottle($bottle: ID!, $quantity: Int!, $vintage: Int, $purchasePrice: Float) {
         addCellarBottle(bottle: $bottle, quantity: $quantity, vintage: $vintage, purchasePrice: $purchasePrice) {
