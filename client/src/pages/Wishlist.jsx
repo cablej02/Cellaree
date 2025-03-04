@@ -4,7 +4,7 @@ import { Box, Text, Textarea, Button, HStack, VStack, Card, CardBody, CardHeader
 import { UPDATE_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from "../utils/mutations";
 import { useMutation } from "@apollo/client";
 import { capitalizeWords } from "../utils/formatting.js";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaSave } from "react-icons/fa";
 
 const Wishlist = () => {
     const { user, setUser } = useUser();
@@ -49,42 +49,56 @@ const Wishlist = () => {
             ) : (
                 <VStack spacing={4} align="stretch">
                     {wishlist.map((entry) => (
-                        <Card key={entry._id} p={4} bg="dark" color="text" shadow="md" borderRadius="md">
-                            <CardHeader>
-                                <HStack justify="space-between">
-                                    <Box>
+                        <Card key={entry._id} p={4} bg="dark" color="text" shadow="md" borderRadius="md" position="relative">
+                            <IconButton 
+                                icon={<FaTrash color="red" />} 
+                                bg="transparent"
+                                variant="ghost"
+                                onClick={() => handleRemoveEntry(entry._id)}
+                                aria-label="Remove from wishlist"
+                                _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
+                                _active={{ bg: "transparent" }}
+                                position="absolute"
+                                top={2}
+                                right={2}
+                            />
+                            <CardBody>
+                                <HStack align="start" spacing={4} w="97%">
+                                    <Box flex={2}>
                                         <Heading size="md">{capitalizeWords(entry.bottle.productName)}</Heading>
                                         <Text fontSize="sm" color="secondary">{capitalizeWords(entry.bottle.winery.name)} - {capitalizeWords(entry.bottle.wineStyle.name)}</Text>
                                         <Text fontSize="sm" color="secondary">Added: {entry.addedDate ? new Date(parseInt(entry.addedDate)).toLocaleDateString() : "Unknown"}</Text>
                                     </Box>
-                                    <IconButton 
-                                        icon={<FaTrash />} 
-                                        colorScheme="red" 
-                                        variant="ghost"
-                                        onClick={() => handleRemoveEntry(entry._id)}
-                                        aria-label="Remove from wishlist"
-                                        _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
-                                        _active={{ bg: "transparent" }}
-                                    />
+                                    <Box flex={3} position="relative">
+                                        <Textarea 
+                                            placeholder="Add notes..." 
+                                            value={notes[entry._id] ?? entry.notes ?? ""} 
+                                            onChange={(e) => handleNoteChange(entry._id, e.target.value)}
+                                            resize="none"
+                                            overflowY="auto"
+                                            minH="100px"
+                                            maxH="200px"
+                                            bg="background"
+                                            color="text"
+                                            borderColor="secondary"
+                                            borderRadius="md"
+                                            w="100%"
+                                        />
+                                        <IconButton 
+                                            icon={<FaSave color="green" />} 
+                                            bg="transparent"
+                                            variant="ghost"
+                                            onClick={() => handleSaveNote(entry._id)}
+                                            aria-label="Save note"
+                                            _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
+                                            _active={{ bg: "transparent" }}
+                                            position="absolute"
+                                            bottom={-1}
+                                            right={-1}
+                                            zIndex={"1001"}
+                                        />
+                                    </Box>
                                 </HStack>
-                            </CardHeader>
-                            <CardBody>
-                                <VStack align="stretch">
-                                    <Textarea 
-                                        placeholder="Add notes..." 
-                                        value={notes[entry._id] ?? entry.notes ?? ""} 
-                                        onChange={(e) => handleNoteChange(entry._id, e.target.value)}
-                                        resize="none"
-                                        overflowY="auto"
-                                        minH="100px"
-                                        maxH="200px"
-                                        bg="background"
-                                        color="text"
-                                        borderColor="secondary"
-                                        borderRadius="md"
-                                    />
-                                    <Button size="sm" colorScheme="blue" onClick={() => handleSaveNote(entry._id)}>Save</Button>
-                                </VStack>
                             </CardBody>
                         </Card>
                     ))}
