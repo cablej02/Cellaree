@@ -40,6 +40,12 @@ const userSchema = new Schema(
     { timestamps: true }
 );
 
+// helper function to hash a password
+const hashPassword = async (password) => {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+};
+
 userSchema.pre('save', async function (next) {
     // create a username_lower field for case-insensitive unique usernames
     if(this.isModified('username')) {
@@ -48,10 +54,33 @@ userSchema.pre('save', async function (next) {
 
     //create password to hash
     if (this.isNew || this.isModified('password')) {
-        const saltRounds = 10;
-        this.password = await bcrypt.hash(this.password, saltRounds);
+        this.password = await hashPassword(this.password);
     }
   
+    next();
+});
+
+// also called on findByIdAndUpdate
+userSchema.pre("findOneAndUpdate", async function (next) {
+    // get the update object
+    const update = this.getUpdate();
+
+    // updates username_lower if username is updated
+    if (update.username) {
+        update.username_lower = update.username.toLowerCase();
+    }
+    if (update.$set?.username) {
+        update.$set.username_lower = update.$set.username.toLowerCase();
+    }
+
+    // Hash password before updating
+    if (update.password) {
+        update.password = await hashPassword(update.password);
+    }
+    if (update.$set?.password) {
+        update.$set.password = await hashPassword(update.$set.password);
+    }
+
     next();
 });
 
