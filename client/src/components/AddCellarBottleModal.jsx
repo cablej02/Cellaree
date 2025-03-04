@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { 
-    Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter, 
-    Button, FormControl, FormLabel, FormErrorMessage, Input, NumberInput, NumberInputField, List, ListItem
+    Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter, Box,
+    Button, FormControl, FormLabel, FormErrorMessage, Input, NumberInput, NumberInputField, List, ListItem,
+    VStack
 } from '@chakra-ui/react';
 import { useMutation } from '@apollo/client';
 import { ADD_CELLAR_BOTTLE } from '../utils/mutations';
@@ -38,18 +39,12 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
         const input = e.target.value;
         setSearchInput(input);
        
-        const filteredBottles = [];
-        for (const bottle of bottles) {
-            if (
-                bottle.winery.name.toLowerCase().includes(input.toLowerCase()) ||
-                bottle.productName.toLowerCase().includes(input.toLowerCase()) ||
-                `${bottle.winery.name} - ${bottle.productName}`.toLowerCase().includes(input.toLowerCase()) ||
-                (bottle.winery.name.toLowerCase().includes(input.toLowerCase()) && bottle.productName.toLowerCase().includes(input.toLowerCase()))
-            ) {
-                filteredBottles.push(bottle);
-                if (filteredBottles.length === 5) break; // limit search results to 5
-            }
-        };
+        const filteredBottles = !input ? [] : bottles.filter((bottle) => (
+            bottle.winery.name.toLowerCase().includes(input.toLowerCase()) ||
+            bottle.productName.toLowerCase().includes(input.toLowerCase()) ||
+            `${bottle.winery.name} - ${bottle.productName}`.toLowerCase().includes(input.toLowerCase()) ||
+            (bottle.winery.name.toLowerCase().includes(input.toLowerCase()) && bottle.productName.toLowerCase().includes(input.toLowerCase()))
+        ));
 
         setSearchResults(filteredBottles);
     };
@@ -121,20 +116,24 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
                             onChange={handleSearchChange}
                             bg='light' color='white'
                         />
-                        {searchResults.length > 0 && (
-                            <List bg='dark' borderRadius='md' mt={2} position="absolute" zIndex={1} w='100%'>
-                                {searchResults.map((bottle) => (
-                                    <ListItem 
-                                        key={bottle._id}
-                                        p={2}
-                                        _hover={{ bg: 'light', cursor: 'pointer' }}
-                                        onClick={() => handleSelectBottle(bottle._id, `${capitalizeWords(bottle.winery.name)} - ${capitalizeWords(bottle.productName)}`)}
-                                    >
-                                        {capitalizeWords(bottle.winery.name)} - {capitalizeWords(bottle.productName)}
-                                    </ListItem>
-                                ))}
-                            </List>
-                        )}
+                        <Box maxH="250px" overflowY="auto" position="absolute" w='100%' zIndex={1}>
+                            <VStack align='stretch' spacing={0}>
+                                {searchResults.length > 0 && (
+                                    <List bg='dark' borderRadius='md' mt={2}>
+                                        {searchResults.map((bottle) => (
+                                            <ListItem 
+                                                key={bottle._id}
+                                                p={2}
+                                                _hover={{ bg: 'light', cursor: 'pointer' }}
+                                                onClick={() => handleSelectBottle(bottle._id, `${capitalizeWords(bottle.winery.name)} - ${capitalizeWords(bottle.productName)}`)}
+                                            >
+                                                {capitalizeWords(bottle.winery.name)} - {capitalizeWords(bottle.productName)}
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                )}
+                            </VStack>
+                        </Box>
                         <FormErrorMessage>{bottleIdError}</FormErrorMessage>
                     </FormControl>
                     <FormControl>
