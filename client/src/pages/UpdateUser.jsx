@@ -69,11 +69,11 @@ const UpdateUser = () => {
                         <VStack spacing={4} align="stretch">
                             <FormControl>
                                 <FormLabel>Updated Username</FormLabel>
-                                <Input name="username" bg="light" placeholder="New Username..." value={formData.username} onChange={handleInputChange} />
+                                <Input name="username" type="text" bg="light" placeholder="New Username..." value={formData.username} onChange={handleInputChange} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Updated Email</FormLabel>
-                                <Input name="email" bg="light" placeholder="New Email..." value={formData.email} onChange={handleInputChange} />
+                                <Input name="email" type="email" bg="light" placeholder="New Email..." value={formData.email} onChange={handleInputChange} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Password</FormLabel>
