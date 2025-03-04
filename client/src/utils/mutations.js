@@ -210,3 +210,31 @@ export const ADD_BOTTLE = gql`
         }
     }
 `;
+
+export const ADD_REVIEW = gql`
+    mutation addReview($bottle: ID!, $rating: Int!, $content: String, $isPublic: Boolean!) {
+        addReview(bottle: $bottle, rating: $rating, content: $content, isPublic: $isPublic) {
+            _id
+            rating
+            content
+            isPublic
+            user {
+                _id
+                username
+            }
+            bottle {
+                _id
+                productName
+                winery {
+                    _id
+                    name
+                }
+                wineStyle {
+                    _id
+                    name
+                    category
+                }
+            }
+        }
+    }
+`;

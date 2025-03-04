@@ -678,7 +678,13 @@ const resolvers = {
             if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
-                return await Review.create({ ...args, user: context.user._id });
+                const newReview = await Review.create({ ...args, user: context.user._id });
+                return await Review.findById(newReview._id)
+                    .populate('user', 'username')
+                    .populate({
+                        path: 'bottle',
+                        populate: 'winery wineStyle'
+                    });
             } catch (err) {
                 throw new Error(`Error adding review: ${err}`);
             }
