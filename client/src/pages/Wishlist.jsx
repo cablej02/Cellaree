@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useUser } from "../context/UserContext";
 import { Box, Text, Textarea, Button, HStack, VStack, Card, CardBody, CardHeader, Heading, IconButton  } from "@chakra-ui/react";
+import { UPDATE_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from "../utils/mutations";
+import { useMutation } from "@apollo/client";
 import { capitalizeWords } from "../utils/formatting.js";
 import { FaTrash } from "react-icons/fa";
 
 const Wishlist = () => {
-    const { user } = useUser();
+    const { user, setUser } = useUser();
     const [notes, setNotes] = useState({});
 
     const sortWishlist = (wishlist) => {
@@ -13,19 +15,30 @@ const Wishlist = () => {
             return parseInt(b.addedDate) - parseInt(a.addedDate);
         });
     };
-
     const wishlist = sortWishlist(user?.wishlist || []);
+
+    const [updateWishlistBottle] = useMutation(UPDATE_WISHLIST_BOTTLE);
+    const [removeWishlistBottle] = useMutation(REMOVE_WISHLIST_BOTTLE);
 
     const handleNoteChange = (id, value) => {
         setNotes({ ...notes, [id]: value });
     }
 
     const handleSaveNote = async (id) => {
-        console.log("Save note", id, notes[id]);
+        try {
+            await updateWishlistBottle({ variables: { _id: id, notes: notes[id] } });
+        } catch (error) {
+            console.error("Error updating note:", error);
+        }
     };
 
-    const handleRemoveEntry = async (id) => {
-        console.log("Remove entry", id);
+    const handleRemoveEntry = async (_id) => {
+        try {
+            await removeWishlistBottle({ variables: { _id } });
+            setUser({ ...user, wishlist: user.wishlist.filter((entry) => entry._id !== _id) });
+        } catch (error) {
+            console.error("Error removing entry:", error);
+        }
     };
 
     return (

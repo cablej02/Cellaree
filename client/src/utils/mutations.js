@@ -126,6 +126,31 @@ export const ADD_WISHLIST_BOTTLE = gql`
     }
 `;
 
+export const UPDATE_WISHLIST_BOTTLE = gql`
+    mutation updateWishlistBottle($_id: ID!, $notes: String!) {
+        updateWishlistBottle(_id: $_id, notes: $notes) {
+            _id
+            notes
+            addedDate
+            bottle {
+                _id
+                winery {
+                    _id
+                    name
+                }
+                productName
+                country
+                location
+                wineStyle {
+                    _id
+                    name
+                    category
+                }
+            }
+        }
+    }
+`;
+
 export const REMOVE_WISHLIST_BOTTLE = gql`
     mutation removeWishlistBottle($_id: ID!) {
         removeWishlistBottle(_id: $_id) {
