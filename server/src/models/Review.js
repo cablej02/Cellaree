@@ -23,7 +23,7 @@ const reviewSchema = new Schema(
             type: Number,
             required: true,
             min: 0,
-            max: 5,
+            max: 100,
         },
         content: {
             type: String,

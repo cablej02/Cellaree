@@ -60,7 +60,7 @@ export const typeDefs = gql`
         user: ReviewUser
         bottle: Bottle
         vintage: Int
-        rating: Float
+        rating: Int
         content: String
         isPublic: Boolean
     }
@@ -126,7 +126,7 @@ export const typeDefs = gql`
         updateWishlistBottle(_id: ID!, notes: String!): WishlistBottle
         removeWishlistBottle(_id: ID!): WishlistBottle
 
-        addReview(bottle: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean!): Review
+        addReview(bottle: ID!, vintage: Int, rating: Int!, content: String, isPublic: Boolean!): Review
         updateReview(_id: ID!, vintage: Int, rating: Float, content: String, isPublic: Boolean): Review
         removeReview(_id: ID!): Review
     }
