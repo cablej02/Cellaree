@@ -3,7 +3,6 @@ import { Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton,
 import { useMutation } from "@apollo/client";
 import { ADD_REVIEW } from "../utils/mutations";
 import { capitalizeWords } from "../utils/formatting";
-import { Form } from "react-router-dom";
 
 const ReviewModal = ({ isOpen, onClose, bottle, drankVintage }) => {
     const [formData, setFormData] = useState({
