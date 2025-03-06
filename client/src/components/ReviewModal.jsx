@@ -13,7 +13,7 @@ const ReviewModal = ({ isOpen, onClose, bottle, drankVintage }) => {
         isPublic: true,
     });
     const [addReview] = useMutation(ADD_REVIEW);
-    const [status, setStatus] = useState({ message: "", type: "" });
+    const [error, setError] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -21,8 +21,8 @@ const ReviewModal = ({ isOpen, onClose, bottle, drankVintage }) => {
     };
 
     const handleSubmit = async () => {
-        if (!formData.rating || !formData.content) {
-            return setStatus({ message: "All fields are required.", type: "error" });
+        if (!formData.rating) {
+            return setError("Enter a rating.");
         }
         try {
             const variables = {
@@ -34,11 +34,11 @@ const ReviewModal = ({ isOpen, onClose, bottle, drankVintage }) => {
             if (formData.vintage) variables.vintage = parseInt(formData.vintage);
 
             await addReview({variables});
-            setStatus({ message: "Review added successfully!", type: "success" });
-            setTimeout(() => onClose(), 1000)
+            setError("Review added successfully!");
+            onClose()
         } catch (error) {
             console.error("Error adding review:", error);
-            setStatus({ message: "Failed to add review.", type: "error" });
+            setError("Failed to add review.");
         }
     };
 
@@ -67,7 +67,7 @@ const ReviewModal = ({ isOpen, onClose, bottle, drankVintage }) => {
                             <Textarea name="content" placeholder="Write your review..." value={formData.content} onChange={handleChange} />
                         </FormControl>
                         <Checkbox name="isPublic" isChecked={formData.isPublic} onChange={handleChange}>Make Review Public</Checkbox>
-                        {status.message && <p style={{ color: status.type === "success" ? "green" : "red" }}>{status.message}</p>}
+                        {error && <Text color='red.500' mt={2}>{error}</Text>}
                     </VStack>
                 </ModalBody>
                 <ModalFooter>
