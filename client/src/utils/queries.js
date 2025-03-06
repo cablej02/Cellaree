@@ -118,3 +118,30 @@ export const GET_ALLOWED_COUNTRIES = gql`
         getAllowedCountries
     }
 `;
+
+export const GET_USER_REVIEWS = gql`
+    {
+        getUserReviews {
+            _id
+            bottle {
+                _id
+                winery {
+                    _id
+                    name
+                }
+                productName
+                country
+                location
+                wineStyle {
+                    _id
+                    name
+                    category
+                }
+            }
+            vintage
+            rating
+            content
+            isPublic
+        }
+    }
+`;

@@ -3,8 +3,9 @@ import {
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter, 
     Button, FormControl, FormLabel, Input, NumberInput, NumberInputField, Text
 } from '@chakra-ui/react';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { DRINK_CELLAR_BOTTLE } from '../utils/mutations';
+import { GET_USER_REVIEWS } from '../utils/queries';
 import { capitalizeWords } from '../utils/formatting';
 import { useUser } from '../context/UserContext';
 import ReviewModal from './ReviewModal';
@@ -18,6 +19,7 @@ const DrinkBottleModal = ({ entry, isOpen, onClose }) => {
     const [showReviewModal, setShowReviewModal] = useState(false);
 
     const [drinkCellarBottle, { loading }] = useMutation(DRINK_CELLAR_BOTTLE);
+    const { data: reviewData } = useQuery(GET_USER_REVIEWS);
 
     const handleSubmit = async () => {
         if (quantity < 1 || quantity > entry.quantity) {
@@ -44,7 +46,14 @@ const DrinkBottleModal = ({ entry, isOpen, onClose }) => {
                 }));
             }
             onClose();
-            setShowReviewModal(true);
+
+            // If user has not reviewed this bottle+vintage, show review modal
+            const reviews = reviewData?.getUserReviews || [];
+            console.log(reviews);
+            const reviewed = reviews.some(review => review.bottle._id === entry.bottle._id && review.vintage === entry.vintage);
+            if (!reviewed) {
+                setShowReviewModal(true);
+            }
         } catch (err) {
             console.error('Error drinking bottle:', err);
             setError('Unable to process request.');

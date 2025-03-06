@@ -79,7 +79,7 @@ const resolvers = {
                 throw new Error(`Error fetching bottle: ${err}`);
             }
         },
-        getReviewsForBottle: async (parent, { bottleId }, context) => {
+        getBottleReviews: async (parent, { bottleId }, context) => {
             try {
                 const reviews = await Review.find({ bottleId })
                     .populate('user', 'username') // only return username
@@ -110,7 +110,7 @@ const resolvers = {
                 throw new Error(`Error fetching reviews for bottle: ${err}`);
             }
         },
-        getReviews: async (parent, args, context) => {
+        getUserReviews: async (parent, args, context) => {
             if (!context.user) throw new AuthenticationError('Not logged in');
             try {
                 return Review.find({ user: context.user._id })
