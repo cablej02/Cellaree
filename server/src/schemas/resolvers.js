@@ -288,7 +288,7 @@ const resolvers = {
         },
 
         addBottle: async (parent, args, context) => {
-            if (!context.user) throw new AuthenticationError("Must be logged in to add a bottle!");
+            if (!context.user) throw new AuthenticationError("Not logged in");
 
             try {
                 const newBottle = await Bottle.create(args);

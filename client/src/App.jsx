@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-
+import { onError } from '@apollo/client/link/error'
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import AuthService from './utils/auth'
@@ -28,8 +28,20 @@ const authLink = setContext((_, { headers }) => {
     }
 });
 
+// Handle global GraphQL errors
+const errorLink = onError(({ graphQLErrors }) => {
+    if (graphQLErrors) {
+      for (let err of graphQLErrors) {
+        if (err.message === "Not logged in") {
+          console.warn("Authentication error detected. Logging out user.");
+          AuthService.logout();
+        }
+      }
+    }
+  });
+
 const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: errorLink.concat(authLink).concat(httpLink),
     cache: new InMemoryCache(),
 });
 
