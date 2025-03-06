@@ -9,21 +9,20 @@ class AuthService {
 
   // check if user's logged in
   loggedIn() {
-    // Checks if there is a saved token and it's still valid
     const token = this.getToken();
-    return !!token && !this.isTokenExpired(token); // handwaiving here
-  }
+    if (!token) return false;
 
-  // check if token is expired
-  isTokenExpired(token) {
     try {
-      const decoded = jwtDecode<UserToken>(token);
+      const decoded = jwtDecode(token);
       if (decoded.exp < Date.now() / 1000) {
-        return true;
-      } 
-      
-      return false;
+        console.warn("Expired token detected, clearing storage.");
+        localStorage.removeItem("id_token");
+        return false;
+      }
+      return true;
     } catch (err) {
+      console.error("Invalid token detected, clearing storage:", err);
+      localStorage.removeItem("id_token");
       return false;
     }
   }
@@ -47,7 +46,11 @@ class AuthService {
     // clear the Apollo cache so the user data is cleared
     if(client) client.resetStore();
     // this will reload the page and reset the state of the application
-    navigate('/login');
+    if(navigate){
+      navigate('/login');
+    } else {
+      window.location.assign('/login');
+    }
   }
 }
 
