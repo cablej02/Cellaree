@@ -239,6 +239,23 @@ export const ADD_REVIEW = gql`
     }
 `;
 
+export const UPDATE_REVIEW = gql`
+    mutation updateReview($_id: ID!, $vintage: Int, $rating: Int!, $content: String, $isPublic: Boolean!) {
+        updateReview(_id: $_id, vintage: $vintage, rating: $rating, content: $content, isPublic: $isPublic) {
+            _id
+            rating
+            content
+            isPublic
+            user {
+                _id
+            }
+            bottle {
+                _id
+            }
+        }
+    }
+`;
+
 export const REMOVE_REVIEW = gql`
     mutation removeReview($_id: ID!) {
         removeReview(_id: $_id){

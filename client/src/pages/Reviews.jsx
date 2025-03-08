@@ -3,8 +3,9 @@ import { GET_USER_REVIEWS } from "../utils/queries";
 import { REMOVE_REVIEW } from "../utils/mutations";
 import { useState, useEffect } from "react";
 import { Box, Heading, VStack, Text, Button, HStack, IconButton, useToast, Divider, Flex, Card, CardBody } from "@chakra-ui/react";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaEdit } from "react-icons/fa";
 import { capitalizeWords } from "../utils/formatting";
+import ReviewModal from "../components/ReviewModal";
 
 const Reviews = () => {
     const { loading, error, data } = useQuery(GET_USER_REVIEWS, { 
@@ -12,6 +13,7 @@ const Reviews = () => {
     });
     const [removeReview] = useMutation(REMOVE_REVIEW);
     const [reviews, setReviews] = useState([]);
+    const [editingReview, setEditingReview] = useState(null);
     const toast = useToast();
 
     useEffect(() => {
@@ -48,15 +50,28 @@ const Reviews = () => {
                                         <Text fontSize="lg" fontWeight="bold">{review.bottle.productName}</Text>
                                         <Text fontSize="sm" color="secondary">{capitalizeWords(review.bottle.winery.name)} - {capitalizeWords(review.bottle.wineStyle.name)}</Text>
                                     </VStack>
-                                    <IconButton
-                                        icon={<FaTrash color="red" />} 
-                                        bg="transparent"
-                                        variant="ghost"
-                                        _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
-                                        _active={{ bg: "transparent" }}
-                                        onClick={() => handleDelete(review._id)}
-                                        aria-label="Delete review"
-                                    />
+                                    <HStack>
+                                        {/* Edit Button */}
+                                        <IconButton
+                                            icon={<FaEdit color="green" />}
+                                            bg="transparent"
+                                            variant="ghost"
+                                            _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
+                                            _active={{ bg: "transparent" }}
+                                            onClick={() => setEditingReview(review)}
+                                            aria-label="Edit review"
+                                        />
+                                        {/* Delete Button */}
+                                        <IconButton
+                                            icon={<FaTrash color="red" />} 
+                                            bg="transparent"
+                                            variant="ghost"
+                                            _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
+                                            _active={{ bg: "transparent" }}
+                                            onClick={() => handleDelete(review._id)}
+                                            aria-label="Delete review"
+                                        />
+                                    </HStack>
                                 </Flex>
                                 <Divider my={2} />
                                 <Text fontSize="sm">Vintage: <b>{review.vintage || "N/A"}</b></Text>
@@ -68,6 +83,15 @@ const Reviews = () => {
                         </Card>
                     ))}
                 </VStack>
+            )}
+            {editingReview && (
+                <ReviewModal
+                    isOpen={!!editingReview}
+                    onClose={() => setEditingReview(null)}
+                    bottle={editingReview.bottle}
+                    drankVintage={editingReview.vintage}
+                    review={editingReview} // Pass review data
+                />
             )}
         </Box>
     );
