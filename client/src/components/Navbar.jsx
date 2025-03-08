@@ -49,6 +49,7 @@ const Navbar = () => {
                                 <MenuItem onClick={() => navigate("/")}>My Cellar</MenuItem>
                                 <MenuItem onClick={() => navigate("/drank-history")}>Drank History</MenuItem>
                                 <MenuItem onClick={() => navigate("/wishlist")}>Wishlist</MenuItem>
+                                <MenuItem onClick={() => navigate("/reviews")}>My Reviews</MenuItem>
                                 <MenuItem onClick={() => navigate("/update-user")}>Update User</MenuItem>
                                 <MenuItem onClick={handleLogout} color="red.500" >
                                     Logout

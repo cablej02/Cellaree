@@ -9,6 +9,7 @@ import DrankHistory from './pages/DrankHistory.jsx'
 import BrowseBottles from './pages/BrowseBottles.jsx'
 import Wishlist from './pages/Wishlist.jsx'
 import UpdateUser from './pages/UpdateUser.jsx'
+import Reviews from './pages/Reviews.jsx'
 
 const router = createBrowserRouter([
     {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
             {
                 path: '/update-user',
                 element: <UpdateUser />,
+            },
+            {
+                path: '/reviews',
+                element: <Reviews />,
             }
         ]
     }

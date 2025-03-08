@@ -19,7 +19,7 @@ const DrinkBottleModal = ({ entry, isOpen, onClose }) => {
     const [showReviewModal, setShowReviewModal] = useState(false);
 
     const [drinkCellarBottle, { loading }] = useMutation(DRINK_CELLAR_BOTTLE);
-    const { data: reviewData } = useQuery(GET_USER_REVIEWS);
+    const { data: reviewData } = useQuery(GET_USER_REVIEWS, { fetchPolicy: 'network-only' });
 
     const handleSubmit = async () => {
         if (quantity < 1 || quantity > entry.quantity) {

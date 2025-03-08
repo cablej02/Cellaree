@@ -238,3 +238,21 @@ export const ADD_REVIEW = gql`
         }
     }
 `;
+
+export const REMOVE_REVIEW = gql`
+    mutation removeReview($_id: ID!) {
+        removeReview(_id: $_id){
+            _id
+            user {
+                _id
+            }
+            bottle {
+                _id
+            }
+            vintage
+            rating
+            content
+            isPublic
+        }
+    }
+`;
