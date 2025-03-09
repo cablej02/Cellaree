@@ -385,6 +385,7 @@ const resolvers = {
                 if (args.purchasePrice) updatedFields.purchasePrice = args.purchasePrice;
                 if (args.currentValue) updatedFields.currentValue = args.currentValue;
                 if (args.purchaseDate) updatedFields.purchaseDate = args.purchaseDate;
+                if (args.notes !== undefined) updatedFields.notes = args.notes;
 
                 if (!Object.keys(updatedFields).length) throw new Error('No fields to update!');
 

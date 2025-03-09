@@ -45,6 +45,7 @@ export const typeDefs = gql`
         purchasePrice: Float
         currentValue: Float
         purchaseDate: String
+        notes: String
     }
 
     type DrankBottle {
