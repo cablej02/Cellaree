@@ -6,6 +6,7 @@ import { useUser } from '../context/UserContext';
 import { Box, Button, IconButton, Table, Thead, Tbody, Tr, Th, Td, Text, useToken } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import AddBottleModal from '../components/AddBottleModal';
+import BottleModal from '../components/BottleModal';
 import { BsBagHeart, BsBagHeartFill } from "react-icons/bs";
 
 const BrowseBottles = () => {
@@ -16,6 +17,7 @@ const BrowseBottles = () => {
     
     const [bottles, setBottles] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedBottle, setSelectedBottle] = useState(null);
 
     const [addWishlistBottle] = useMutation(ADD_WISHLIST_BOTTLE);
     const [removeWishlistBottle] = useMutation(REMOVE_WISHLIST_BOTTLE);
@@ -85,7 +87,11 @@ const BrowseBottles = () => {
                                 const { cellarCount, drankCount, onWishlist } = getBottleUserStats(bottle._id);
                                 return (
                                     <Tr key={bottle._id}>
-                                        <Td>{capitalizeWords(bottle.productName)}</Td>
+                                        <Td>
+                                            <Button variant='link' color='blue.400' onClick={() => setSelectedBottle(bottle)}>
+                                                {capitalizeWords(bottle.productName)}
+                                            </Button>
+                                        </Td>
                                         <Td>{capitalizeWords(bottle.winery.name)}</Td>
                                         <Td>{bottle.wineStyle.category}</Td>
                                         <Td>{bottle.wineStyle.name}</Td>
@@ -121,6 +127,9 @@ const BrowseBottles = () => {
                     wineries={wineriesData?.getWineries || []}
                     wineStyles={wineStylesData?.getWineStyles || []}
                 />
+                {selectedBottle && (
+                    <BottleModal isOpen={!!selectedBottle} onClose={() => setSelectedBottle(null)} bottle={selectedBottle} />
+                )}
             </>)}
         </Box>
     );
