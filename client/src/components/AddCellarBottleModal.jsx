@@ -20,6 +20,7 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
         quantity: 1,
         purchasePrice: '',
         purchaseDate: new Date().toISOString().split('T')[0], // today's date
+        notes: '',
     });
     
     const [searchInput, setSearchInput] = useState('');
@@ -71,6 +72,7 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
                 quantity: Number(formData.quantity),
                 purchasePrice: Number(formData.purchasePrice) || 0,
                 purchaseDate: formData.purchaseDate,
+                notes: formData.notes
             };
 
             if (formData.vintage && Number(formData.vintage) >= 1800) {
@@ -88,6 +90,7 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
                     quantity: 1,
                     purchasePrice: '',
                     purchaseDate: new Date().toISOString().split('T')[0],
+                    notes: '',
                 });
                 setSearchInput('');
                 setSearchResults([]);
@@ -153,6 +156,10 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
                     <FormControl>
                         <FormLabel>Purchase Date</FormLabel>
                         <Input type='date' name='purchaseDate' bg='light' value={formData.purchaseDate} onChange={handleChange} />
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>Notes</FormLabel>
+                        <Input type='text' name='notes' bg='light' value={formData.notes} onChange={handleChange} />
                     </FormControl>
                 </ModalBody>
                 <ModalFooter>

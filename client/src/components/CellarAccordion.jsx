@@ -23,7 +23,7 @@ const CellarAccordion = ({ groupedBottles}) => {
                                     <Box flex='1' textAlign='left'>
                                         <Text fontWeight='bold'>{capitalizeWords(bottle.productName)}</Text>
                                         <Text fontSize='sm' color='secondary'>
-                                            {capitalizeWords(bottle.winery.name)} - {bottle.winery.countries?.join(", ") || ""} - {bottle.location} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
+                                            {capitalizeWords(bottle.winery.name)} - {bottle.country} - {bottle.location} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
                                         </Text>
                                     </Box>
                                     <AccordionIcon />
@@ -38,6 +38,7 @@ const CellarAccordion = ({ groupedBottles}) => {
                                             <Th color="tertiary">Purchase Price</Th>
                                             <Th color="tertiary">Current Value</Th>
                                             <Th color="tertiary">Purchase Date</Th>
+                                            <Th color="tertiary">Notes</Th>
                                             <Th color="tertiary">Drink Bottle</Th>
                                         </Tr>
                                     </Thead>
@@ -49,7 +50,8 @@ const CellarAccordion = ({ groupedBottles}) => {
                                                 <Td>${entry.purchasePrice?.toFixed(2) || 'N/A'}</Td>
                                                 <Td>${entry.currentValue?.toFixed(2) || 'N/A'}</Td>
                                                 <Td>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Td>
-                                                <Td>
+                                                <Td>{entry.notes}</Td>
+                                                <Td textAlign='center'>
                                                     <Button variant='primary' size='xs' onClick={() => openModal(entry)}>Drink</Button>
                                                 </Td>
                                             </Tr>

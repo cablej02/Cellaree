@@ -28,6 +28,7 @@ export const ME = gql`
                 purchasePrice
                 currentValue
                 purchaseDate
+                notes
             }
             drankHistory {
                 _id

@@ -38,14 +38,15 @@ export const UPDATE_PASSWORD = gql`
 `;
 
 export const ADD_CELLAR_BOTTLE = gql`
-    mutation addCellarBottle($bottle: ID!, $quantity: Int!, $vintage: Int, $purchasePrice: Float) {
-        addCellarBottle(bottle: $bottle, quantity: $quantity, vintage: $vintage, purchasePrice: $purchasePrice) {
+    mutation addCellarBottle($bottle: ID!, $quantity: Int!, $vintage: Int, $purchasePrice: Float, $notes: String) {
+        addCellarBottle(bottle: $bottle, quantity: $quantity, vintage: $vintage, purchasePrice: $purchasePrice, notes: $notes) {
             _id
             vintage
             quantity
             purchasePrice
             currentValue
             purchaseDate
+            notes
             bottle {
                 _id
                 winery {
