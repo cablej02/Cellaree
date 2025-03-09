@@ -273,3 +273,12 @@ export const REMOVE_REVIEW = gql`
         }
     }
 `;
+
+export const ADD_WINERY = gql`
+    mutation addWinery($name: String!) {
+        addWinery(name: $name) {
+            _id
+            name
+        }
+    }
+`;

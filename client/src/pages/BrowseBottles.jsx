@@ -3,21 +3,24 @@ import { useQuery, useMutation } from '@apollo/client';
 import { ADD_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from '../utils/mutations';
 import { GET_BOTTLES, GET_WINERIES, GET_WINE_STYLES } from '../utils/queries';
 import { useUser } from '../context/UserContext';
-import { Box, Button, IconButton, Table, Thead, Tbody, Tr, Th, Td, Text, useToken } from '@chakra-ui/react';
+import { Box, Flex, Button, IconButton, Table, Thead, Tbody, Tr, Th, Td, Text, useToken, useToast } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import AddBottleModal from '../components/AddBottleModal';
 import BottleModal from '../components/BottleModal';
+import AddWineryModal from '../components/AddWineryModal';
 import { BsBagHeart, BsBagHeartFill } from "react-icons/bs";
 
 const BrowseBottles = () => {
+    const toast = useToast();
     const { user, setUser } = useUser();
     const { data: bottlesData, loading, error } = useQuery(GET_BOTTLES);
     const { data: wineriesData } = useQuery(GET_WINERIES);
     const { data: wineStylesData } = useQuery(GET_WINE_STYLES);
     
     const [bottles, setBottles] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedBottle, setSelectedBottle] = useState(null);
+    const [isBottleModalOpen, setIsBottleModalOpen] = useState(false);
+    const [isWineryModalOpen, setIsWineryModalOpen] = useState(false);
+    const [selectedBottle, setSelectedBottle] = useState(null); // for bottle modal
 
     const [addWishlistBottle] = useMutation(ADD_WISHLIST_BOTTLE);
     const [removeWishlistBottle] = useMutation(REMOVE_WISHLIST_BOTTLE);
@@ -66,7 +69,10 @@ const BrowseBottles = () => {
 
             {!loading && !error && (
             <>
-                <Button variant='primary' mb={4} onClick={() => setIsModalOpen(true)}>Add New Bottle</Button>
+                <Flex justify="space-between" mb={4}>
+                    <Button variant='primary' onClick={() => setIsBottleModalOpen(true)}>Add Bottle</Button>
+                    <Button variant='primary' onClick={() => setIsWineryModalOpen(true)}>Add Winery</Button>
+                </Flex>
                 <Table variant='simple' size='sm'>
                     <Thead>
                         <Tr>
@@ -120,17 +126,22 @@ const BrowseBottles = () => {
                         )}
                     </Tbody>
                 </Table>
-                <AddBottleModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onAddSuccess={handleAddBottleSuccess}
-                    wineries={wineriesData?.getWineries || []}
-                    wineStyles={wineStylesData?.getWineStyles || []}
-                />
                 {selectedBottle && (
                     <BottleModal isOpen={!!selectedBottle} onClose={() => setSelectedBottle(null)} bottle={selectedBottle} />
                 )}
             </>)}
+            <AddBottleModal
+                    isOpen={isBottleModalOpen}
+                    onClose={() => setIsBottleModalOpen(false)}
+                    onAddSuccess={handleAddBottleSuccess}
+                    wineries={wineriesData?.getWineries || []}
+                    wineStyles={wineStylesData?.getWineStyles || []}
+                />
+            <AddWineryModal
+                isOpen={isWineryModalOpen}
+                onClose={() => setIsWineryModalOpen(false)}
+                onAddSuccess={() => toast({ title: 'Winery added!', status: 'success' })}
+            />
         </Box>
     );
 };
