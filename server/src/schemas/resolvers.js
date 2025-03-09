@@ -79,9 +79,9 @@ const resolvers = {
                 throw new Error(`Error fetching bottle: ${err}`);
             }
         },
-        getBottleReviews: async (parent, { bottleId }, context) => {
+        getBottleReviews: async (parent, args, context) => {
             try {
-                const reviews = await Review.find({ bottleId })
+                const reviews = await Review.find({ bottle: args.bottle })
                     .populate('user', 'username') // only return username
                     .populate({
                         path: 'bottle',

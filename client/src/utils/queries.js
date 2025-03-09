@@ -145,3 +145,38 @@ export const GET_USER_REVIEWS = gql`
         }
     }
 `;
+
+export const GET_BOTTLE_REVIEWS = gql`
+    query getBottleReviews($bottle: ID!) {
+        getBottleReviews(bottle: $bottle) {
+            avgRating
+            ratingsCount
+            reviews {
+                _id
+                user {
+                    _id
+                    username
+                }
+                bottle {
+                    _id
+                    winery {
+                        _id
+                        name
+                    }
+                    productName
+                    country
+                    location
+                    wineStyle {
+                        _id
+                        name
+                        category
+                        }
+                }
+                vintage
+                rating
+                content
+                isPublic
+            }
+        }
+    }
+`;
