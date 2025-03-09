@@ -1,12 +1,22 @@
 import { useState, useEffect } from "react";
-import { Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, VStack, Input, Textarea, Checkbox, FormControl, FormLabel } from "@chakra-ui/react";
+import { 
+    Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
+    Text, Button, Divider, VStack, Input, Textarea, Checkbox, FormControl, FormLabel } from "@chakra-ui/react";
 import { useMutation } from "@apollo/client";
+import { GET_BOTTLE_REVIEWS } from "../utils/queries";
 import { ADD_REVIEW, UPDATE_REVIEW } from "../utils/mutations";
 import { capitalizeWords } from "../utils/formatting";
 
 const ReviewModal = ({ isOpen, onClose, bottle, drankVintage, review }) => {
-    const [formData, setFormData] = useState({});
-    const [addReview] = useMutation(ADD_REVIEW);
+    const [formData, setFormData] = useState({
+        rating: "",
+        vintage: "",
+        content: "",
+        isPublic: true,
+    });
+    const [addReview] = useMutation(ADD_REVIEW, {
+        refetchQueries: [{ query: GET_BOTTLE_REVIEWS, variables: { bottle: bottle._id } }],
+    });
     const [updateReview] = useMutation(UPDATE_REVIEW);
     const [error, setError] = useState("");
 
@@ -70,11 +80,21 @@ const ReviewModal = ({ isOpen, onClose, bottle, drankVintage, review }) => {
                 <ModalHeader>{review ? "Edit Review" : "Leave a Review"}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
+                    <Divider mb={2} />
                     <Text fontWeight='bold'>{capitalizeWords(bottle.productName)}</Text>
                     <Text fontSize='sm' color='secondary'>
                         {capitalizeWords(bottle.winery.name)} - {capitalizeWords(bottle.wineStyle.name)}
                     </Text>
-                    <Text mt={3}fontSize='sm'><b>Vintage:</b> {formData.vintage}</Text>
+                    <Divider my={2} />
+                    {/* If we didn't get a vintage from the inputs, render it as an input, otherwise render as text */}
+                    {(!drankVintage || !review) ? (
+                        <FormControl>
+                            <FormLabel>Vintage</FormLabel>
+                            <Input name="vintage" type="number" placeholder="Enter vintage..." value={formData.vintage} onChange={handleChange} />
+                        </FormControl>
+                    ) : (
+                        <Text fontSize='sm'><b>Vintage:</b> {formData.vintage || ""}</Text>
+                    )}
                     <VStack mt={4} spacing={3} align="stretch">
                         <FormControl>
                             <FormLabel>Rating (0-100)</FormLabel>
