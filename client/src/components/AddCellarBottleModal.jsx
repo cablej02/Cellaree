@@ -11,7 +11,7 @@ import { GET_BOTTLES } from '../utils/queries';
 import { capitalizeWords } from '../utils/formatting';
 
 const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
-    const { data } = useQuery(GET_BOTTLES);
+    const { data } = useQuery(GET_BOTTLES, { fetchPolicy: 'network-only' });
     const bottles = data?.getBottles || [];
 
     const [formData, setFormData] = useState({
