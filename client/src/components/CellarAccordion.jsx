@@ -1,11 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, Text, Button, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import DrinkBottleModal from './DrinkBottleModal';
 
-const CellarAccordion = ({ groupedBottles}) => {
+const CellarAccordion = ({ cellar }) => {
     const [selectedBottle, setSelectedBottle] = useState(null);
     const [isDrinkModalOpen, setIsDrinkModalOpen] = useState(false);
+    const [groupedBottles, setGroupedBottles] = useState([]);
+
+    useEffect(() => {
+        if (cellar.length > 0) {
+            // group entries by bottleId
+            const grouped = cellar.reduce((acc, entry) => {
+                // find group if it already exists in the accumulator
+                let group = acc.find(group => group.bottle._id === entry.bottle._id);
+                
+                // if bottleId not in accumulator, add new group
+                if (!group) {
+                    group = {
+                        bottle: entry.bottle,
+                        totalQuantity: 0,
+                        entries: [],
+                    };
+                    acc.push(group);
+                }
+                
+                // add entry to group and increment total quantity
+                group.totalQuantity += entry.quantity;
+                group.entries.push(entry);
+                return acc;
+            }, []);
+
+            // sort by vintage. if no vintage, put at end
+            grouped.forEach(group => {
+                group.entries.sort((a, b) => (a.vintage || 9999) - (b.vintage || 9999)); 
+            });
+            setGroupedBottles(grouped);
+        } else {
+            setGroupedBottles([]);
+        }
+    }, [cellar]);
     
     const openModal = (entry) => {
         setSelectedBottle(entry);

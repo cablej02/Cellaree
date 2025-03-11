@@ -5,3 +5,6 @@ export const capitalizeWords = (str) => {
         )
         : '';
 };
+
+// remove special characters and convert to lowercase
+export const normalizeText = (text) => text.toLowerCase().replace(/[^a-z0-9]/g, "");
