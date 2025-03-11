@@ -15,7 +15,7 @@ export const authenticateToken = ({ req }) => {
     }
   
     try {
-        const { data } = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '24hr' });
+        const { data } = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '30d' });
         req.user = data;
     } catch (err) {
         console.log('Invalid token');
@@ -28,7 +28,7 @@ export const signToken = (username, email, _id) => {
     const payload = { username, email, _id };
     const secretKey = process.env.JWT_SECRET_KEY || '';
 
-    return jwt.sign({ data: payload }, secretKey, { expiresIn: '24h' });
+    return jwt.sign({ data: payload }, secretKey, { expiresIn: '30d' });
 };
 
 export class AuthenticationError extends GraphQLError {
