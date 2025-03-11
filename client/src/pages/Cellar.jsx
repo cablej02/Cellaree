@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
-import { Box, Heading, Button } from "@chakra-ui/react";
+import { Box, Heading, Button, HStack, Switch, Text } from "@chakra-ui/react";
 
 import CellarAccordion from "../components/CellarAccordion";
+import CellarTable from "../components/CellarTable";
 import AddCellarBottleModal from "../components/AddCellarBottleModal";    
 
 const Cellar = () => {
@@ -10,6 +11,9 @@ const Cellar = () => {
 
     // bottles groupbed by bottleId for accordion display
     const [groupedBottles, setGroupedBottles] = useState([]);
+
+    // toggle state for view
+    const [isTableView, setIsTableView] = useState(false);
 
     // open modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,16 +58,29 @@ const Cellar = () => {
     };
 
     return (
-        <Box maxW='1000px' mx='auto' p={4}>
-            <Heading as='h1' mb={4}>My Cellar</Heading>
-            <Button variant='primary' mb={4} onClick={() => setIsModalOpen(true)}>Add Bottle</Button>
+        <>
+            <Box maxW='1000px' mx='auto' p={4}>
+                <Heading as='h1' mb={4}>My Cellar</Heading>
+                <HStack justifyContent="space-between" mb={4}>
+                    <Button variant='primary' mb={4} onClick={() => setIsModalOpen(true)}>Add Bottle</Button>
+                    <HStack>
+                        <Text fontWeight="bold">Table View</Text>
+                        <Switch isChecked={isTableView} onChange={() => setIsTableView(!isTableView)}/>
+                    </HStack>
+                </HStack>
+                {isTableView ?
+                    <CellarTable cellar={user.cellar} /> :
+                    <CellarAccordion groupedBottles={groupedBottles} />
+                }
+            </Box>
+
+            {/* Modal */}
             <AddCellarBottleModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={handleAddBottleSuccess} 
             />
-            <CellarAccordion groupedBottles={groupedBottles} />
-        </Box>
+        </>
     );
 };
 
