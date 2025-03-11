@@ -1,7 +1,10 @@
 import { useUser } from "../context/UserContext";
 import AuthService from "../utils/auth";
 import { useNavigate } from "react-router-dom";
-import { Box, Flex, HStack, Button, IconButton, Text, Spacer, Menu, MenuButton, MenuList, MenuItem, MenuDivider, useToken } from "@chakra-ui/react";
+import { 
+    Box, Flex, HStack, Button, IconButton, Text, Spacer, Menu,
+    MenuButton, MenuList, MenuItem, MenuDivider, useToken, useBreakpointValue 
+} from "@chakra-ui/react";
 import { GiHamburgerMenu } from "react-icons/gi";
 
 const Navbar = () => {
@@ -10,6 +13,9 @@ const Navbar = () => {
 
     // get pimary color hex value from theme
     const primary500 = useToken("colors", "primary.500");
+
+    // detect if user is on mobile
+    const isMobile = useBreakpointValue({ base: true, md: false });
 
     const handleLogout = () => {
         AuthService.logout(navigate);
@@ -36,10 +42,12 @@ const Navbar = () => {
                 <Spacer />
                 {/* Right Side - Nav Links */}
                 {user && (
-                    <HStack spacing={4} display={{ base: "none", md: "flex" }}>
-                        <Button variant="navbar" onClick={() => navigate("/browse")}>
-                            Browse Bottles
-                        </Button>
+                    <HStack spacing={4}>
+                        {!isMobile && (                        
+                            <Button variant="navbar" onClick={() => navigate("/browse")}>
+                                Browse Bottles
+                            </Button>
+                        )}
 
                         {/* User Dropdown Menu */}
                         <Menu variant="navbar">
@@ -49,6 +57,9 @@ const Navbar = () => {
                                 icon={<GiHamburgerMenu />}
                             />
                             <MenuList>
+                                {isMobile && (
+                                    <MenuItem onClick={() => navigate("/browse")}>Browse Bottles</MenuItem>
+                                )}
                                 <MenuItem onClick={() => navigate("/")}>My Cellar</MenuItem>
                                 <MenuItem onClick={() => navigate("/drank-history")}>Drank History</MenuItem>
                                 <MenuItem onClick={() => navigate("/wishlist")}>Wishlist</MenuItem>
