@@ -8,7 +8,7 @@ import { useMutation } from '@apollo/client';
 import { ADD_CELLAR_BOTTLE } from '../utils/mutations';
 import { useQuery } from '@apollo/client';
 import { GET_BOTTLES } from '../utils/queries';
-import { capitalizeWords } from '../utils/formatting';
+import { capitalizeWords, normalizeText } from '../utils/formatting';
 
 const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
     const { data } = useQuery(GET_BOTTLES, { fetchPolicy: 'network-only' });
@@ -40,12 +40,14 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
         const input = e.target.value;
         setSearchInput(input);
        
-        const filteredBottles = !input ? [] : bottles.filter((bottle) => (
-            bottle.winery.name.toLowerCase().includes(input.toLowerCase()) ||
-            bottle.productName.toLowerCase().includes(input.toLowerCase()) ||
-            `${bottle.winery.name} - ${bottle.productName}`.toLowerCase().includes(input.toLowerCase()) ||
-            (bottle.winery.name.toLowerCase().includes(input.toLowerCase()) && bottle.productName.toLowerCase().includes(input.toLowerCase()))
-        ));
+        const filteredBottles = !input ? [] : bottles.filter((bottle) => {
+            const normalizedInput = normalizeText(input);
+            return (
+                normalizeText(bottle.winery.name).includes(normalizedInput) ||
+                normalizeText(bottle.productName).includes(normalizedInput) ||
+                normalizeText(`${bottle.winery.name} - ${bottle.productName}`).includes(normalizedInput)
+            );
+        });
 
         setSearchResults(filteredBottles);
     };
