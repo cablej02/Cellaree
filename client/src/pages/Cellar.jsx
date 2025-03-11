@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { useUser } from "../context/UserContext";
-import { Box, Heading, Button, HStack, Switch, Text, Input, InputGroup, InputRightElement, Menu, MenuList, MenuButton, MenuItem, Checkbox } from "@chakra-ui/react";
+import { 
+    Box, Heading, Button, HStack, Switch, Text, Input, InputGroup, InputRightElement, 
+    Menu, MenuList, MenuButton, MenuItem, Checkbox, useBreakpointValue } from "@chakra-ui/react";
 import { FaChevronDown, FaSearch } from "react-icons/fa";
 
 import { normalizeText } from "../utils/formatting";
@@ -15,6 +17,9 @@ const CATEGORY_ORDER = ["Red", "White", "Rosé", "Sparkling", "Dessert", "Fortif
 const Cellar = () => {
     const { user, setUser } = useUser();
     const { data } = useQuery(GET_WINE_STYLES);
+
+    // detect if screen is mobile
+    const isMobile = useBreakpointValue({ base: true, md: false });
 
     // toggle state for view
     const [isTableView, setIsTableView] = useState(false);
@@ -94,14 +99,14 @@ const Cellar = () => {
         <>
             <Box maxW='1000px' mx='auto' p={4}>
                 {/* Header Row */}
-                <HStack justifyContent="space-between">
-                    <Heading as='h1' mb={4}>My Cellar</Heading>
-                    <Text fontWeight="bold">Total Bottles: {filteredCellar.length}</Text>
-                </HStack>
-
-                {/* Second Row */}
-                <HStack justifyContent="space-between" mb={4}>
-                    <Button variant='primary' mb={4} onClick={() => setIsModalOpen(true)}>Add Bottle</Button>
+                <HStack justifyContent="space-between" mb={3}>
+                    <Heading as='h1'>My Cellar</Heading>
+                    {!isMobile &&
+                        <HStack>
+                            <Text fontWeight="bold">Table View</Text>
+                            <Switch isChecked={isTableView} onChange={() => setIsTableView(!isTableView)}/>
+                        </HStack>
+                    }
                     <HStack>
                         <InputGroup>
                             <Input 
@@ -110,6 +115,7 @@ const Cellar = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 bg="dark"
                                 color="text"
+                                maxW="40vw"
                             />
                             <InputRightElement pointerEvents="none">
                                 <FaSearch color="text" />
@@ -118,17 +124,17 @@ const Cellar = () => {
                     </HStack>
                 </HStack>
 
-                {/* Third Row */}
+                {/* Second Row */}
                 <HStack justifyContent={"space-between"} mb={4}>
-                    <HStack>
-                        <Text fontWeight="bold">Table View</Text>
-                        <Switch isChecked={isTableView} onChange={() => setIsTableView(!isTableView)}/>
-                    </HStack>
-
+                    <Button variant='primary' onClick={() => setIsModalOpen(true)}>
+                        <Text fontSize="sm">Add Bottle</Text>
+                    </Button>
                     <HStack>
                         {/* Style Filter Menu */}
                         <Menu closeOnSelect={false}>
-                            <MenuButton as={Button} variant="primary" rightIcon={<FaChevronDown />}>Style</MenuButton>
+                            <MenuButton as={Button} variant="primary" rightIcon={<FaChevronDown />} minW="100px">
+                                <Text fontSize="sm">Style {selectedStyles.length ? `(${selectedStyles.length})`: ""}</Text>
+                            </MenuButton>
                             <MenuList bg="dark" color="text" maxH="50vh" overflowY="auto">
                                 <MenuItem
                                     onClick={clearStyles} 
@@ -151,7 +157,9 @@ const Cellar = () => {
                         </Menu>
                         {/* Category Filter Menu */}
                         <Menu closeOnSelect={false}>
-                            <MenuButton as={Button} variant="primary" rightIcon={<FaChevronDown />}>Category</MenuButton>
+                            <MenuButton as={Button} variant="primary" rightIcon={<FaChevronDown />} minW="130px">
+                                <Text fontSize="sm">Category {selectedCategories.length ? `(${selectedCategories.length})` : ""}</Text>
+                            </MenuButton>
                             <MenuList bg="dark" color="text">
                             <MenuItem
                                     onClick={clearCategories} 
