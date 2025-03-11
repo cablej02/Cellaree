@@ -1,13 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@apollo/client";
 import { useUser } from "../context/UserContext";
-import { Box, Heading, Button, HStack, Switch, Text, Input } from "@chakra-ui/react";
+import { Box, Heading, Button, HStack, Switch, Text, Input, InputGroup, InputRightElement, Menu, MenuList, MenuButton, MenuItem, Checkbox } from "@chakra-ui/react";
+import { FaChevronDown, FaSearch } from "react-icons/fa";
+
 import { normalizeText } from "../utils/formatting";
+import { GET_WINE_STYLES } from "../utils/queries";
 import CellarAccordion from "../components/CellarAccordion";
 import CellarTable from "../components/CellarTable";
 import AddCellarBottleModal from "../components/AddCellarBottleModal";
 
+const CATEGORY_ORDER = ["Red", "White", "Rosé", "Sparkling", "Dessert", "Fortified", "Other"];
+
 const Cellar = () => {
     const { user, setUser } = useUser();
+    const { data } = useQuery(GET_WINE_STYLES);
+    const wineStyles = data?.getWineStyles || [];
+    const wineCategories = data?.getWineStyles ? [...new Set(wineStyles.map(style => style.category))] : []; // get unique categories
 
     // toggle state for view
     const [isTableView, setIsTableView] = useState(false);
@@ -17,7 +26,19 @@ const Cellar = () => {
 
     // search query state
     const [searchQuery, setSearchQuery] = useState("");
-     
+
+    // filter states
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectedStyles, setSelectedStyles] = useState([]);
+    
+    // handle category selection
+    const toggleCategory = (category) => {
+        setSelectedCategories(prev =>
+            // if category already selected, remove it.  Otherwise, add it
+            prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
+        );
+    };
+
     // apply filtering
     let filteredCellar = user?.cellar.filter(entry => {
         const normalizedQuery = normalizeText(searchQuery);
@@ -27,7 +48,7 @@ const Cellar = () => {
             normalizeText(entry.bottle.wineStyle.name).includes(normalizedQuery) ||
             normalizeText(entry.bottle.country).includes(normalizedQuery) ||
             normalizeText(entry.bottle.location).includes(normalizedQuery)
-        )
+        ) && (!selectedCategories.length || selectedCategories.includes(entry.bottle.wineStyle.category)) // if none selected or category matches
     }) || [];
 
     const handleAddBottleSuccess = (newBottle) => {
@@ -51,11 +72,18 @@ const Cellar = () => {
                 <HStack justifyContent="space-between" mb={4}>
                     <Button variant='primary' mb={4} onClick={() => setIsModalOpen(true)}>Add Bottle</Button>
                     <HStack>
-                        <Input 
-                            placeholder="Search..." 
-                            value={searchQuery} 
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                        <InputGroup>
+                            <Input 
+                                placeholder="Search..." 
+                                value={searchQuery} 
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                bg="dark"
+                                color="text"
+                            />
+                            <InputRightElement pointerEvents="none">
+                                <FaSearch color="text" />
+                            </InputRightElement>
+                        </InputGroup>
                     </HStack>
                 </HStack>
 
@@ -65,6 +93,17 @@ const Cellar = () => {
                         <Text fontWeight="bold">Table View</Text>
                         <Switch isChecked={isTableView} onChange={() => setIsTableView(!isTableView)}/>
                     </HStack>
+                    <Menu closeOnSelect={false}>
+                        <MenuButton as={Button} variant="primary" rightIcon={<FaChevronDown />}>Category</MenuButton>
+                        <MenuList bg="dark" color="text">
+                            {CATEGORY_ORDER.map(category => (
+                                <MenuItem key={category} onClick={() => toggleCategory(category)} bg="transparent" _hover={{ bg: "light" }}>
+                                    <Checkbox isChecked={selectedCategories.includes(category)} mr={2} colorScheme="primary" />
+                                    {category}
+                                </MenuItem>
+                            ))}
+                        </MenuList>
+                    </Menu>
                 </HStack>
             </Box>
 
