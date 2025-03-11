@@ -2,14 +2,21 @@ import { useState } from 'react';
 import { Table, Thead, Tbody, Tr, Th, Td, Box, Text, Button } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import DrinkBottleModal from './DrinkBottleModal';
+import BottleModal from './BottleModal';
 
 const CellarTable = ({ cellar }) => {
     const [selectedBottle, setSelectedBottle] = useState(null);
     const [isDrinkModalOpen, setIsDrinkModalOpen] = useState(false);
+    const [isBottleModalOpen, setIsBottleModalOpen] = useState(false);
     
-    const openModal = (entry) => {
+    const openDrinkModal = (entry) => {
         setSelectedBottle(entry);
         setIsDrinkModalOpen(true);
+    }
+
+    const openBottleModal = (entry) => {
+        setSelectedBottle(entry);
+        setIsBottleModalOpen(true);
     }
 
     return (
@@ -36,7 +43,11 @@ const CellarTable = ({ cellar }) => {
                         {cellar.map(entry => (
                             <Tr key={entry._id}>
                                 <Td>{capitalizeWords(entry.bottle.winery.name)}</Td>
-                                <Td>{capitalizeWords(entry.bottle.productName)}</Td>
+                                <Td>
+                                    <Button variant='link' color='blue.400' onClick={() => openBottleModal(entry)}>
+                                        {capitalizeWords(entry.bottle.productName)}
+                                    </Button>
+                                </Td>
                                 <Td>{capitalizeWords(entry.bottle.wineStyle.name)}</Td>
                                 <Td>{entry.bottle.country}</Td>
                                 <Td>{entry.bottle.location}</Td>
@@ -47,7 +58,7 @@ const CellarTable = ({ cellar }) => {
                                 <Td>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Td>
                                 <Td>{entry.notes}</Td>
                                 <Td textAlign='center'>
-                                    <Button variant='primary' size='xs' onClick={() => openModal(entry)}>Drink</Button>
+                                    <Button variant='primary' size='xs' onClick={() => openDrinkModal(entry)}>Drink</Button>
                                 </Td>
                             </Tr>
                         ))}
@@ -62,6 +73,13 @@ const CellarTable = ({ cellar }) => {
                     isOpen={isDrinkModalOpen} 
                     onClose={() => setIsDrinkModalOpen(false)} 
                     entry={selectedBottle} 
+                />
+            )}
+            {selectedBottle && (
+                <BottleModal 
+                    isOpen={isBottleModalOpen} 
+                    onClose={() => setIsBottleModalOpen(false)} 
+                    bottle={selectedBottle.bottle} 
                 />
             )}
         </Box>
