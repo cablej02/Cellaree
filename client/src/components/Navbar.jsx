@@ -1,7 +1,8 @@
 import { useUser } from "../context/UserContext";
 import AuthService from "../utils/auth";
 import { useNavigate } from "react-router-dom";
-import { Box, Flex, HStack, Button, Text, Spacer, Menu, MenuButton, MenuList, MenuItem, useToken } from "@chakra-ui/react";
+import { Box, Flex, HStack, Button, IconButton, Text, Spacer, Menu, MenuButton, MenuList, MenuItem, MenuDivider, useToken } from "@chakra-ui/react";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 const Navbar = () => {
     const { user, setUser } = useUser();
@@ -42,14 +43,17 @@ const Navbar = () => {
 
                         {/* User Dropdown Menu */}
                         <Menu variant="navbar">
-                            <MenuButton as={Button} variant="navbar">
-                                {user.username}
-                            </MenuButton>
+                            <MenuButton 
+                                as={IconButton}
+                                variant="navbar"
+                                icon={<GiHamburgerMenu />}
+                            />
                             <MenuList>
                                 <MenuItem onClick={() => navigate("/")}>My Cellar</MenuItem>
                                 <MenuItem onClick={() => navigate("/drank-history")}>Drank History</MenuItem>
                                 <MenuItem onClick={() => navigate("/wishlist")}>Wishlist</MenuItem>
                                 <MenuItem onClick={() => navigate("/reviews")}>My Reviews</MenuItem>
+                                <MenuDivider />
                                 <MenuItem onClick={() => navigate("/update-user")}>Update User</MenuItem>
                                 <MenuItem onClick={handleLogout} color="red.500" >
                                     Logout
