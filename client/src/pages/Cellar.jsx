@@ -15,8 +15,6 @@ const CATEGORY_ORDER = ["Red", "White", "Rosé", "Sparkling", "Dessert", "Fortif
 const Cellar = () => {
     const { user, setUser } = useUser();
     const { data } = useQuery(GET_WINE_STYLES);
-    const wineStyles = data?.getWineStyles || [];
-    const wineCategories = data?.getWineStyles ? [...new Set(wineStyles.map(style => style.category))] : []; // get unique categories
 
     // toggle state for view
     const [isTableView, setIsTableView] = useState(false);
@@ -30,13 +28,45 @@ const Cellar = () => {
     // filter states
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedStyles, setSelectedStyles] = useState([]);
+
+    // extract styles based on selected categories
+    const wineStyles = data?.getWineStyles?.filter(style =>
+        selectedCategories.length === 0 || selectedCategories.includes(style.category)
+    ) || [];
     
     // handle category selection
     const toggleCategory = (category) => {
-        setSelectedCategories(prev =>
-            // if category already selected, remove it.  Otherwise, add it
-            prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
+        setSelectedCategories(prev => {
+            const newCategories = prev.includes(category) 
+                ? prev.filter(c => c !== category) 
+                : [...prev, category];
+            
+            // Remove styles that no longer belong to any selected categories
+            const validStyles = wineStyles
+                .filter(style => newCategories.includes(style.category))
+                .map(style => style.name);
+            
+            setSelectedStyles(prevStyles => prevStyles.filter(style => validStyles.includes(style)));
+            return newCategories;
+        });
+    };
+
+    // handle style selection
+    const toggleStyle = (style) => {
+        setSelectedStyles(prev =>
+            prev.includes(style) ? prev.filter(s => s !== style) : [...prev, style]
         );
+    };
+
+    // clear category filters
+    const clearCategories = () => {
+        setSelectedCategories([]);
+        setSelectedStyles([]);
+    };
+
+    // clear style filters
+    const clearStyles = () => {
+        setSelectedStyles([]);
     };
 
     // apply filtering
@@ -49,6 +79,7 @@ const Cellar = () => {
             normalizeText(entry.bottle.country).includes(normalizedQuery) ||
             normalizeText(entry.bottle.location).includes(normalizedQuery)
         ) && (!selectedCategories.length || selectedCategories.includes(entry.bottle.wineStyle.category)) // if none selected or category matches
+        && (!selectedStyles.length || selectedStyles.includes(entry.bottle.wineStyle.name)); // if none selected or style matches
     }) || [];
 
     const handleAddBottleSuccess = (newBottle) => {
@@ -93,17 +124,55 @@ const Cellar = () => {
                         <Text fontWeight="bold">Table View</Text>
                         <Switch isChecked={isTableView} onChange={() => setIsTableView(!isTableView)}/>
                     </HStack>
-                    <Menu closeOnSelect={false}>
-                        <MenuButton as={Button} variant="primary" rightIcon={<FaChevronDown />}>Category</MenuButton>
-                        <MenuList bg="dark" color="text">
-                            {CATEGORY_ORDER.map(category => (
-                                <MenuItem key={category} onClick={() => toggleCategory(category)} bg="transparent" _hover={{ bg: "light" }}>
-                                    <Checkbox isChecked={selectedCategories.includes(category)} mr={2} colorScheme="primary" />
-                                    {category}
+
+                    <HStack>
+                        {/* Style Filter Menu */}
+                        <Menu closeOnSelect={false}>
+                            <MenuButton as={Button} variant="primary" rightIcon={<FaChevronDown />}>Style</MenuButton>
+                            <MenuList bg="dark" color="text" maxH="50vh" overflowY="auto">
+                                <MenuItem
+                                    onClick={clearStyles} 
+                                    fontWeight="bold" 
+                                    bg="transparent" 
+                                    color="primary.200" 
+                                    justifyContent="center" 
+                                    _hover={{ bg: "light" }} 
+                                    _active={{ bg: "primary.100", transition: "background-color 0.3s ease-in-out" }}
+                                >
+                                    Clear All
                                 </MenuItem>
-                            ))}
-                        </MenuList>
-                    </Menu>
+                                {wineStyles.map(style => (
+                                    <MenuItem key={style.name} onClick={() => toggleStyle(style.name)} bg="transparent" _hover={{ bg: "light" }}>
+                                        <Checkbox isChecked={selectedStyles.includes(style.name)} mr={2} colorScheme="primary" />
+                                        {style.name}
+                                    </MenuItem>
+                                ))}
+                            </MenuList>
+                        </Menu>
+                        {/* Category Filter Menu */}
+                        <Menu closeOnSelect={false}>
+                            <MenuButton as={Button} variant="primary" rightIcon={<FaChevronDown />}>Category</MenuButton>
+                            <MenuList bg="dark" color="text">
+                            <MenuItem
+                                    onClick={clearCategories} 
+                                    fontWeight="bold" 
+                                    bg="transparent" 
+                                    color="primary.200" 
+                                    justifyContent="center" 
+                                    _hover={{ bg: "light" }} 
+                                    _active={{ bg: "primary.100", transition: "background-color 0.3s ease-in-out" }}
+                                >
+                                    Clear All
+                                </MenuItem>
+                                {CATEGORY_ORDER.map(category => (
+                                    <MenuItem key={category} onClick={() => toggleCategory(category)} bg="transparent" _hover={{ bg: "light" }}>
+                                        <Checkbox isChecked={selectedCategories.includes(category)} mr={2} colorScheme="primary" />
+                                        {category}
+                                    </MenuItem>
+                                ))}
+                            </MenuList>
+                        </Menu>
+                    </HStack>
                 </HStack>
             </Box>
 
