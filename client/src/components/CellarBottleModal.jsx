@@ -12,7 +12,7 @@ import { capitalizeWords, normalizeText } from '../utils/formatting';
 import { useUser } from '../context/UserContext';
 
 const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
-    const { user, setUser } = useUser();
+    const { setUser } = useUser();
     const { data } = useQuery(GET_BOTTLES, { fetchPolicy: 'network-only' });
     const bottles = data?.getBottles || [];
 
@@ -21,6 +21,7 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
         vintage: '',
         quantity: 1,
         purchasePrice: '',
+        currentValue: '',
         purchaseDate: new Date().toISOString().split('T')[0], // today's date
         notes: '',
     });
@@ -37,14 +38,13 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
     // populate form data if editing an existing entry
     useEffect(() => {
         if (entry) {
-            console.log(entry)
             setFormData({
                 bottleId: entry.bottle._id,
                 vintage: entry.vintage || '',
                 quantity: entry.quantity,
                 purchasePrice: entry.purchasePrice || '',
                 currentValue: entry.currentValue || '',
-                purchaseDate: new Date(parseInt(entry.purchaseDate)).toLocaleDateString('en-CA'),
+                purchaseDate: new Date(parseInt(entry.purchaseDate)).toISOString().split('T')[0],
                 notes: entry.notes || '',
             });
         }
@@ -119,7 +119,12 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
                     variables.currentValue = Number(formData.currentValue) || Number(formData.purchasePrice) || 0;
                     const { data } = await updateCellarBottle({ variables });
                     success = !!data?.updateCellarBottle;
-                    // don't need to update context as cache is updated automatically
+                    if(data?.updateCellarBottle) {
+                        setUser((prev) => ({
+                            ...prev,
+                            cellar: prev.cellar.map((entry) => entry._id === data.updateCellarBottle._id ? data.updateCellarBottle : entry)
+                        }));
+                    }
                 }
             } else {
                 const { data } = await addCellarBottle({ variables });
@@ -139,6 +144,7 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
                     vintage: '',
                     quantity: 1,
                     purchasePrice: '',
+                    currentValue: '',
                     purchaseDate: new Date().toISOString().split('T')[0],
                     notes: '',
                 });

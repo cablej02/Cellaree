@@ -72,6 +72,18 @@ export const UPDATE_CELLAR_BOTTLE = gql`
             _id
             bottle {
                 _id
+                winery {
+                    _id
+                    name
+                }
+                productName
+                country
+                location
+                wineStyle {
+                    _id
+                    name
+                    category
+                }
             }
             vintage
             quantity
