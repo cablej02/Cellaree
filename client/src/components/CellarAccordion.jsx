@@ -43,10 +43,14 @@ const CellarAccordion = ({ cellar }) => {
                 return acc;
             }, []);
 
-            // sort by vintage. if no vintage, put at end
+            // sort by vintage within each group. if no vintage, put at end
             grouped.forEach(group => {
                 group.entries.sort((a, b) => (a.vintage || 9999) - (b.vintage || 9999)); 
             });
+
+            // sort groups by winery name
+            grouped.sort((a, b) => a.bottle.winery.name.localeCompare(b.bottle.winery.name));
+            
             setGroupedBottles(grouped);
         } else {
             setGroupedBottles([]);
@@ -101,7 +105,7 @@ const CellarAccordion = ({ cellar }) => {
                                                 </Flex>
                                             )}
                                             <Flex justify="end" gap={3} mt={2}>
-                                                <Button variant='solid' bg="green" _hover={{bg: "green.500"}} size='sm' onClick={() => openCellarBottleModal(entry)}>Edit</Button>
+                                                <Button variant='solid' bg="green" _hover={{bg: "green.400"}} size='sm' onClick={() => openCellarBottleModal(entry)}>Edit</Button>
                                                 <Button variant='primary' size='sm' onClick={() => openDrinkModal(entry)}>Drink</Button>
                                             </Flex>
                                         </Box>
