@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, Text, Button, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
+import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, Text, Button, VStack, Flex } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import DrinkBottleModal from './DrinkBottleModal';
 
@@ -47,13 +47,13 @@ const CellarAccordion = ({ cellar }) => {
     }
 
     return (
-        <>
+        <Box maxW="600px" mx="auto">
             <Accordion allowToggle>
                 {groupedBottles.length > 0 ? (
                     groupedBottles.map(({ bottle, totalQuantity, entries }) => (
                         <AccordionItem key={bottle._id}>
                             <h2>
-                                <AccordionButton>
+                                <AccordionButton color='primary.200'>
                                     <Box flex='1' textAlign='left'>
                                         <Text fontWeight='bold'>{capitalizeWords(bottle.productName)}</Text>
                                         <Text fontSize='sm' color='secondary'>
@@ -64,34 +64,39 @@ const CellarAccordion = ({ cellar }) => {
                                 </AccordionButton>
                             </h2>
                             <AccordionPanel pb={4}>
-                                <Table variant='simple' size='sm'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th color="tertiary">Vintage</Th>
-                                            <Th color="tertiary">Quantity</Th>
-                                            <Th color="tertiary">Purchase Price</Th>
-                                            <Th color="tertiary">Current Value</Th>
-                                            <Th color="tertiary">Purchase Date</Th>
-                                            <Th color="tertiary">Notes</Th>
-                                            <Th color="tertiary">Drink Bottle</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {entries.map((entry) => (
-                                            <Tr key={entry._id}>
-                                                <Td>{entry.vintage || 'N/A'}</Td>
-                                                <Td>{entry.quantity}</Td>
-                                                <Td>${entry.purchasePrice?.toFixed(2) || 'N/A'}</Td>
-                                                <Td>${entry.currentValue?.toFixed(2) || 'N/A'}</Td>
-                                                <Td>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Td>
-                                                <Td>{entry.notes}</Td>
-                                                <Td textAlign='center'>
-                                                    <Button variant='primary' size='xs' onClick={() => openModal(entry)}>Drink</Button>
-                                                </Td>
-                                            </Tr>
-                                        ))}
-                                    </Tbody>
-                                </Table>
+                                <VStack spacing={3} align="stretch">
+                                    {entries.map((entry) => (
+                                        <Box key={entry._id} p={3} bg="dark" borderRadius="xl" fontSize='sm'>
+                                            <Flex justify="space-between" fontWeight="bold">
+                                                <Text>Vintage:</Text>
+                                                <Text>{entry.vintage || 'NV'}</Text>
+                                            </Flex>
+                                            <Flex justify="space-between">
+                                                <Text>Quantity:</Text>
+                                                <Text>{entry.quantity}</Text>
+                                            </Flex>
+                                            <Flex justify="space-between">
+                                                <Text>Purchase Price:</Text>
+                                                <Text>${entry.purchasePrice?.toFixed(2)}</Text>
+                                            </Flex>
+                                            <Flex justify="space-between">
+                                                <Text>Current Value:</Text>
+                                                <Text>${entry.currentValue?.toFixed(2)}</Text>
+                                            </Flex>
+                                            <Flex justify="space-between">
+                                                <Text>Purchase Date:</Text>
+                                                <Text>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Text>
+                                            </Flex>
+                                            {entry.notes && (
+                                                <Flex justify="space-between">
+                                                    <Text>Notes:</Text>
+                                                    <Text>{entry.notes}</Text>
+                                                </Flex>
+                                            )}
+                                            <Button mt={2} variant='primary' size='sm' w="full" onClick={() => openModal(entry)}>Drink</Button>
+                                        </Box>
+                                    ))}
+                                </VStack>
                             </AccordionPanel>
                         </AccordionItem>
                     ))
@@ -106,7 +111,7 @@ const CellarAccordion = ({ cellar }) => {
                     entry={selectedBottle} 
                 />
             )}
-        </>
+        </Box>
     );
 };
 
