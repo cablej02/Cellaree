@@ -22,7 +22,7 @@ const Cellar = () => {
     const isMobile = useBreakpointValue({ base: true, md: false });
 
     // toggle state for view
-    const [isTableView, setIsTableView] = useState(() => JSON.parse(localStorage.getItem("isTableView")) || false);
+    const [isTableView, setIsTableView] = useState(() => isMobile ? false : JSON.parse(localStorage.getItem("isTableView")) || false);
 
     // open modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
