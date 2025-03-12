@@ -22,7 +22,7 @@ const Cellar = () => {
     const isMobile = useBreakpointValue({ base: true, md: false });
 
     // toggle state for view
-    const [isTableView, setIsTableView] = useState(false);
+    const [isTableView, setIsTableView] = useState(() => JSON.parse(localStorage.getItem("isTableView")) || false);
 
     // open modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,7 +96,10 @@ const Cellar = () => {
                     {!isMobile &&
                         <HStack>
                             <Text fontWeight="bold">Table View</Text>
-                            <Switch isChecked={isTableView} onChange={() => setIsTableView(!isTableView)}/>
+                            <Switch isChecked={isTableView} onChange={() => {
+                                localStorage.setItem("isTableView", JSON.stringify(!isTableView));
+                                setIsTableView(!isTableView);
+                            }}/>
                         </HStack>
                     }
                     <HStack>
