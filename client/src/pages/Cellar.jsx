@@ -10,12 +10,12 @@ import { normalizeText } from "../utils/formatting";
 import { GET_WINE_STYLES } from "../utils/queries";
 import CellarAccordion from "../components/CellarAccordion";
 import CellarTable from "../components/CellarTable";
-import AddCellarBottleModal from "../components/AddCellarBottleModal";
+import CellarBottleModal from "../components/CellarBottleModal";
 
 const CATEGORY_ORDER = ["Red", "White", "Rosé", "Sparkling", "Dessert", "Fortified", "Other"];
 
 const Cellar = () => {
-    const { user, setUser } = useUser();
+    const { user } = useUser();
     const { data } = useQuery(GET_WINE_STYLES);
 
     // detect if screen is mobile
@@ -86,14 +86,6 @@ const Cellar = () => {
         ) && (!selectedCategories.length || selectedCategories.includes(entry.bottle.wineStyle.category)) // if none selected or category matches
         && (!selectedStyles.length || selectedStyles.includes(entry.bottle.wineStyle.name)); // if none selected or style matches
     }) || [];
-
-    const handleAddBottleSuccess = (newBottle) => {
-        // if bottle already exists, do nothing.  Apollo cache will update automatically
-        if(user.cellar.some(entry => entry._id === newBottle._id)) return;
-        
-        // add new bottle to user context
-        setUser(prev => ({ ...prev, cellar: [...prev.cellar, newBottle] })); 
-    };
 
     return (
         <>
@@ -193,10 +185,9 @@ const Cellar = () => {
             </Box>
 
             {/* Modal */}
-            <AddCellarBottleModal
+            <CellarBottleModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSuccess={handleAddBottleSuccess} 
             />
         </>
     );

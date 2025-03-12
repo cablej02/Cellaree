@@ -66,6 +66,39 @@ export const ADD_CELLAR_BOTTLE = gql`
     }
 `;
 
+export const UPDATE_CELLAR_BOTTLE = gql`
+    mutation updateCellarBottle($_id: ID!, $quantity: Int!, $vintage: Int, $purchasePrice: Float, $currentValue: Float, $purchaseDate: String, $notes: String) {
+          updateCellarBottle(_id: $_id, vintage: $vintage, quantity: $quantity, purchasePrice: $purchasePrice, currentValue: $currentValue, purchaseDate: $purchaseDate, notes: $notes) {
+            _id
+            bottle {
+                _id
+            }
+            vintage
+            quantity
+            purchasePrice
+            currentValue
+            purchaseDate
+            notes
+        }
+    }
+`;
+
+export const REMOVE_CELLAR_BOTTLE = gql`
+    mutation removeCellarBottle($_id: ID!) {
+        removeCellarBottle(_id: $_id) {
+            _id
+            bottle {
+                _id
+            }
+            vintage
+            quantity
+            purchasePrice
+            currentValue
+            purchaseDate
+        }
+    }
+`;
+
 export const DRINK_CELLAR_BOTTLE = gql`
     mutation drinkCellarBottle($_id: ID!, $quantity: Int!, $drankDate: String) {
         drinkCellarBottle(_id: $_id, quantity: $quantity, drankDate: $drankDate) {

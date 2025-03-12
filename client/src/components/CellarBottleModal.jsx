@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
-    Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter, Box,
-    Button, FormControl, FormLabel, FormErrorMessage, Input, NumberInput, NumberInputField, List, ListItem,
-    VStack
+    Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter,
+    Button, FormControl, FormLabel, FormErrorMessage, Input, NumberInput, NumberInputField,
+    List, ListItem, VStack,  Box, Text, InputLeftElement, InputGroup
 } from '@chakra-ui/react';
 import { useMutation } from '@apollo/client';
-import { ADD_CELLAR_BOTTLE } from '../utils/mutations';
+import { ADD_CELLAR_BOTTLE, UPDATE_CELLAR_BOTTLE, REMOVE_CELLAR_BOTTLE } from '../utils/mutations';
 import { useQuery } from '@apollo/client';
 import { GET_BOTTLES } from '../utils/queries';
 import { capitalizeWords, normalizeText } from '../utils/formatting';
+import { useUser } from '../context/UserContext';
 
-const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
+const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
+    const { user, setUser } = useUser();
     const { data } = useQuery(GET_BOTTLES, { fetchPolicy: 'network-only' });
     const bottles = data?.getBottles || [];
 
@@ -29,6 +31,24 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
 
     // mutation to add bottle to cellar
     const [addCellarBottle, { loading, error }] = useMutation(ADD_CELLAR_BOTTLE);
+    const [updateCellarBottle] = useMutation(UPDATE_CELLAR_BOTTLE);
+    const [removeCellarBottle] = useMutation(REMOVE_CELLAR_BOTTLE);
+
+    // populate form data if editing an existing entry
+    useEffect(() => {
+        if (entry) {
+            console.log(entry)
+            setFormData({
+                bottleId: entry.bottle._id,
+                vintage: entry.vintage || '',
+                quantity: entry.quantity,
+                purchasePrice: entry.purchasePrice || '',
+                currentValue: entry.currentValue || '',
+                purchaseDate: new Date(parseInt(entry.purchaseDate)).toLocaleDateString('en-CA'),
+                notes: entry.notes || '',
+            });
+        }
+    }, [entry]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -81,11 +101,31 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
                 variables.vintage = Number(formData.vintage);
             }
 
-            const { data } = await addCellarBottle({ variables });
-            if(data?.addCellarBottle) {
-                onSuccess(data.addCellarBottle);
+            let success = false;
+            if (entry) {
+                variables._id = entry._id;
+                variables.currentValue = Number(formData.currentValue) || Number(formData.purchasePrice) || 0;
+                const { data } = await updateCellarBottle({ variables });
+                success = !!data?.updateCellarBottle;
+                // if(data?.updateCellarBottle) {
+                //     setUser((prev) => ({
+                //         ...prev,
+                //         cellar: prev.cellar.map((entry) => entry._id === data.updateCellarBottle._id ? data.updateCellarBottle : entry)
+                //     }));
+                // }
+            } else {
+                const { data } = await addCellarBottle({ variables });
+                success = !!data?.addCellarBottle;
+                if(data?.addCellarBottle) {
+                    setUser((prev) => ({
+                        ...prev,
+                        cellar: [...prev.cellar, data.addCellarBottle]
+                    }));
+                }
+            }
 
-                // reset form data and modal inputs
+            // reset form data and modal inputs
+            if(success) {
                 setFormData({
                     bottleId: '',
                     vintage: '',
@@ -112,15 +152,20 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
                 <ModalCloseButton />
                 <ModalBody>
                 <FormControl isRequired isInvalid={!!bottleIdError} position="relative">
-                        <FormLabel>Search Bottle</FormLabel>
-                        <Input 
-                            type='text'
-                            placeholder='Search for a bottle...'
-                            autoComplete='off'
-                            value={searchInput}
-                            onChange={handleSearchChange}
-                            bg='light' color='white'
-                        />
+                        <FormLabel>Bottle</FormLabel>
+                        {/* If editing entry, we cannot change bottle */}
+                        {entry ? (
+                            <Text>{capitalizeWords(entry.bottle.winery.name)} - {capitalizeWords(entry.bottle.productName)}</Text>
+                        ) : (
+                            <Input 
+                                type='text'
+                                placeholder='Search for a bottle...'
+                                autoComplete='off'
+                                value={searchInput}
+                                onChange={handleSearchChange}
+                                bg='light' color='white'
+                            />
+                        )}
                         <Box maxH="250px" overflowY="auto" position="absolute" w='100%' zIndex={1}>
                             <VStack align='stretch' spacing={0}>
                                 {searchResults.length > 0 && (
@@ -147,14 +192,26 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
                     </FormControl>
                     <FormControl isRequired>
                         <FormLabel>Quantity</FormLabel>
-                        <NumberInput min={1}>
-                            <NumberInputField name='quantity' bg='light' value={formData.quantity} onChange={handleChange} />
+                        <NumberInput min={0} value={formData.quantity} onChange={(valueString, valueNumber) => setFormData(prev => ({ ...prev, quantity: valueNumber || 0 }))}>
+                            <NumberInputField name="quantity" bg="light" />
                         </NumberInput>
                     </FormControl>
                     <FormControl>
                         <FormLabel>Purchase Price</FormLabel>
-                        <Input type='number' name='purchasePrice' bg='light' value={formData.purchasePrice} onChange={handleChange} />
+                        <InputGroup>
+                            <InputLeftElement pointerEvents="none" color="text" fontSize="1.1em">$</InputLeftElement>
+                            <Input type='number' name='purchasePrice' bg='light' value={formData.purchasePrice} onChange={handleChange} />
+                        </InputGroup>
                     </FormControl>
+                    {entry && (
+                        <FormControl>
+                            <FormLabel>Current Value</FormLabel>
+                            <InputGroup>
+                                <InputLeftElement pointerEvents="none" color="text" fontSize="1.1em">$</InputLeftElement>
+                                <Input type='number' name='currentValue' bg='light' value={formData.currentValue} onChange={handleChange} />
+                            </InputGroup>
+                        </FormControl>
+                    )}
                     <FormControl>
                         <FormLabel>Purchase Date</FormLabel>
                         <Input type='date' name='purchaseDate' bg='light' value={formData.purchaseDate} onChange={handleChange} />
@@ -166,11 +223,13 @@ const AddCellarBottleModal = ({ isOpen, onClose, onSuccess }) => {
                 </ModalBody>
                 <ModalFooter>
                     <Button onClick={onClose} mr={3}>Cancel</Button>
-                    <Button variant='primary' onClick={handleSubmit} isLoading={loading}>Add to Cellar</Button>
+                    <Button variant='primary' onClick={handleSubmit} isLoading={loading}>
+                        {entry ? 'Update' : 'Add to Cellar'}
+                    </Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
     );
 };
 
-export default AddCellarBottleModal;
+export default CellarBottleModal;

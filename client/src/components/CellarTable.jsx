@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, Box, Text, Button } from '@chakra-ui/react';
+import { Table, Thead, Tbody, Tr, Th, Td, Box, Text, Button, Flex } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import DrinkBottleModal from './DrinkBottleModal';
 import BottleModal from './BottleModal';
+import CellarBottleModal from './CellarBottleModal';
 
 const CellarTable = ({ cellar }) => {
     const [selectedBottle, setSelectedBottle] = useState(null);
     const [isDrinkModalOpen, setIsDrinkModalOpen] = useState(false);
     const [isBottleModalOpen, setIsBottleModalOpen] = useState(false);
+    const [isCellarBottleModalOpen, setIsCellarBottleModalOpen] = useState(false);
     
     const openDrinkModal = (entry) => {
         setSelectedBottle(entry);
@@ -17,6 +19,11 @@ const CellarTable = ({ cellar }) => {
     const openBottleModal = (entry) => {
         setSelectedBottle(entry);
         setIsBottleModalOpen(true);
+    }
+
+    const openCellarBottleModal = (entry) => {
+        setSelectedBottle(entry);
+        setIsCellarBottleModalOpen(true);
     }
 
     return (
@@ -36,7 +43,7 @@ const CellarTable = ({ cellar }) => {
                             <Th color="tertiary">Current Value</Th>
                             <Th color="tertiary">Purchase Date</Th>
                             <Th color="tertiary">Notes</Th>
-                            <Th color="tertiary">Drink Bottle</Th>
+                            <Th color="tertiary">Actions</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
@@ -58,7 +65,10 @@ const CellarTable = ({ cellar }) => {
                                 <Td>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Td>
                                 <Td>{entry.notes}</Td>
                                 <Td textAlign='center'>
-                                    <Button variant='primary' size='xs' onClick={() => openDrinkModal(entry)}>Drink</Button>
+                                    <Flex justifyContent='center' gap={1}>
+                                        <Button variant='solid' color="text" bg="green" _hover={{bg: "green.400"}} size='xs' onClick={() => openCellarBottleModal(entry)}>Edit</Button>
+                                        <Button variant='primary' size='xs' onClick={() => openDrinkModal(entry)}>Drink</Button>
+                                    </Flex>
                                 </Td>
                             </Tr>
                         ))}
@@ -80,6 +90,13 @@ const CellarTable = ({ cellar }) => {
                     isOpen={isBottleModalOpen} 
                     onClose={() => setIsBottleModalOpen(false)} 
                     bottle={selectedBottle.bottle} 
+                />
+            )}
+            {selectedBottle && (
+                <CellarBottleModal 
+                    isOpen={isCellarBottleModalOpen} 
+                    onClose={() => setIsCellarBottleModalOpen(false)} 
+                    entry={selectedBottle} 
                 />
             )}
         </Box>
