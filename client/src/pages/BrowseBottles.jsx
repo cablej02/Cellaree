@@ -13,7 +13,7 @@ import { BsBagHeart, BsBagHeartFill } from "react-icons/bs";
 const BrowseBottles = () => {
     const toast = useToast();
     const { user, setUser } = useUser();
-    const { data: bottlesData, loading, error } = useQuery(GET_BOTTLES);
+    const { data: bottlesData, loading, error } = useQuery(GET_BOTTLES, { fetchPolicy: 'network-only' });
     const { data: wineriesData } = useQuery(GET_WINERIES);
     const { data: wineStylesData } = useQuery(GET_WINE_STYLES);
     
@@ -55,8 +55,8 @@ const BrowseBottles = () => {
     };
 
     const handleAddBottleSuccess = (newBottle) => {
-        console.log('New bottle added:', newBottle);
         setBottles((prevBottles) => [...prevBottles, newBottle]);
+        toast({ title: 'Bottle added!', status: 'success' });
     };
     
     //color imports
