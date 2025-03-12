@@ -72,7 +72,7 @@ const BrowseBottles = () => {
                 {!loading && !error && (
                 <>
                     <Flex justify="space-between" mb={4}>
-                        <Heading as='h1'>Browse Bottles</Heading>
+                        <Heading as='h1'>Browse</Heading>
                     </Flex>
                     <HStack justifyContent='space-between' mb={4}>
                         <Button variant='primary' onClick={() => setIsBottleModalOpen(true)}>Add Bottle</Button>
@@ -82,19 +82,19 @@ const BrowseBottles = () => {
                         {bottles.map((bottle) => {
                             const { cellarCount, drankCount, onWishlist } = getBottleUserStats(bottle._id);
                             return (
-                                <Card key={bottle._id} p={4} borderRadius="xl" bg="dark" color="text">
-                                    <CardBody>
+                                <Card key={bottle._id} borderRadius="xl" bg="dark" color="text">
+                                    <CardBody pb={1}>
                                         <Text fontWeight="bold" fontSize="lg" color="primary.200">{capitalizeWords(bottle.productName)}</Text>
                                         <Text fontSize="sm" color="secondary">{capitalizeWords(bottle.winery.name)} - {bottle.wineStyle.name}</Text>
-                                        <Text fontSize="sm">{bottle.country}, {bottle.location}</Text>
+                                        <Text fontSize="sm" color="secondary">{bottle.country}, {bottle.location}</Text>
                                         <Flex justify="space-between" mt={2}>
                                             <Text fontSize="sm">In Cellar: {cellarCount}</Text>
                                             <Text fontSize="sm">Drank: {drankCount}</Text>
                                         </Flex>
-                                        <Flex justify="space-between" mt={4}>
+                                        <Flex justify="space-between" mt={2}>
                                             <IconButton
                                                 icon={<FaArrowUpFromBracket color={textColor} />} 
-                                                size='sm'
+                                                size='lg'
                                                 onClick={() => setSelectedBottle(bottle)}
                                                 aria-label='View Bottle'
                                                 bg="transparent"
@@ -103,7 +103,7 @@ const BrowseBottles = () => {
                                             />
                                             <IconButton
                                                 icon={onWishlist ? <BsBagHeartFill color={primaryColor} /> : <BsBagHeart color={textColor} />}
-                                                size='md'
+                                                size='lg'
                                                 onClick={() => toggleWishlist(bottle._id)}
                                                 aria-label='Toggle Wishlist'
                                                 bg="transparent"
