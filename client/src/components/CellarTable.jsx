@@ -75,7 +75,7 @@ const CellarTable = ({ cellar }) => {
     return (
         <Box>
             {sortedCellar.length > 0 ? (
-                <Table variant='simple' size='sm' colorScheme="primary">
+                <Table variant='simple' size='sm' colorScheme="primary" width='100%'>
                     <Thead>
                         <Tr>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("winery")}> 
@@ -116,20 +116,26 @@ const CellarTable = ({ cellar }) => {
                         {sortedCellar.map(entry => (
                             <Tr key={entry._id}>
                                 <Td>{capitalizeWords(entry.bottle.winery.name)}</Td>
-                                <Td>
-                                    <Button variant='link' color='blue.400' onClick={() => openBottleModal(entry)}>
-                                        {capitalizeWords(entry.bottle.productName)}
-                                    </Button>
+                                {/* <Td maxWidth="120px" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap"> */}
+                                <Td 
+                                    maxW="160px" 
+                                    whiteSpace="normal" 
+                                    cursor="pointer" 
+                                    color="blue.400" 
+                                    _hover={{ textDecoration: "underline" }} 
+                                    onClick={() => openBottleModal(entry)}
+                                >
+                                    {capitalizeWords(entry.bottle.productName)}
                                 </Td>
                                 <Td>{capitalizeWords(entry.bottle.wineStyle.name)}</Td>
                                 <Td>{entry.bottle.country}</Td>
-                                <Td>{entry.bottle.location}</Td>
+                                <Td maxW="10px">{entry.bottle.location}</Td>
                                 <Td>{entry.vintage || 'NV'}</Td>
                                 <Td>{entry.quantity}</Td>
                                 <Td>${entry.purchasePrice?.toFixed(2) || 'N/A'}</Td>
                                 <Td>${entry.currentValue?.toFixed(2) || 'N/A'}</Td>
                                 <Td>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Td>
-                                <Td>{entry.notes}</Td>
+                                <Td maxW="100px">{entry.notes}</Td>
                                 <Td textAlign='center'>
                                     <Flex justifyContent='center' gap={1}>
                                         <Button variant='solid' color="text" bg="green" _hover={{bg: "green.400"}} size='xs' onClick={() => openCellarBottleModal(entry)}>Edit</Button>
@@ -138,7 +144,6 @@ const CellarTable = ({ cellar }) => {
                                 </Td>
                             </Tr>
                         ))}
-                        
                     </Tbody>
                 </Table>
             ) : (
