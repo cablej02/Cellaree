@@ -103,16 +103,24 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
 
             let success = false;
             if (entry) {
-                variables._id = entry._id;
-                variables.currentValue = Number(formData.currentValue) || Number(formData.purchasePrice) || 0;
-                const { data } = await updateCellarBottle({ variables });
-                success = !!data?.updateCellarBottle;
-                // if(data?.updateCellarBottle) {
-                //     setUser((prev) => ({
-                //         ...prev,
-                //         cellar: prev.cellar.map((entry) => entry._id === data.updateCellarBottle._id ? data.updateCellarBottle : entry)
-                //     }));
-                // }
+                if(parseInt(formData.quantity) === 0) {
+                    const { data } = await removeCellarBottle({ variables: { _id: entry._id } });
+                    success = !!data?.removeCellarBottle;
+
+                    // update user context if successful
+                    if(data?.removeCellarBottle) {
+                        setUser((prev) => ({
+                            ...prev,
+                            cellar: prev.cellar.filter((entry) => entry._id !== data.removeCellarBottle._id)
+                        }));
+                    }
+                } else{
+                    variables._id = entry._id;
+                    variables.currentValue = Number(formData.currentValue) || Number(formData.purchasePrice) || 0;
+                    const { data } = await updateCellarBottle({ variables });
+                    success = !!data?.updateCellarBottle;
+                    // don't need to update context as cache is updated automatically
+                }
             } else {
                 const { data } = await addCellarBottle({ variables });
                 success = !!data?.addCellarBottle;
@@ -155,7 +163,7 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
                         <FormLabel>Bottle</FormLabel>
                         {/* If editing entry, we cannot change bottle */}
                         {entry ? (
-                            <Text>{capitalizeWords(entry.bottle.winery.name)} - {capitalizeWords(entry.bottle.productName)}</Text>
+                            <Text mb={1}>{capitalizeWords(entry.bottle.winery.name)} - {capitalizeWords(entry.bottle.productName)}</Text>
                         ) : (
                             <Input 
                                 type='text'
