@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter, 
     Button, FormControl, FormLabel, Input, NumberInput, NumberInputField, Text
@@ -21,6 +21,14 @@ const DrinkBottleModal = ({ entry, isOpen, onClose }) => {
     const [drinkCellarBottle, { loading }] = useMutation(DRINK_CELLAR_BOTTLE);
     const { data: reviewData } = useQuery(GET_USER_REVIEWS, { fetchPolicy: 'network-only' });
 
+    useEffect(() => {
+        if(isOpen) {
+            setQuantity(1);
+            setDrankDate(new Date().toISOString().split('T')[0]);
+            setError('');
+        }
+    }, [isOpen]);
+
     const handleSubmit = async () => {
         if (quantity < 1 || quantity > entry.quantity) {
             setError(`Invalid quantity. You have ${entry.quantity} available.`);
@@ -33,7 +41,7 @@ const DrinkBottleModal = ({ entry, isOpen, onClose }) => {
                 variables: {
                     _id: entry._id,
                     quantity: Number(quantity),
-                    drankDate
+                    drankDate: drankDate
                 }
             });
 
