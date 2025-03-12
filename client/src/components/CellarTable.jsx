@@ -75,7 +75,7 @@ const CellarTable = ({ cellar }) => {
     return (
         <Box>
             {sortedCellar.length > 0 ? (
-                <Table variant='simple' size='sm'>
+                <Table variant='simple' size='sm' colorScheme="primary">
                     <Thead>
                         <Tr>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("winery")}> 
