@@ -75,38 +75,38 @@ const CellarTable = ({ cellar }) => {
     return (
         <Box>
             {sortedCellar.length > 0 ? (
-                <Table variant='simple' size='sm' colorScheme="primary" width='100%'>
+                <Table variant='simple' size='sm' colorScheme="primary">
                     <Thead>
                         <Tr>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("winery")}> 
-                                <Flex align="center" gap={2}> Winery {getSortIcon("winery")} </Flex>
+                                <Flex align="center"> Winery {getSortIcon("winery")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("product")}> 
-                                <Flex align="center" gap={2}> Product {getSortIcon("product")} </Flex>
+                                <Flex align="center"> Product {getSortIcon("product")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("style")}> 
-                                <Flex align="center" gap={2}> Style {getSortIcon("style")} </Flex>
+                                <Flex align="center"> Style {getSortIcon("style")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("country")}> 
-                                <Flex align="center" gap={2}> Country {getSortIcon("country")} </Flex>
+                                <Flex align="center"> Country {getSortIcon("country")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("location")}> 
-                                <Flex align="center" gap={2}> Location {getSortIcon("location")} </Flex>
+                                <Flex align="center"> Location {getSortIcon("location")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("vintage")}> 
-                                <Flex align="center" gap={2}> Vintage {getSortIcon("vintage")} </Flex>
+                                <Flex align="center"> Vintage {getSortIcon("vintage")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("quantity")}> 
-                                <Flex align="center" gap={2}> Quantity {getSortIcon("quantity")} </Flex>
+                                <Flex align="center"> Quantity {getSortIcon("quantity")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("purchasePrice")}> 
-                                <Flex align="center" gap={2}> Purchase Price {getSortIcon("purchasePrice")} </Flex>
+                                <Flex align="center"> Purchase Price {getSortIcon("purchasePrice")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("currentValue")}> 
-                                <Flex align="center" gap={2}> Current Value {getSortIcon("currentValue")} </Flex>
+                                <Flex align="center"> Current Value {getSortIcon("currentValue")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("purchaseDate")}> 
-                                <Flex align="center" gap={2}> Purchase Date {getSortIcon("purchaseDate")} </Flex>
+                                <Flex align="center"> Purchase Date {getSortIcon("purchaseDate")} </Flex>
                             </Th>
                             <Th color="tertiary">Notes</Th>
                             <Th color="tertiary">Actions</Th>
@@ -115,7 +115,7 @@ const CellarTable = ({ cellar }) => {
                     <Tbody>
                         {sortedCellar.map(entry => (
                             <Tr key={entry._id}>
-                                <Td>{capitalizeWords(entry.bottle.winery.name)}</Td>
+                                <Td maxW="110px">{capitalizeWords(entry.bottle.winery.name)}</Td>
                                 {/* <Td maxWidth="120px" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap"> */}
                                 <Td 
                                     maxW="160px" 
@@ -127,15 +127,15 @@ const CellarTable = ({ cellar }) => {
                                 >
                                     {capitalizeWords(entry.bottle.productName)}
                                 </Td>
-                                <Td>{capitalizeWords(entry.bottle.wineStyle.name)}</Td>
-                                <Td>{entry.bottle.country}</Td>
-                                <Td maxW="10px">{entry.bottle.location}</Td>
+                                <Td maxW="100px">{capitalizeWords(entry.bottle.wineStyle.name)}</Td>
+                                <Td maxW="110px">{entry.bottle.country}</Td>
+                                <Td maxW="110px">{entry.bottle.location}</Td>
                                 <Td>{entry.vintage || 'NV'}</Td>
                                 <Td>{entry.quantity}</Td>
                                 <Td>${entry.purchasePrice?.toFixed(2) || 'N/A'}</Td>
                                 <Td>${entry.currentValue?.toFixed(2) || 'N/A'}</Td>
                                 <Td>{new Date(parseInt(entry.purchaseDate)).toLocaleDateString()}</Td>
-                                <Td maxW="100px">{entry.notes}</Td>
+                                <Td maxW="150px">{entry.notes}</Td>
                                 <Td textAlign='center'>
                                     <Flex justifyContent='center' gap={1}>
                                         <Button variant='solid' color="text" bg="green" _hover={{bg: "green.400"}} size='xs' onClick={() => openCellarBottleModal(entry)}>Edit</Button>
