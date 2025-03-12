@@ -68,7 +68,7 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
                 normalizeText(`${bottle.winery.name} - ${bottle.productName}`).includes(normalizedInput)
             );
         });
-
+        filteredBottles.sort((a, b) => a.winery.name.localeCompare(b.winery.name));
         setSearchResults(filteredBottles);
     };
 
