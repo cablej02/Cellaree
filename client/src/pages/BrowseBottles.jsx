@@ -3,13 +3,14 @@ import { useQuery, useMutation } from '@apollo/client';
 import { ADD_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from '../utils/mutations';
 import { GET_BOTTLES, GET_WINERIES, GET_WINE_STYLES } from '../utils/queries';
 import { useUser } from '../context/UserContext';
-import { Box, Flex, HStack, Button, IconButton, SimpleGrid, Card, CardBody, Text, Heading, useToken, useToast } from '@chakra-ui/react';
-import { capitalizeWords } from '../utils/formatting';
+import { Box, Flex, HStack, Button, IconButton, SimpleGrid, Card, CardBody, Text, Input, Heading, InputGroup, InputRightElement, useToken, useToast } from '@chakra-ui/react';
+import { capitalizeWords, normalizeText } from '../utils/formatting';
 import AddBottleModal from '../components/AddBottleModal';
 import BottleModal from '../components/BottleModal';
 import AddWineryModal from '../components/AddWineryModal';
 import { BsBagHeart, BsBagHeartFill } from "react-icons/bs";
 import { FaArrowUpFromBracket } from "react-icons/fa6";
+import { FaSearch } from 'react-icons/fa';
 
 const BrowseBottles = () => {
     const toast = useToast();
@@ -25,6 +26,21 @@ const BrowseBottles = () => {
 
     const [addWishlistBottle] = useMutation(ADD_WISHLIST_BOTTLE);
     const [removeWishlistBottle] = useMutation(REMOVE_WISHLIST_BOTTLE);
+
+    // search query state
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // apply filtering
+    let filteredBottles = bottles?.filter(bottle => {
+        const normalizedQuery = normalizeText(searchQuery);
+        return (!searchQuery || 
+            normalizeText(bottle.productName).includes(normalizedQuery) ||
+            normalizeText(bottle.winery.name).includes(normalizedQuery) ||
+            normalizeText(bottle.wineStyle.name).includes(normalizedQuery) ||
+            normalizeText(bottle.country).includes(normalizedQuery) ||
+            normalizeText(bottle.location).includes(normalizedQuery)
+        )
+    }) || [];
 
     useEffect(() => {
         if (bottlesData?.getBottles && !loading) {
@@ -71,15 +87,30 @@ const BrowseBottles = () => {
 
                 {!loading && !error && (
                 <>
-                    <Flex justify="space-between" mb={4}>
+                    <HStack justify="space-between" mb={4}>
                         <Heading as='h1'>Browse</Heading>
-                    </Flex>
+                        <HStack>
+                            <InputGroup>
+                                <Input 
+                                    placeholder="Search..." 
+                                    value={searchQuery} 
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    bg="dark"
+                                    color="text"
+                                    maxW="40vw"
+                                />
+                                <InputRightElement pointerEvents="none">
+                                    <FaSearch color="text" />
+                                </InputRightElement>
+                            </InputGroup>
+                        </HStack>
+                    </HStack>
                     <HStack justifyContent='space-between' mb={4}>
                         <Button variant='primary' onClick={() => setIsBottleModalOpen(true)}>Add Bottle</Button>
                         <Button variant='primary' onClick={() => setIsWineryModalOpen(true)}>Add Winery</Button>
                     </HStack>
                     <SimpleGrid columns={[1, 2]} spacing={6}>
-                        {bottles.map((bottle) => {
+                        {filteredBottles.map((bottle) => {
                             const { cellarCount, drankCount, onWishlist } = getBottleUserStats(bottle._id);
                             return (
                                 <Card key={bottle._id} borderRadius="xl" bg="dark" color="text">
