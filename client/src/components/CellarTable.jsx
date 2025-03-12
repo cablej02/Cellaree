@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, Thead, Tbody, Tr, Th, Td, Box, Text, Button, Flex } from '@chakra-ui/react';
+import { FaSortUp, FaSortDown, FaSort } from 'react-icons/fa';
 import { capitalizeWords } from '../utils/formatting';
 import DrinkBottleModal from './DrinkBottleModal';
 import BottleModal from './BottleModal';
@@ -10,6 +11,7 @@ const CellarTable = ({ cellar }) => {
     const [isDrinkModalOpen, setIsDrinkModalOpen] = useState(false);
     const [isBottleModalOpen, setIsBottleModalOpen] = useState(false);
     const [isCellarBottleModalOpen, setIsCellarBottleModalOpen] = useState(false);
+    const [sortConfig, setSortConfig] = useState({ key: 'purchaseDate', direction: 'desc' });
     
     const openDrinkModal = (entry) => {
         setSelectedBottle(entry);
@@ -26,28 +28,92 @@ const CellarTable = ({ cellar }) => {
         setIsCellarBottleModalOpen(true);
     }
 
+    const handleSort = (key) => {
+        setSortConfig((prev) => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+        }));
+    };
+
+    const getSortIcon = (key) => {
+        if (sortConfig.key === key) {
+            return sortConfig.direction === "asc" ? <FaSortUp /> : <FaSortDown />;
+        }
+        return <FaSort />;
+    };
+
+    const sortedCellar = cellar.map(entry => ({
+        ...entry,
+        // flatten nested fields for sorting
+        winery: entry.bottle.winery.name,
+        product: entry.bottle.productName,
+        style: entry.bottle.wineStyle.name,
+        country: entry.bottle.country,
+        location: entry.bottle.location,
+    })).sort((a, b) => {
+        let valA = a[sortConfig.key];
+        let valB = b[sortConfig.key];
+
+        if (sortConfig.key === "purchaseDate") {
+            valA = parseInt(valA);
+            valB = parseInt(valB);
+        }
+
+        // push bottles with no vintage to end
+        if (sortConfig.key === "vintage") {
+            if (!valA) valA = sortConfig.direction === "asc" ? 9999 : -1;
+            if (!valB) valB = sortConfig.direction === "asc" ? 9999 : -1;
+            return sortConfig.direction === "asc" ? valA - valB : valB - valA;
+        } else if (typeof valA === "string" && typeof valB === "string") {
+            // localeCompare is case insensitive and handles special characters
+            return sortConfig.direction === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }
+
+        return sortConfig.direction === "asc" ? valA - valB : valB - valA;
+    });
+
     return (
         <Box>
-            {cellar.length > 0 ? (
+            {sortedCellar.length > 0 ? (
                 <Table variant='simple' size='sm'>
                     <Thead>
                         <Tr>
-                            <Th color="tertiary">Winery</Th>
-                            <Th color="tertiary">Product</Th>
-                            <Th color="tertiary">Style</Th>
-                            <Th color="tertiary">Country</Th>
-                            <Th color="tertiary">Location</Th>
-                            <Th color="tertiary">Vintage</Th>
-                            <Th color="tertiary">Quantity</Th>
-                            <Th color="tertiary">Purchase Price</Th>
-                            <Th color="tertiary">Current Value</Th>
-                            <Th color="tertiary">Purchase Date</Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("winery")}> 
+                                <Flex align="center" gap={2}> Winery {getSortIcon("winery")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("product")}> 
+                                <Flex align="center" gap={2}> Product {getSortIcon("product")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("style")}> 
+                                <Flex align="center" gap={2}> Style {getSortIcon("style")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("country")}> 
+                                <Flex align="center" gap={2}> Country {getSortIcon("country")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("location")}> 
+                                <Flex align="center" gap={2}> Location {getSortIcon("location")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("vintage")}> 
+                                <Flex align="center" gap={2}> Vintage {getSortIcon("vintage")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("quantity")}> 
+                                <Flex align="center" gap={2}> Quantity {getSortIcon("quantity")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("purchasePrice")}> 
+                                <Flex align="center" gap={2}> Purchase Price {getSortIcon("purchasePrice")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("currentValue")}> 
+                                <Flex align="center" gap={2}> Current Value {getSortIcon("currentValue")} </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("purchaseDate")}> 
+                                <Flex align="center" gap={2}> Purchase Date {getSortIcon("purchaseDate")} </Flex>
+                            </Th>
                             <Th color="tertiary">Notes</Th>
                             <Th color="tertiary">Actions</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {cellar.map(entry => (
+                        {sortedCellar.map(entry => (
                             <Tr key={entry._id}>
                                 <Td>{capitalizeWords(entry.bottle.winery.name)}</Td>
                                 <Td>
@@ -58,7 +124,7 @@ const CellarTable = ({ cellar }) => {
                                 <Td>{capitalizeWords(entry.bottle.wineStyle.name)}</Td>
                                 <Td>{entry.bottle.country}</Td>
                                 <Td>{entry.bottle.location}</Td>
-                                <Td>{entry.vintage || 'N/A'}</Td>
+                                <Td>{entry.vintage || 'NV'}</Td>
                                 <Td>{entry.quantity}</Td>
                                 <Td>${entry.purchasePrice?.toFixed(2) || 'N/A'}</Td>
                                 <Td>${entry.currentValue?.toFixed(2) || 'N/A'}</Td>
