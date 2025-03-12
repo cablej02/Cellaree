@@ -90,9 +90,7 @@ export const typeDefs = gql`
     type Query {
         me: User
         getWineries: [Winery]
-        getWinery(_id: ID!): Winery
         getWineStyles: [WineStyle]
-        getWineStyle(_id: ID!): WineStyle
         getBottles(page: Int, limit: Int): [Bottle]
         getBottle(_id: ID!): Bottle
         getBottleReviews(bottle: ID!): BottleReviews

@@ -35,25 +35,7 @@ const resolvers = {
             throw new AuthenticationError('Not logged in');
         },
         getWineries: async () => Winery.find().sort({name:1}).lean(),
-        getWinery: async (parent, { _id }) => {
-            try {
-                const winery = await Winery.findById( _id );
-                if(!winery) throw new Error('No winery found with this id!');
-                return winery;
-            } catch (err) {
-                throw new Error(`Error fetching Winery: ${err}`);
-            }
-        },
         getWineStyles: async () => WineStyle.find().sort({name:1}).lean(),
-        getWineStyle: async (parent, { _id }) => {
-            try {
-                const style = await WineStyle.findById( _id );
-                if (!style) throw new Error('No style found with this id!');
-                return style;
-            } catch (err) {
-                throw new Error(`Error fetching WineStyle: ${err}`);
-            }
-        },
         getBottles: async (parent, { page = 1, limit = 0 }) => {
             const result = Bottle.find()
                 .populate('winery')
@@ -196,7 +178,6 @@ const resolvers = {
 
                 // check if the current password is correct
                 const validPassword = await user.isCorrectPassword(args.password);
-                console.log(validPassword, typeof validPassword); //TODO remove this
                 if (!validPassword) throw new AuthenticationError('Incorrect password!');
 
                 // add new fields to updatedFields object
