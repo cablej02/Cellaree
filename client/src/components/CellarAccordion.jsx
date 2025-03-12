@@ -2,11 +2,23 @@ import { useState, useEffect } from 'react';
 import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, Text, Button, VStack, Flex } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import DrinkBottleModal from './DrinkBottleModal';
+import CellarBottleModal from './CellarBottleModal';
 
 const CellarAccordion = ({ cellar }) => {
     const [selectedBottle, setSelectedBottle] = useState(null);
     const [isDrinkModalOpen, setIsDrinkModalOpen] = useState(false);
+    const [isCellarBottleModalOpen, setIsCellarBottleModalOpen] = useState(false);
     const [groupedBottles, setGroupedBottles] = useState([]);
+
+    const openDrinkModal = (entry) => {
+        setSelectedBottle(entry);
+        setIsDrinkModalOpen(true);
+    }
+
+    const openCellarBottleModal = (entry) => {
+        setSelectedBottle(entry);
+        setIsCellarBottleModalOpen(true);
+    }
 
     useEffect(() => {
         if (cellar.length > 0) {
@@ -40,11 +52,6 @@ const CellarAccordion = ({ cellar }) => {
             setGroupedBottles([]);
         }
     }, [cellar]);
-    
-    const openModal = (entry) => {
-        setSelectedBottle(entry);
-        setIsDrinkModalOpen(true);
-    }
 
     return (
         <Box maxW="600px" mx="auto">
@@ -93,7 +100,10 @@ const CellarAccordion = ({ cellar }) => {
                                                     <Text>{entry.notes}</Text>
                                                 </Flex>
                                             )}
-                                            <Button mt={2} variant='primary' size='sm' w="full" onClick={() => openModal(entry)}>Drink</Button>
+                                            <Flex justify="end" gap={3} mt={2}>
+                                                <Button variant='solid' bg="green" _hover={{bg: "green.500"}} size='sm' onClick={() => openCellarBottleModal(entry)}>Edit</Button>
+                                                <Button variant='primary' size='sm' onClick={() => openDrinkModal(entry)}>Drink</Button>
+                                            </Flex>
                                         </Box>
                                     ))}
                                 </VStack>
@@ -108,6 +118,13 @@ const CellarAccordion = ({ cellar }) => {
                 <DrinkBottleModal 
                     isOpen={isDrinkModalOpen} 
                     onClose={() => setIsDrinkModalOpen(false)} 
+                    entry={selectedBottle} 
+                />
+            )}
+            {selectedBottle && (
+                <CellarBottleModal 
+                    isOpen={isCellarBottleModalOpen} 
+                    onClose={() => setIsCellarBottleModalOpen(false)} 
                     entry={selectedBottle} 
                 />
             )}
