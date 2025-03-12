@@ -3,12 +3,13 @@ import { useQuery, useMutation } from '@apollo/client';
 import { ADD_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from '../utils/mutations';
 import { GET_BOTTLES, GET_WINERIES, GET_WINE_STYLES } from '../utils/queries';
 import { useUser } from '../context/UserContext';
-import { Box, Flex, Button, IconButton, Table, Thead, Tbody, Tr, Th, Td, Text, useToken, useToast } from '@chakra-ui/react';
+import { Box, Flex, HStack, Button, IconButton, SimpleGrid, Card, CardBody, Text, Heading, useToken, useToast } from '@chakra-ui/react';
 import { capitalizeWords } from '../utils/formatting';
 import AddBottleModal from '../components/AddBottleModal';
 import BottleModal from '../components/BottleModal';
 import AddWineryModal from '../components/AddWineryModal';
 import { BsBagHeart, BsBagHeartFill } from "react-icons/bs";
+import { FaArrowUpFromBracket } from "react-icons/fa6";
 
 const BrowseBottles = () => {
     const toast = useToast();
@@ -63,86 +64,76 @@ const BrowseBottles = () => {
     const primaryColor = useToken("colors", "primary.300");
     const textColor = useToken("colors", "text");
     return (
-        <Box maxW='1000px' mx='auto' p={4}>
-            {loading && <Text>Loading bottles...</Text>}
-            {error && <Text color='red.500'>Error loading bottles.</Text>}
+        <>
+            <Box maxW='1000px' mx='auto' p={4}>
+                {loading && <Text>Loading bottles...</Text>}
+                {error && <Text color='red.500'>Error loading bottles.</Text>}
 
-            {!loading && !error && (
-            <>
-                <Flex justify="space-between" mb={4}>
-                    <Button variant='primary' onClick={() => setIsBottleModalOpen(true)}>Add Bottle</Button>
-                    <Button variant='primary' onClick={() => setIsWineryModalOpen(true)}>Add Winery</Button>
-                </Flex>
-                <Table variant='simple' size='sm'>
-                    <Thead>
-                        <Tr>
-                            <Th color='tertiary'>Product Name</Th>
-                            <Th color='tertiary'>Winery</Th>
-                            <Th color='tertiary'>Type</Th>
-                            <Th color='tertiary'>Wine Style</Th>
-                            <Th color='tertiary'>Country</Th>
-                            <Th color='tertiary'>Location</Th>
-                            <Th color='tertiary'>In Cellar</Th>
-                            <Th color='tertiary'>Drank</Th>
-                            <Th color='tertiary'>Wishlist</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {bottles.length > 0 ? (
-                            bottles.map((bottle) => {
-                                const { cellarCount, drankCount, onWishlist } = getBottleUserStats(bottle._id);
-                                return (
-                                    <Tr key={bottle._id}>
-                                        <Td>
-                                            <Button variant='link' color='blue.400' onClick={() => setSelectedBottle(bottle)}>
-                                                {capitalizeWords(bottle.productName)}
-                                            </Button>
-                                        </Td>
-                                        <Td>{capitalizeWords(bottle.winery.name)}</Td>
-                                        <Td>{bottle.wineStyle.category}</Td>
-                                        <Td>{bottle.wineStyle.name}</Td>
-                                        <Td>{bottle.country}</Td>
-                                        <Td>{bottle.location}</Td>
-                                        <Td>{cellarCount}</Td>
-                                        <Td>{drankCount}</Td>
-                                        <Td textAlign="center">
+                {!loading && !error && (
+                <>
+                    <Flex justify="space-between" mb={4}>
+                        <Heading as='h1'>Browse Bottles</Heading>
+                    </Flex>
+                    <HStack justifyContent='space-between' mb={4}>
+                        <Button variant='primary' onClick={() => setIsBottleModalOpen(true)}>Add Bottle</Button>
+                        <Button variant='primary' onClick={() => setIsWineryModalOpen(true)}>Add Winery</Button>
+                    </HStack>
+                    <SimpleGrid columns={[1, 2]} spacing={6}>
+                        {bottles.map((bottle) => {
+                            const { cellarCount, drankCount, onWishlist } = getBottleUserStats(bottle._id);
+                            return (
+                                <Card key={bottle._id} p={4} borderRadius="xl" bg="dark" color="text">
+                                    <CardBody>
+                                        <Text fontWeight="bold" fontSize="lg" color="primary.200">{capitalizeWords(bottle.productName)}</Text>
+                                        <Text fontSize="sm" color="secondary">{capitalizeWords(bottle.winery.name)} - {bottle.wineStyle.name}</Text>
+                                        <Text fontSize="sm">{bottle.country}, {bottle.location}</Text>
+                                        <Flex justify="space-between" mt={2}>
+                                            <Text fontSize="sm">In Cellar: {cellarCount}</Text>
+                                            <Text fontSize="sm">Drank: {drankCount}</Text>
+                                        </Flex>
+                                        <Flex justify="space-between" mt={4}>
+                                            <IconButton
+                                                icon={<FaArrowUpFromBracket color={textColor} />} 
+                                                size='sm'
+                                                onClick={() => setSelectedBottle(bottle)}
+                                                aria-label='View Bottle'
+                                                bg="transparent"
+                                                _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
+                                                _active={{ bg: "transparent" }}
+                                            />
                                             <IconButton
                                                 icon={onWishlist ? <BsBagHeartFill color={primaryColor} /> : <BsBagHeart color={textColor} />}
-                                                size='lg'
+                                                size='md'
                                                 onClick={() => toggleWishlist(bottle._id)}
                                                 aria-label='Toggle Wishlist'
                                                 bg="transparent"
                                                 _hover={{ filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))" }}
                                                 _active={{ bg: "transparent" }}
                                             />
-                                        </Td>
-                                    </Tr>
-                                );
-                            })
-                        ) : (
-                            <Tr>
-                                <Td colSpan={4} textAlign='center'>No bottles found.</Td>
-                            </Tr>
-                        )}
-                    </Tbody>
-                </Table>
-                {selectedBottle && (
-                    <BottleModal isOpen={!!selectedBottle} onClose={() => setSelectedBottle(null)} bottle={selectedBottle} />
-                )}
-            </>)}
+                                        </Flex>
+                                    </CardBody>
+                                </Card>
+                            );
+                        })}
+                    </SimpleGrid>
+                    {selectedBottle && (
+                        <BottleModal isOpen={!!selectedBottle} onClose={() => setSelectedBottle(null)} bottle={selectedBottle} />
+                    )}
+                </>)}
+            </Box>
             <AddBottleModal
-                    isOpen={isBottleModalOpen}
-                    onClose={() => setIsBottleModalOpen(false)}
-                    onAddSuccess={handleAddBottleSuccess}
-                    wineries={wineriesData?.getWineries || []}
-                    wineStyles={wineStylesData?.getWineStyles || []}
-                />
+                isOpen={isBottleModalOpen}
+                onClose={() => setIsBottleModalOpen(false)}
+                onAddSuccess={handleAddBottleSuccess}
+                wineries={wineriesData?.getWineries || []}
+                wineStyles={wineStylesData?.getWineStyles || []}
+            />
             <AddWineryModal
                 isOpen={isWineryModalOpen}
                 onClose={() => setIsWineryModalOpen(false)}
                 onAddSuccess={() => toast({ title: 'Winery added!', status: 'success' })}
             />
-        </Box>
+        </>
     );
 };
 
