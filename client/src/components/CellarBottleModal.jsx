@@ -8,7 +8,8 @@ import { useMutation } from '@apollo/client';
 import { ADD_CELLAR_BOTTLE, UPDATE_CELLAR_BOTTLE, REMOVE_CELLAR_BOTTLE } from '../utils/mutations';
 import { useQuery } from '@apollo/client';
 import { GET_BOTTLES } from '../utils/queries';
-import { capitalizeWords, normalizeText } from '../utils/formatting';
+import { capitalizeWords } from '../utils/formatting';
+import { normalizeText } from "@shared/utils/formatting";
 import { useUser } from '../context/UserContext';
 
 const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {

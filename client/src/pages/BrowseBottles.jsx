@@ -4,7 +4,8 @@ import { ADD_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from '../utils/mutations'
 import { GET_BOTTLES, GET_WINERIES, GET_WINE_STYLES } from '../utils/queries';
 import { useUser } from '../context/UserContext';
 import { Box, Flex, HStack, Button, IconButton, SimpleGrid, Card, CardBody, Text, Input, Heading, InputGroup, InputRightElement, useToken, useToast } from '@chakra-ui/react';
-import { capitalizeWords, normalizeText } from '../utils/formatting';
+import { capitalizeWords } from '../utils/formatting';
+import { normalizeText } from "@shared/utils/formatting";
 import AddBottleModal from '../components/AddBottleModal';
 import BottleModal from '../components/BottleModal';
 import AddWineryModal from '../components/AddWineryModal';

@@ -6,7 +6,7 @@ import {
     Menu, MenuList, MenuButton, MenuItem, Checkbox, useBreakpointValue } from "@chakra-ui/react";
 import { FaChevronDown, FaSearch } from "react-icons/fa";
 
-import { normalizeText } from "../utils/formatting";
+import { normalizeText } from "@shared/utils/formatting";
 import { GET_WINE_STYLES } from "../utils/queries";
 import CellarAccordion from "../components/CellarAccordion";
 import CellarTable from "../components/CellarTable";
