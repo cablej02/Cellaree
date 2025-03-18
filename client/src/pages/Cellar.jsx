@@ -81,6 +81,8 @@ const Cellar = () => {
             normalizeText(entry.bottle.productName).includes(normalizedQuery) ||
             normalizeText(entry.bottle.winery.name).includes(normalizedQuery) ||
             normalizeText(entry.bottle.wineStyle.name).includes(normalizedQuery) ||
+            normalizeText(entry.bottle.winery.name + entry.bottle.wineStyle.name).includes(normalizedQuery) ||
+            normalizeText(entry.bottle.winery.name + entry.bottle.productName).includes(normalizedQuery) ||
             normalizeText(entry.bottle.country).includes(normalizedQuery) ||
             normalizeText(entry.bottle.location).includes(normalizedQuery)
         ) && (!selectedCategories.length || selectedCategories.includes(entry.bottle.wineStyle.category)) // if none selected or category matches

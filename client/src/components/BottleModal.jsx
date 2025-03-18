@@ -20,13 +20,26 @@ const BottleModal = ({ isOpen, onClose, bottle }) => {
             <Modal isOpen={isOpen} onClose={onClose} size="lg">
                 <ModalOverlay />
                 <ModalContent bg="bgModal" color="text">
-                    <ModalHeader>
-                        <Text fontSize="xl" fontWeight="bold">{bottle.productName}</Text>
-                        <Text fontSize="sm" color="secondary">{bottle.winery.name} - {bottle.wineStyle.name}</Text>
-                        <Text fontSize="sm" color="secondary">{bottle.country || "Unknown"} | {bottle.location || "Unknown"}</Text>
-                        <Text fontSize="sm" fontWeight="bold" color="primary">
-                            Avg Rating: {data?.getBottleReviews.avgRating ? data.getBottleReviews.avgRating.toFixed(1) : "No Ratings Yet"}
+                    <ModalHeader display="flex" flexDirection="column" alignItems="start">
+                        <Text fontSize="3xl" fontWeight="bold" color="primary.300">
+                            {bottle.winery.name}
                         </Text>
+                        <Text fontSize="xl" fontWeight="bold" color="secondary">
+                            {bottle.productName 
+                                ? bottle.productName + (!bottle.productName.toLowerCase().includes(bottle.wineStyle.name.toLowerCase()) 
+                                    ? ` - ${bottle.wineStyle.name}` 
+                                    : "") 
+                                : bottle.wineStyle.name
+                            }
+                        </Text>
+                        <Text fontSize="sm" color="secondary" my={1}>{bottle.country || "Unknown"}{bottle.location ? ` | ${bottle.location}` :""}</Text>
+                        <Divider my={2} />
+                        <HStack>
+                        <Text fontSize="sm" fontWeight="bold" color="secondary" my={1}>Avg Rating: </Text>
+                        <Text fontSize="sm" fontWeight="bold" color="text">
+                            {data?.getBottleReviews.avgRating ? data.getBottleReviews.avgRating.toFixed(1) : "No Ratings Yet"}
+                        </Text>
+                        </HStack>
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>

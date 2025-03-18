@@ -60,14 +60,20 @@ const CellarAccordion = ({ cellar }) => {
         <Box maxW="600px" mx="auto">
             <Accordion allowToggle>
                 {groupedBottles.length > 0 ? (
-                    groupedBottles.map(({ bottle, totalQuantity, entries }) => (
-                        <AccordionItem key={bottle._id}>
+                    groupedBottles.map(({ bottle, totalQuantity, entries }) => {
+                        const displayName = bottle.productName
+                        ? `${bottle.winery.name} - ${bottle.productName}`
+                        : `${bottle.winery.name} - ${bottle.wineStyle.name}`;
+
+                        // Check if `wineStyle` is already included in `productName`
+                        const styleIncluded = !bottle.productName || bottle.productName?.toLowerCase().includes(bottle.wineStyle.name.toLowerCase());
+                        return (<AccordionItem key={bottle._id}>
                             <h2>
                                 <AccordionButton color='primary.200'>
                                     <Box flex='1' textAlign='left'>
-                                        <Text fontWeight='bold'>{bottle.productName}</Text>
+                                        <Text fontWeight='bold'>{displayName}</Text>
                                         <Text fontSize='sm' color='secondary'>
-                                            {bottle.winery.name} - {bottle.country} - {bottle.location} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
+                                            {bottle.country}{bottle.location ? ` | ${bottle.location}` : ""}{styleIncluded ? "" : ` ${bottle.wineStyle.name}`} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
                                         </Text>
                                     </Box>
                                     <AccordionIcon />
@@ -112,7 +118,7 @@ const CellarAccordion = ({ cellar }) => {
                                 </VStack>
                             </AccordionPanel>
                         </AccordionItem>
-                    ))
+                    )})
                 ) : (
                     <Text>No bottles in your cellar.</Text>
                 )}

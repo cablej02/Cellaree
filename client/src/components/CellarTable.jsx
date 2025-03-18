@@ -86,14 +86,14 @@ const CellarTable = ({ cellar }) => {
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("style")}> 
                                 <Flex align="center"> Style {getSortIcon("style")} </Flex>
                             </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("vintage")}> 
+                                <Flex align="center"> Vintage {getSortIcon("vintage")} </Flex>
+                            </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("country")}> 
                                 <Flex align="center"> Country {getSortIcon("country")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("location")}> 
                                 <Flex align="center"> Location {getSortIcon("location")} </Flex>
-                            </Th>
-                            <Th color="tertiary" cursor="pointer" onClick={() => handleSort("vintage")}> 
-                                <Flex align="center"> Vintage {getSortIcon("vintage")} </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={() => handleSort("quantity")}> 
                                 <Flex align="center"> Quantity {getSortIcon("quantity")} </Flex>
@@ -124,12 +124,12 @@ const CellarTable = ({ cellar }) => {
                                     _hover={{ textDecoration: "underline" }} 
                                     onClick={() => openBottleModal(entry)}
                                 >
-                                    {entry.bottle.productName}
+                                    {entry.bottle.productName ? entry.bottle.productName : `${entry.bottle.wineStyle.name}`}
                                 </Td>
                                 <Td maxW="100px">{entry.bottle.wineStyle.name}</Td>
+                                <Td>{entry.vintage || 'NV'}</Td>
                                 <Td maxW="110px">{entry.bottle.country}</Td>
                                 <Td maxW="110px">{entry.bottle.location}</Td>
-                                <Td>{entry.vintage || 'NV'}</Td>
                                 <Td>{entry.quantity}</Td>
                                 <Td>${entry.purchasePrice?.toFixed(2) || 'N/A'}</Td>
                                 <Td>${entry.currentValue?.toFixed(2) || 'N/A'}</Td>

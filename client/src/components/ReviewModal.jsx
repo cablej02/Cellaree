@@ -76,15 +76,22 @@ const ReviewModal = ({ isOpen, onClose, bottle, drankVintage, review }) => {
         <Modal isOpen={isOpen} onClose={onClose} size="md">
             <ModalOverlay />
             <ModalContent bg="bgModal" color="text">
-                <ModalHeader>{review ? "Edit Review" : "Leave a Review"}</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                    <Divider mb={2} />
-                    <Text fontWeight='bold'>{bottle.productName}</Text>
+                <ModalHeader>
+                    <Text fontSize="xl">{review ? "Edit Review" : "Leave a Review"}</Text>
+                    <Divider my={2} />
+                    <Text fontWeight='bold' fontSize="xl" color="primary.300">{bottle.winery.name}</Text>
                     <Text fontSize='sm' color='secondary'>
-                        {bottle.winery.name} - {bottle.wineStyle.name}
+                        {bottle.productName 
+                            ? bottle.productName + (!bottle.productName.toLowerCase().includes(bottle.wineStyle.name.toLowerCase()) 
+                                ? ` - ${bottle.wineStyle.name}` 
+                                : "") 
+                            : bottle.wineStyle.name
+                        }
                     </Text>
                     <Divider my={2} />
+                </ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
                     {/* If we didn't get a vintage from the inputs, render it as an input, otherwise render as text */}
                     {(!drankVintage || !review) ? (
                         <FormControl>

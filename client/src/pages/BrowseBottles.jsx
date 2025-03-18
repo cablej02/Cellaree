@@ -38,7 +38,9 @@ const BrowseBottles = () => {
             normalizeText(bottle.winery.name).includes(normalizedQuery) ||
             normalizeText(bottle.wineStyle.name).includes(normalizedQuery) ||
             normalizeText(bottle.country).includes(normalizedQuery) ||
-            normalizeText(bottle.location).includes(normalizedQuery)
+            normalizeText(bottle.location).includes(normalizedQuery) ||
+            normalizeText(bottle.winery.name + bottle.wineStyle.name).includes(normalizedQuery) ||
+            normalizeText(bottle.winery.name + bottle.productName).includes(normalizedQuery)
         )
     }) || [];
 
@@ -112,12 +114,20 @@ const BrowseBottles = () => {
                     <SimpleGrid columns={[1, 2]} spacing={6}>
                         {filteredBottles.map((bottle) => {
                             const { cellarCount, drankCount, onWishlist } = getBottleUserStats(bottle._id);
+
+                            const displayName = bottle.productName
+                                ? `${bottle.winery.name} - ${bottle.productName}`
+                                : `${bottle.winery.name} - ${bottle.wineStyle.name}`;
+
+                            // Check if `wineStyle` is already included in `productName`
+                            const styleIncluded = !bottle.productName || bottle.productName?.toLowerCase().includes(bottle.wineStyle.name.toLowerCase());
+
                             return (
                                 <Card key={bottle._id} borderRadius="xl" bg="dark" color="text">
                                     <CardBody pb={1}>
-                                        <Text fontWeight="bold" fontSize="lg" color="primary.200">{bottle.productName}</Text>
-                                        <Text fontSize="sm" color="secondary">{bottle.winery.name} - {bottle.wineStyle.name}</Text>
-                                        <Text fontSize="sm" color="secondary">{bottle.country}, {bottle.location}</Text>
+                                        <Text fontWeight="bold" fontSize="lg" color="primary.200">{displayName}</Text>
+                                        {!styleIncluded && <Text fontSize="sm" color="secondary">{bottle.wineStyle.name}</Text>}
+                                        <Text fontSize="sm" color="secondary">{bottle.country}{bottle.location ? ` | ${bottle.location}` : ""}</Text>
                                         <Flex justify="space-between" mt={2}>
                                             <Text fontSize="sm">In Cellar: {cellarCount}</Text>
                                             <Text fontSize="sm">Drank: {drankCount}</Text>

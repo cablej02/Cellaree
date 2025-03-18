@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter, 
-    Button, FormControl, FormLabel, Input, NumberInput, NumberInputField, Text
+    Button, FormControl, FormLabel, Input, NumberInput, NumberInputField, Text, Divider
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@apollo/client';
 import { DRINK_CELLAR_BOTTLE } from '../utils/mutations';
@@ -72,14 +72,26 @@ const DrinkBottleModal = ({ entry, isOpen, onClose }) => {
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
                 <ModalContent bg='bgModal' color='text'>
-                    <ModalHeader>Drink Bottle</ModalHeader>
+                    <ModalHeader display="flex" flexDirection="column" alignItems="start">
+                        <Text fontSize="xl">Drink Bottle</Text>
+                        <Divider my={2}/>
+                        <Text fontSize="xl" fontWeight="bold" color='primary.300'>
+                            {entry.bottle.winery.name}
+                        </Text>
+                        <Text fontSize="sm" color="secondary">
+                            {`${entry.vintage} ` || 'NV '}
+                            {entry.bottle.productName
+                                ? entry.bottle.productName + (!entry.bottle.productName.toLowerCase().includes(entry.bottle.wineStyle.name.toLowerCase())
+                                    ? ` - ${entry.bottle.wineStyle.name}`
+                                    : '')
+                                : entry.bottle.wineStyle.name
+                            }
+                        </Text>
+                        <Divider mt={2}/>
+                    </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <Text fontWeight='bold'>{entry.bottle.productName}</Text>
-                        <Text fontSize='sm' color='secondary'>
-                            {entry.bottle.winery.name} - {entry.vintage || 'N/A'}
-                        </Text>
-                        <FormControl mt={4} isRequired>
+                        <FormControl isRequired>
                             <FormLabel>Quantity</FormLabel>
                             <NumberInput min={1} max={entry.quantity} value={quantity} onChange={(value) => setQuantity(value)}>
                                 <NumberInputField />

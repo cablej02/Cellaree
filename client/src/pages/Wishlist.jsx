@@ -67,8 +67,15 @@ const Wishlist = () => {
                             <CardBody>
                                 <HStack align="start" spacing={4} w="97%">
                                     <Box flex={2}>
-                                        <Heading size="md">{entry.bottle.productName}</Heading>
-                                        <Text fontSize="sm" color="secondary">{entry.bottle.winery.name} - {entry.bottle.wineStyle.name}</Text>
+                                        <Heading size="lg" color="primary.300">{entry.bottle.winery.name}</Heading>
+                                        <Text fontSize="sm" color="secondary" my={1}>
+                                            {entry.bottle.productName 
+                                                ? entry.bottle.productName + (!entry.bottle.productName.toLowerCase().includes(entry.bottle.wineStyle.name.toLowerCase()) 
+                                                    ? ` - ${entry.bottle.wineStyle.name}` 
+                                                    : "")
+                                                : entry.bottle.wineStyle.name
+                                            }
+                                        </Text>
                                         <Text fontSize="sm" color="secondary">Added: {entry.addedDate ? new Date(parseInt(entry.addedDate)).toLocaleDateString() : "Unknown"}</Text>
                                     </Box>
                                     <Box flex={3} position="relative">

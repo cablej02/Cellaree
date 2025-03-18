@@ -184,16 +184,17 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
                             <VStack align='stretch' spacing={0}>
                                 {searchResults.length > 0 && (
                                     <List bg='dark' borderRadius='md' mt={2}>
-                                        {searchResults.map((bottle) => (
-                                            <ListItem 
+                                        {searchResults.map((bottle) => {
+                                            const displayName = bottle.productName ? `${bottle.winery.name} - ${bottle.productName}` : `${bottle.winery.name} - ${bottle.wineStyle.name}`;
+                                            return (<ListItem 
                                                 key={bottle._id}
                                                 p={2}
                                                 _hover={{ bg: 'light', cursor: 'pointer' }}
-                                                onClick={() => handleSelectBottle(bottle._id, `${bottle.winery.name} - ${bottle.productName}`)}
+                                                onClick={() => handleSelectBottle(bottle._id, displayName)}
                                             >
-                                                {bottle.winery.name} - {bottle.productName}
+                                                {displayName}
                                             </ListItem>
-                                        ))}
+                                        )})}
                                     </List>
                                 )}
                             </VStack>

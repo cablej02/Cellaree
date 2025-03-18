@@ -81,29 +81,14 @@ const DrankHistory = () => {
                                     Drank Date {getSortIcon("drankDate")}
                                 </Flex>
                             </Th>
-                            <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("productName")}>
-                                <Flex align="center" gap={2}>
-                                    Product Name{ getSortIcon("productName")}
-                                </Flex>
-                            </Th>
                             <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("wineryName")}>
                                 <Flex align="center" gap={2}>
                                     Winery {getSortIcon("wineryName")}
                                 </Flex>
                             </Th>
-                            <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("country")}>
+                            <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("productName")}>
                                 <Flex align="center" gap={2}>
-                                    Country {getSortIcon("country")}
-                                </Flex>
-                            </Th>
-                            <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("location")}>
-                                <Flex align="center" gap={2}>
-                                    Location {getSortIcon("location")}
-                                </Flex>
-                            </Th>
-                            <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("type")}>
-                                <Flex align="center" gap={2}>
-                                    Type {getSortIcon("type")}
+                                    Product Name{ getSortIcon("productName")}
                                 </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("style")}>
@@ -114,6 +99,16 @@ const DrankHistory = () => {
                             <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("vintage")}>
                                 <Flex align="center" gap={2}>
                                     Vintage {getSortIcon("vintage")}
+                                </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("country")}>
+                                <Flex align="center" gap={2}>
+                                    Country {getSortIcon("country")}
+                                </Flex>
+                            </Th>
+                            <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("location")}>
+                                <Flex align="center" gap={2}>
+                                    Location {getSortIcon("location")}
                                 </Flex>
                             </Th>
                             <Th color="tertiary" cursor="pointer" onClick={()=> handleSort("quantity")}>
@@ -133,17 +128,16 @@ const DrankHistory = () => {
                                             : "Invalid Date"
                                         }
                                     </Td>
+                                    <Td color="text">{entry.bottle.winery.name}</Td>
                                     <Td>
                                         <Button variant="link" color="blue.400" onClick={() => setSelectedBottle(entry.bottle)}>
-                                            {entry.bottle.productName}
+                                            {entry.bottle.productName ? entry.bottle.productName : entry.bottle.wineStyle.name}
                                         </Button>
                                     </Td>
-                                    <Td color="text">{entry.bottle.winery.name}</Td>
+                                    <Td color="text">{entry.bottle.wineStyle.name}</Td>
+                                    <Td color="text">{entry.vintage || "NV"}</Td>
                                     <Td color="text">{entry.bottle.country || "Unknown"}</Td>
                                     <Td color="text">{entry.bottle.location || "Unknown" }</Td>
-                                    <Td color="text">{entry.bottle.wineStyle.category}</Td>
-                                    <Td color="text">{entry.bottle.wineStyle.name}</Td>
-                                    <Td color="text">{entry.vintage || "N/A"}</Td>
                                     <Td color="text">{entry.quantity}</Td>
                                 </Tr>
                             ))

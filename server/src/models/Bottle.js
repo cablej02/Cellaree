@@ -10,11 +10,10 @@ const bottleSchema = new Schema(
         },
         productName: {
             type: String,
-            required: true,
             trim: true,
-            minlength: 1,
             maxlength: 100,
             index: true,
+            default: "",
         },
         country: {
             type: String,

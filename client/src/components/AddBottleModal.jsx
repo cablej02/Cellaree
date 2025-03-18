@@ -30,12 +30,12 @@ const AddBottleModal = ({ isOpen, onClose, onAddSuccess, wineries, wineStyles })
             const selectedWinery = wineries.find(w => w._id === updatedData.winery)?.name || '';
             const selectedWineStyle = wineStyles.find(s => s._id === updatedData.wineStyle)?.name || '';
             
-            // if winery or wineStyle is updated, update productName
-            if (name === 'winery' || name === 'wineStyle') {
-                updatedData.productName = selectedWinery && selectedWineStyle
-                    ? `${selectedWinery} - ${selectedWineStyle}`
-                    : selectedWinery || selectedWineStyle;
-            }
+            // // if winery or wineStyle is updated, update productName
+            // if (name === 'winery' || name === 'wineStyle') {
+            //     updatedData.productName = selectedWinery && selectedWineStyle
+            //         ? `${selectedWinery} - ${selectedWineStyle}`
+            //         : selectedWinery || selectedWineStyle;
+            // }
 
             return updatedData;
         });
@@ -94,7 +94,7 @@ const AddBottleModal = ({ isOpen, onClose, onAddSuccess, wineries, wineStyles })
                         <FormLabel>Location</FormLabel>
                         <Input name='location' value={formData.location} onChange={handleChange} bg="dark"/>
                     </FormControl>
-                    <FormControl isRequired>
+                    <FormControl>
                         <FormLabel >Product Name</FormLabel>
                         <Input name='productName' value={formData.productName} onChange={handleChange} bg="dark"/>
                     </FormControl>

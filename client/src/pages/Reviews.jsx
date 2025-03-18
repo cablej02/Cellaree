@@ -45,9 +45,17 @@ const Reviews = () => {
                         <Card key={review._id} w="full" shadow="md" bg="dark" color="text" borderRadius="md">
                             <CardBody>
                                 <Flex justify="space-between" align="center">
-                                    <VStack align="start" spacing={1}>
-                                        <Text fontSize="lg" fontWeight="bold">{review.bottle.productName}</Text>
-                                        <Text fontSize="sm" color="secondary">{review.bottle.winery.name} - {review.bottle.wineStyle.name}</Text>
+                                    <VStack align="start" spacing={0}>
+                                        <Text fontSize="lg" fontWeight="bold" color="primary.300">{review.bottle.winery.name}</Text>
+                                        <Text fontSize="sm" color="secondary">
+                                            {review.vintage ? `${review.vintage} ` : ""}
+                                        {review.bottle.productName 
+                                            ? review.bottle.productName + (!review.bottle.productName.toLowerCase().includes(review.bottle.wineStyle.name.toLowerCase()) 
+                                                ? ` - ${review.bottle.wineStyle.name}` 
+                                                : "") 
+                                            : review.bottle.wineStyle.name
+                                        }
+                                        </Text>
                                     </VStack>
                                     <HStack>
                                         {/* Edit Button */}
@@ -73,7 +81,6 @@ const Reviews = () => {
                                     </HStack>
                                 </Flex>
                                 <Divider my={2} />
-                                <Text fontSize="sm">Vintage: <b>{review.vintage || "N/A"}</b></Text>
                                 <Text fontSize="sm">Rating: <b>{review.rating}/100</b></Text>
                                 <Text mt={2}>{review.content || "No review text provided."}</Text>
                                 <Divider my={2} />
