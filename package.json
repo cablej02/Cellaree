@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "App for managing your wine and whisky cellar",
   "main": "server/src/server.js",
+  "type": "module",
   "scripts": {
     "start": "cd server && npm start",
     "start:dev": "concurrently \"cd server && npm run watch\" \"cd client && npm run dev\"",
