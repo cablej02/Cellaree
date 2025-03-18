@@ -23,11 +23,6 @@ const cellarBottleSchema = new Schema(
             min: 0,
             default: 0,
         },
-        currentValue: {
-            type: Number,
-            min: 0,
-            default: function () { return this.purchasePrice; },
-        },
         purchaseDate: {
             type: Date,
             required: true,

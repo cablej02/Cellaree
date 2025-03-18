@@ -31,6 +31,13 @@ const bottleSchema = new Schema(
             required: true,
             index: true,
         },
+        currentValues: [
+            {
+                vintage: { type: Number, required: true },
+                value: { type: Number, required: true },
+                date: { type: Date, required: true, default: Date.now }
+            }
+        ],
     },
     { timestamps: true }
 );

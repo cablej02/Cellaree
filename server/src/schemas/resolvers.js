@@ -29,6 +29,12 @@ const resolvers = {
                         path: 'wishlist.bottle',
                         populate: 'winery wineStyle' // populate paths for nested objects
                     })
+                
+                    userData.cellar.forEach(entry => {
+                        const bottle = entry.bottle;
+                        const currentValue = bottle.currentValues.find(obj => obj.vintage === entry.vintage);
+                        entry.currentValue = currentValue ? currentValue.value : entry.purchasePrice;                  
+                });
 
                 return userData;
             }
@@ -317,10 +323,11 @@ const resolvers = {
 
                 // Find an existing entry with same bottleId, vintage, purchasePrice and purchaseDate
                 const existingEntry = user.cellar.find(
-                    obj => obj.bottle.toString() === args.bottle &&
-                    obj.vintage === args.vintage &&
-                    obj.purchasePrice === args.purchasePrice &&
-                    normalizeDate(obj.purchaseDate) === normalizeDate(purchaseDate)
+                    obj =>
+                        obj.bottle.toString() === args.bottle &&
+                        obj.vintage === args.vintage &&
+                        obj.purchasePrice === args.purchasePrice &&
+                        normalizeDate(obj.purchaseDate) === normalizeDate(purchaseDate)
                 );
 
                 // if entry exists, increment quantity
@@ -351,7 +358,40 @@ const resolvers = {
                     populate: 'winery wineStyle'
                 });
 
-                return updatedUser.cellar[updatedUser.cellar.length - 1]; // return the last item in the cellar array
+                // get the last item in the cellar array
+                const newCellarEntry = updatedUser.cellar[updatedUser.cellar.length - 1];
+
+                // get the bottle and update the current value with the purchase price if date is greater than the last value date
+                const bottle = await Bottle.findById(newCellarEntry.bottle);
+                if (bottle) {
+                    // index of the existing vintage entry
+                    const existingIndex = bottle.currentValues.findIndex(v => v.vintage === args.vintage);
+
+                    // get the date of the current value for this vintage
+                    const existingValueDate = existingIndex !== -1 ? parseInt(bottle.currentValues[existingIndex].date) : null;
+
+                    // if no current value or the date is greater than the last value date - 1 day
+                    if (!existingValueDate || existingValueDate - 86400000 < parseInt(purchaseDate)) {
+                        if (existingIndex !== -1) {
+                            // replace existing value
+                            bottle.currentValues[existingIndex] = {
+                                vintage: args.vintage,
+                                value: args.purchasePrice,
+                                date: new Date(parseInt(purchaseDate))
+                            };
+                        } else {
+                            // push a new value if none exists for this vintage
+                            bottle.currentValues.push({
+                                vintage: args.vintage,
+                                value: args.purchasePrice,
+                                date: new Date(parseInt(purchaseDate))
+                            });
+                        }
+                        await bottle.save();
+                    }
+                }
+
+                return newCellarEntry;
             } catch (err) {
                 throw new Error(`Error adding bottle to cellar: ${err}`);
             }
@@ -364,11 +404,14 @@ const resolvers = {
                 if (args.vintage) updatedFields.vintage = args.vintage;
                 if (args.quantity) updatedFields.quantity = args.quantity;
                 if (args.purchasePrice) updatedFields.purchasePrice = args.purchasePrice;
-                if (args.currentValue) updatedFields.currentValue = args.currentValue;
                 if (args.purchaseDate) updatedFields.purchaseDate = args.purchaseDate;
                 if (args.notes !== undefined) updatedFields.notes = args.notes;
 
-                if (!Object.keys(updatedFields).length) throw new Error('No fields to update!');
+                const { currentValue } = args;
+
+                if (!Object.keys(updatedFields).length && currentValue === undefined){
+                    throw new Error('No fields to update!');
+                }
 
                 // build $set object by looping over updatedFields and setting the values to the correct path for the subdocument
                 const setObj = {};
@@ -387,8 +430,38 @@ const resolvers = {
                 
                 if (!updatedUser) throw new Error('No cellar bottle found with this id!');
 
+                // get the updated cellar bottle entry
+                const updatedEntry = updatedUser.cellar.find(obj => obj._id.toString() === args._id);
+
+                // update the current value if it was provided
+                if (currentValue !== undefined) {
+                    const bottle = await Bottle.findById(updatedEntry.bottle);
+                    if (bottle) {
+                        // index of the existing vintage entry
+                        const existingIndex = bottle.currentValues.findIndex(v => v.vintage === updatedEntry.vintage);
+                
+                        if (existingIndex !== -1) {
+                            // replace the existing value
+                            bottle.currentValues[existingIndex] = {
+                                vintage: updatedEntry.vintage,
+                                value: currentValue,
+                                date: new Date()
+                            };
+                        } else {
+                            // push a new value if none exists for this vintage
+                            bottle.currentValues.push({
+                                vintage: updatedEntry.vintage,
+                                value: currentValue,
+                                date: new Date()
+                            });
+                        }
+
+                        await bottle.save();
+                    }
+                }
+
                 // return the updated cellar entry
-                return updatedUser.cellar.find(obj => obj._id.toString() === args._id);
+                return updatedEntry
             } catch (err) {
                 throw new Error(`Error updating cellar bottle: ${err}`);
             }
