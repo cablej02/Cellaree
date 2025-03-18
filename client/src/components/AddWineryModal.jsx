@@ -17,7 +17,7 @@ const WineryModal = ({ isOpen, onClose, onAddSuccess }) => {
     const handleSubmit = async () => {
         if (!formData.name.trim()) return;
         try {
-            const { data } = await addWinery({ variables: { name: formData.name.trim().toLowerCase() } });
+            const { data } = await addWinery({ variables: { name: formData.name.trim() } });
             onAddSuccess(data.addWinery);
             formData.name = ""; // clear form data
             onClose();
