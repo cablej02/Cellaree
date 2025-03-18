@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Button, Text, VStack, Divider, Box, HStack } from "@chakra-ui/react";
 import { GET_BOTTLE_REVIEWS } from "../utils/queries";
-import { capitalizeWords } from "../utils/formatting";
 import ReviewModal from "./ReviewModal";
 import { useUser } from "../context/UserContext";
 
@@ -22,8 +21,8 @@ const BottleModal = ({ isOpen, onClose, bottle }) => {
                 <ModalOverlay />
                 <ModalContent bg="bgModal" color="text">
                     <ModalHeader>
-                        <Text fontSize="xl" fontWeight="bold">{capitalizeWords(bottle.productName)}</Text>
-                        <Text fontSize="sm" color="secondary">{capitalizeWords(bottle.winery.name)} - {capitalizeWords(bottle.wineStyle.name)}</Text>
+                        <Text fontSize="xl" fontWeight="bold">{bottle.productName}</Text>
+                        <Text fontSize="sm" color="secondary">{bottle.winery.name} - {bottle.wineStyle.name}</Text>
                         <Text fontSize="sm" color="secondary">{bottle.country || "Unknown"} | {bottle.location || "Unknown"}</Text>
                         <Text fontSize="sm" fontWeight="bold" color="primary">
                             Avg Rating: {data?.getBottleReviews.avgRating ? data.getBottleReviews.avgRating.toFixed(1) : "No Ratings Yet"}

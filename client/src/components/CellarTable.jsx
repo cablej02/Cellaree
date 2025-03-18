@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, Thead, Tbody, Tr, Th, Td, Box, Text, Button, Flex } from '@chakra-ui/react';
 import { FaSortUp, FaSortDown, FaSort } from 'react-icons/fa';
-import { capitalizeWords } from '../utils/formatting';
 import DrinkBottleModal from './DrinkBottleModal';
 import BottleModal from './BottleModal';
 import CellarBottleModal from './CellarBottleModal';
@@ -115,7 +114,7 @@ const CellarTable = ({ cellar }) => {
                     <Tbody>
                         {sortedCellar.map(entry => (
                             <Tr key={entry._id}>
-                                <Td maxW="110px">{capitalizeWords(entry.bottle.winery.name)}</Td>
+                                <Td maxW="110px">{entry.bottle.winery.name}</Td>
                                 {/* <Td maxWidth="120px" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap"> */}
                                 <Td 
                                     maxW="160px" 
@@ -125,9 +124,9 @@ const CellarTable = ({ cellar }) => {
                                     _hover={{ textDecoration: "underline" }} 
                                     onClick={() => openBottleModal(entry)}
                                 >
-                                    {capitalizeWords(entry.bottle.productName)}
+                                    {entry.bottle.productName}
                                 </Td>
-                                <Td maxW="100px">{capitalizeWords(entry.bottle.wineStyle.name)}</Td>
+                                <Td maxW="100px">{entry.bottle.wineStyle.name}</Td>
                                 <Td maxW="110px">{entry.bottle.country}</Td>
                                 <Td maxW="110px">{entry.bottle.location}</Td>
                                 <Td>{entry.vintage || 'NV'}</Td>

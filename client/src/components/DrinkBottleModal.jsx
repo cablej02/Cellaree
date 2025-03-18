@@ -6,7 +6,6 @@ import {
 import { useMutation, useQuery } from '@apollo/client';
 import { DRINK_CELLAR_BOTTLE } from '../utils/mutations';
 import { GET_USER_REVIEWS } from '../utils/queries';
-import { capitalizeWords } from '../utils/formatting';
 import { useUser } from '../context/UserContext';
 import ReviewModal from './ReviewModal';
 
@@ -76,9 +75,9 @@ const DrinkBottleModal = ({ entry, isOpen, onClose }) => {
                     <ModalHeader>Drink Bottle</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <Text fontWeight='bold'>{capitalizeWords(entry.bottle.productName)}</Text>
+                        <Text fontWeight='bold'>{entry.bottle.productName}</Text>
                         <Text fontSize='sm' color='secondary'>
-                            {capitalizeWords(entry.bottle.winery.name)} - {entry.vintage || 'N/A'}
+                            {entry.bottle.winery.name} - {entry.vintage || 'N/A'}
                         </Text>
                         <FormControl mt={4} isRequired>
                             <FormLabel>Quantity</FormLabel>

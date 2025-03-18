@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, Text, Button, VStack, Flex } from '@chakra-ui/react';
-import { capitalizeWords } from '../utils/formatting';
 import DrinkBottleModal from './DrinkBottleModal';
 import CellarBottleModal from './CellarBottleModal';
 
@@ -66,9 +65,9 @@ const CellarAccordion = ({ cellar }) => {
                             <h2>
                                 <AccordionButton color='primary.200'>
                                     <Box flex='1' textAlign='left'>
-                                        <Text fontWeight='bold'>{capitalizeWords(bottle.productName)}</Text>
+                                        <Text fontWeight='bold'>{bottle.productName}</Text>
                                         <Text fontSize='sm' color='secondary'>
-                                            {capitalizeWords(bottle.winery.name)} - {bottle.country} - {bottle.location} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
+                                            {bottle.winery.name} - {bottle.country} - {bottle.location} - {bottle.wineStyle.name} ({totalQuantity === 1 ? '1 bottle' : `${totalQuantity} bottles`})
                                         </Text>
                                     </Box>
                                     <AccordionIcon />

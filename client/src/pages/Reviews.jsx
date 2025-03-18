@@ -4,7 +4,6 @@ import { REMOVE_REVIEW } from "../utils/mutations";
 import { useState, useEffect } from "react";
 import { Box, Heading, VStack, Text, Button, HStack, IconButton, useToast, Divider, Flex, Card, CardBody } from "@chakra-ui/react";
 import { FaTrash, FaEdit } from "react-icons/fa";
-import { capitalizeWords } from "../utils/formatting";
 import ReviewModal from "../components/ReviewModal";
 
 const Reviews = () => {
@@ -48,7 +47,7 @@ const Reviews = () => {
                                 <Flex justify="space-between" align="center">
                                     <VStack align="start" spacing={1}>
                                         <Text fontSize="lg" fontWeight="bold">{review.bottle.productName}</Text>
-                                        <Text fontSize="sm" color="secondary">{capitalizeWords(review.bottle.winery.name)} - {capitalizeWords(review.bottle.wineStyle.name)}</Text>
+                                        <Text fontSize="sm" color="secondary">{review.bottle.winery.name} - {review.bottle.wineStyle.name}</Text>
                                     </VStack>
                                     <HStack>
                                         {/* Edit Button */}

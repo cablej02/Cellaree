@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 import { Flex, Box, Table, Thead, Tbody, Tr, Th, Td, Text, Button, HStack, Heading } from "@chakra-ui/react";
 import { FaSortUp, FaSortDown, FaSort } from "react-icons/fa";
-import { capitalizeWords } from "../utils/formatting";
 import BottleModal from "../components/BottleModal";
 
 const DrankHistory = () => {
@@ -136,10 +135,10 @@ const DrankHistory = () => {
                                     </Td>
                                     <Td>
                                         <Button variant="link" color="blue.400" onClick={() => setSelectedBottle(entry.bottle)}>
-                                            {capitalizeWords(entry.bottle.productName)}
+                                            {entry.bottle.productName}
                                         </Button>
                                     </Td>
-                                    <Td color="text">{capitalizeWords(entry.bottle.winery.name)}</Td>
+                                    <Td color="text">{entry.bottle.winery.name}</Td>
                                     <Td color="text">{entry.bottle.country || "Unknown"}</Td>
                                     <Td color="text">{entry.bottle.location || "Unknown" }</Td>
                                     <Td color="text">{entry.bottle.wineStyle.category}</Td>

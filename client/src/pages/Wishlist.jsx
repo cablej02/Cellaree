@@ -3,7 +3,6 @@ import { useUser } from "../context/UserContext";
 import { Box, Text, Textarea, Button, HStack, VStack, Card, CardBody, CardHeader, Heading, IconButton  } from "@chakra-ui/react";
 import { UPDATE_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from "../utils/mutations";
 import { useMutation } from "@apollo/client";
-import { capitalizeWords } from "../utils/formatting.js";
 import { FaTrash, FaSave } from "react-icons/fa";
 
 const Wishlist = () => {
@@ -68,8 +67,8 @@ const Wishlist = () => {
                             <CardBody>
                                 <HStack align="start" spacing={4} w="97%">
                                     <Box flex={2}>
-                                        <Heading size="md">{capitalizeWords(entry.bottle.productName)}</Heading>
-                                        <Text fontSize="sm" color="secondary">{capitalizeWords(entry.bottle.winery.name)} - {capitalizeWords(entry.bottle.wineStyle.name)}</Text>
+                                        <Heading size="md">{entry.bottle.productName}</Heading>
+                                        <Text fontSize="sm" color="secondary">{entry.bottle.winery.name} - {entry.bottle.wineStyle.name}</Text>
                                         <Text fontSize="sm" color="secondary">Added: {entry.addedDate ? new Date(parseInt(entry.addedDate)).toLocaleDateString() : "Unknown"}</Text>
                                     </Box>
                                     <Box flex={3} position="relative">

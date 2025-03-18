@@ -8,7 +8,6 @@ import { useMutation } from '@apollo/client';
 import { ADD_CELLAR_BOTTLE, UPDATE_CELLAR_BOTTLE, REMOVE_CELLAR_BOTTLE } from '../utils/mutations';
 import { useQuery } from '@apollo/client';
 import { GET_BOTTLES } from '../utils/queries';
-import { capitalizeWords } from '../utils/formatting';
 import { normalizeText } from "@shared/utils/formatting";
 import { useUser } from '../context/UserContext';
 
@@ -170,7 +169,7 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
                         <FormLabel>Bottle</FormLabel>
                         {/* If editing entry, we cannot change bottle */}
                         {entry ? (
-                            <Text mb={1}>{capitalizeWords(entry.bottle.winery.name)} - {capitalizeWords(entry.bottle.productName)}</Text>
+                            <Text mb={1}>{entry.bottle.winery.name} - {entry.bottle.productName}</Text>
                         ) : (
                             <Input 
                                 type='text'
@@ -190,9 +189,9 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
                                                 key={bottle._id}
                                                 p={2}
                                                 _hover={{ bg: 'light', cursor: 'pointer' }}
-                                                onClick={() => handleSelectBottle(bottle._id, `${capitalizeWords(bottle.winery.name)} - ${capitalizeWords(bottle.productName)}`)}
+                                                onClick={() => handleSelectBottle(bottle._id, `${bottle.winery.name} - ${bottle.productName}`)}
                                             >
-                                                {capitalizeWords(bottle.winery.name)} - {capitalizeWords(bottle.productName)}
+                                                {bottle.winery.name} - {bottle.productName}
                                             </ListItem>
                                         ))}
                                     </List>

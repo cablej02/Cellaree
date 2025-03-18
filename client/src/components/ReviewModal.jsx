@@ -5,7 +5,6 @@ import {
 import { useMutation } from "@apollo/client";
 import { GET_BOTTLE_REVIEWS } from "../utils/queries";
 import { ADD_REVIEW, UPDATE_REVIEW } from "../utils/mutations";
-import { capitalizeWords } from "../utils/formatting";
 
 const ReviewModal = ({ isOpen, onClose, bottle, drankVintage, review }) => {
     const [formData, setFormData] = useState({
@@ -81,9 +80,9 @@ const ReviewModal = ({ isOpen, onClose, bottle, drankVintage, review }) => {
                 <ModalCloseButton />
                 <ModalBody>
                     <Divider mb={2} />
-                    <Text fontWeight='bold'>{capitalizeWords(bottle.productName)}</Text>
+                    <Text fontWeight='bold'>{bottle.productName}</Text>
                     <Text fontSize='sm' color='secondary'>
-                        {capitalizeWords(bottle.winery.name)} - {capitalizeWords(bottle.wineStyle.name)}
+                        {bottle.winery.name} - {bottle.wineStyle.name}
                     </Text>
                     <Divider my={2} />
                     {/* If we didn't get a vintage from the inputs, render it as an input, otherwise render as text */}

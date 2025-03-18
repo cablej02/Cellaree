@@ -6,8 +6,6 @@ import {
 import { useMutation, useQuery } from '@apollo/client';
 import { ADD_BOTTLE } from '../utils/mutations';
 import { GET_ALLOWED_COUNTRIES } from '../utils/queries';
-import { capitalizeWords } from '../utils/formatting';
-
 
 const AddBottleModal = ({ isOpen, onClose, onAddSuccess, wineries, wineStyles }) => {
     const { data: countryData } = useQuery(GET_ALLOWED_COUNTRIES);
@@ -35,7 +33,7 @@ const AddBottleModal = ({ isOpen, onClose, onAddSuccess, wineries, wineStyles })
             // if winery or wineStyle is updated, update productName
             if (name === 'winery' || name === 'wineStyle') {
                 updatedData.productName = selectedWinery && selectedWineStyle
-                    ? `${capitalizeWords(selectedWinery)} - ${capitalizeWords(selectedWineStyle)}`
+                    ? `${selectedWinery} - ${selectedWineStyle}`
                     : selectedWinery || selectedWineStyle;
             }
 
@@ -70,7 +68,7 @@ const AddBottleModal = ({ isOpen, onClose, onAddSuccess, wineries, wineStyles })
                         <Select name='winery' value={formData.winery} onChange={handleChange} bg="dark">
                             <option value='' disabled style={{ background: '#212529', color: 'white' }}>Select a Winery</option>
                             {wineries.map((winery) => (
-                                <option key={winery._id} value={winery._id} style={{ background: '#212529', color: 'white' }}>{capitalizeWords(winery.name)}</option>
+                                <option key={winery._id} value={winery._id} style={{ background: '#212529', color: 'white' }}>{winery.name}</option>
                             ))}
                         </Select>
                     </FormControl>
@@ -79,7 +77,7 @@ const AddBottleModal = ({ isOpen, onClose, onAddSuccess, wineries, wineStyles })
                         <Select name='wineStyle' value={formData.wineStyle} onChange={handleChange} bg="dark">
                             <option value='' disabled style={{ background: '#212529', color: 'white' }}>Select a Wine Style</option>
                             {wineStyles.map((style) => (
-                                <option key={style._id} value={style._id} style={{ background: '#212529', color: 'white' }}>{capitalizeWords(style.name)}</option>
+                                <option key={style._id} value={style._id} style={{ background: '#212529', color: 'white' }}>{style.name}</option>
                             ))}
                         </Select>
                     </FormControl>

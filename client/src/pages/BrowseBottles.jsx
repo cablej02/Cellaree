@@ -4,7 +4,6 @@ import { ADD_WISHLIST_BOTTLE, REMOVE_WISHLIST_BOTTLE } from '../utils/mutations'
 import { GET_BOTTLES, GET_WINERIES, GET_WINE_STYLES } from '../utils/queries';
 import { useUser } from '../context/UserContext';
 import { Box, Flex, HStack, Button, IconButton, SimpleGrid, Card, CardBody, Text, Input, Heading, InputGroup, InputRightElement, useToken, useToast } from '@chakra-ui/react';
-import { capitalizeWords } from '../utils/formatting';
 import { normalizeText } from "@shared/utils/formatting";
 import AddBottleModal from '../components/AddBottleModal';
 import BottleModal from '../components/BottleModal';
@@ -116,8 +115,8 @@ const BrowseBottles = () => {
                             return (
                                 <Card key={bottle._id} borderRadius="xl" bg="dark" color="text">
                                     <CardBody pb={1}>
-                                        <Text fontWeight="bold" fontSize="lg" color="primary.200">{capitalizeWords(bottle.productName)}</Text>
-                                        <Text fontSize="sm" color="secondary">{capitalizeWords(bottle.winery.name)} - {bottle.wineStyle.name}</Text>
+                                        <Text fontWeight="bold" fontSize="lg" color="primary.200">{bottle.productName}</Text>
+                                        <Text fontSize="sm" color="secondary">{bottle.winery.name} - {bottle.wineStyle.name}</Text>
                                         <Text fontSize="sm" color="secondary">{bottle.country}, {bottle.location}</Text>
                                         <Flex justify="space-between" mt={2}>
                                             <Text fontSize="sm">In Cellar: {cellarCount}</Text>
