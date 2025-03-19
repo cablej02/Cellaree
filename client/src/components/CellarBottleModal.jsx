@@ -28,6 +28,7 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
     
     const [searchInput, setSearchInput] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [selectedBottle, setSelectedBottle] = useState(null);
     const [bottleIdError, setBottleIdError] = useState(''); // state for managing missing bottleId custom error message
 
     // mutation to add bottle to cellar
@@ -49,6 +50,23 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
             });
         }
     }, [entry]);
+
+    // prefill purchase price for new entry based on selected bottle + vintage
+    useEffect(() => {
+        if (entry || !selectedBottle || !formData.vintage) return;
+    
+        const storedValue = selectedBottle.currentValues?.find(
+            (v) => v.vintage === Number(formData.vintage)
+        );
+
+        if (storedValue) {
+            setFormData((prev) => ({ 
+                ...prev, 
+                purchasePrice: storedValue.value 
+            }));
+        }
+
+    }, [selectedBottle, formData.vintage]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -72,10 +90,11 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
         setSearchResults(filteredBottles);
     };
 
-    const handleSelectBottle = (bottleId, bottleName) => {
+    const handleSelectBottle = (bottle, bottleName) => {
         setSearchInput(bottleName); // set search input to selected bottle name
+        setSelectedBottle(bottle); // set selected bottle
         setSearchResults([]); // clear search results
-        setFormData((prev) => ({ ...prev, bottleId })); // set bottleId in form data
+        setFormData((prev) => ({ ...prev, bottleId: bottle._id })); // set bottleId in form data
     };
 
     const handleSubmit = async (e) => {
@@ -190,7 +209,7 @@ const CellarBottleModal = ({ isOpen, onClose, entry = null }) => {
                                                 key={bottle._id}
                                                 p={2}
                                                 _hover={{ bg: 'light', cursor: 'pointer' }}
-                                                onClick={() => handleSelectBottle(bottle._id, displayName)}
+                                                onClick={() => handleSelectBottle(bottle, displayName)}
                                             >
                                                 {displayName}
                                             </ListItem>
