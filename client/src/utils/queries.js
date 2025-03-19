@@ -91,6 +91,11 @@ export const GET_BOTTLES = gql`
                 name
                 category
             }
+            currentValues {
+                vintage
+                value
+                date
+            }
         }
     }
 `;
