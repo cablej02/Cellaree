@@ -24,6 +24,13 @@ export const typeDefs = gql`
         country: String
         location: String
         wineStyle: WineStyle
+        currentValues: [BottleValues]
+    }
+
+    type BottleValues {
+        vintage: Int
+        value: Float
+        date: String
     }
 
     type Winery {
