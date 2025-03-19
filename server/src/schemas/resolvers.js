@@ -319,7 +319,9 @@ const resolvers = {
                 if(!user) throw new Error('No user found with this id!');
 
                 // if purchaseDate is not provided, set it to today
-                const purchaseDate = args.purchaseDate ? new Date(args.purchaseDate) : new Date();
+                const purchaseDate = args.purchaseDate && !isNaN(Date.parse(args.purchaseDate)) 
+                    ? new Date(args.purchaseDate) 
+                    : new Date();
 
                 // Find an existing entry with same bottleId, vintage, purchasePrice and purchaseDate
                 const existingEntry = user.cellar.find(
@@ -377,18 +379,20 @@ const resolvers = {
                             bottle.currentValues[existingIndex] = {
                                 vintage: args.vintage,
                                 value: args.purchasePrice,
-                                date: new Date(parseInt(purchaseDate))
+                                date: new Date(purchaseDate)
                             };
                         } else {
                             // push a new value if none exists for this vintage
                             bottle.currentValues.push({
                                 vintage: args.vintage,
                                 value: args.purchasePrice,
-                                date: new Date(parseInt(purchaseDate))
+                                date: new Date(purchaseDate)
                             });
                         }
                         await bottle.save();
                     }
+                    const curValue = bottle.currentValues.find(v => v.vintage === newCellarEntry.vintage);
+                    newCellarEntry.currentValue = curValue ? curValue.value : newCellarEntry.purchasePrice;
                 }
 
                 return newCellarEntry;
@@ -407,7 +411,7 @@ const resolvers = {
                 if (args.purchaseDate) updatedFields.purchaseDate = args.purchaseDate;
                 if (args.notes !== undefined) updatedFields.notes = args.notes;
 
-                const { currentValue } = args;
+                const currentValue = args.currentValue !== undefined ? args.currentValue : null;
 
                 if (!Object.keys(updatedFields).length && currentValue === undefined){
                     throw new Error('No fields to update!');
@@ -433,10 +437,10 @@ const resolvers = {
                 // get the updated cellar bottle entry
                 const updatedEntry = updatedUser.cellar.find(obj => obj._id.toString() === args._id);
 
-                // update the current value if it was provided
-                if (currentValue !== undefined) {
-                    const bottle = await Bottle.findById(updatedEntry.bottle);
-                    if (bottle) {
+                const bottle = await Bottle.findById(updatedEntry.bottle);
+                if (bottle) {
+                    // update the current value if it was provided
+                    if (currentValue !== undefined) {
                         // index of the existing vintage entry
                         const existingIndex = bottle.currentValues.findIndex(v => v.vintage === updatedEntry.vintage);
                 
@@ -458,6 +462,8 @@ const resolvers = {
 
                         await bottle.save();
                     }
+                    const curValue = bottle.currentValues.find(v => v.vintage === updatedEntry.vintage);
+                    updatedEntry.currentValue = curValue ? curValue.value : updatedEntry.purchasePrice;
                 }
 
                 // return the updated cellar entry
